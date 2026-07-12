@@ -55,61 +55,75 @@ function formatCost(entry: Entry) {
   if (entry.cost == null) return ''
   return `${entry.cost.toLocaleString('ru-RU')} ${entry.currency}`
 }
+
+const entryTypeIcons: Record<string, string> = {
+  repair: '🔧',
+  replacement: '🔩',
+  purchase: '🛒',
+  maintenance: '🛠️',
+  other: '📋'
+}
 </script>
 
 <template>
   <div>
-    <NuxtLink :to="`/cars/${carId}`" class="text-sm text-slate-500 hover:underline">← К автомобилю</NuxtLink>
+    <NuxtLink :to="`/cars/${carId}`" class="text-sm text-slate-500 hover:text-slate-800 transition-colors">← К автомобилю</NuxtLink>
 
     <div class="flex items-center justify-between mt-2 mb-4">
       <h1 class="text-lg font-semibold text-slate-800">Журнал</h1>
-      <button class="text-sm rounded-lg bg-slate-800 text-white px-3 py-1.5" @click="openCreate">
+      <button class="btn-primary px-3 py-1.5 text-sm" @click="openCreate">
         + Добавить запись
       </button>
     </div>
 
-    <div class="flex flex-wrap gap-2 mb-4 text-sm">
-      <select v-model="filters.type" class="rounded-lg border border-slate-300 px-2 py-1">
+    <div class="card p-3 flex flex-wrap gap-2 mb-4 text-sm">
+      <select v-model="filters.type" class="input w-auto py-1.5">
         <option :value="undefined">Все типы</option>
         <option v-for="t in entryTypes" :key="t" :value="t">{{ entryTypeLabels[t] }}</option>
       </select>
-      <select v-model.number="filters.categoryId" class="rounded-lg border border-slate-300 px-2 py-1">
+      <select v-model.number="filters.categoryId" class="input w-auto py-1.5">
         <option :value="undefined">Все категории</option>
         <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
       </select>
-      <input v-model="filters.dateFrom" type="date" class="rounded-lg border border-slate-300 px-2 py-1" />
-      <input v-model="filters.dateTo" type="date" class="rounded-lg border border-slate-300 px-2 py-1" />
-      <select v-model="filters.sortBy" class="rounded-lg border border-slate-300 px-2 py-1">
+      <input v-model="filters.dateFrom" type="date" class="input w-auto py-1.5" />
+      <input v-model="filters.dateTo" type="date" class="input w-auto py-1.5" />
+      <select v-model="filters.sortBy" class="input w-auto py-1.5">
         <option value="date">По дате</option>
         <option value="mileage">По пробегу</option>
       </select>
     </div>
 
-    <div v-if="showForm" class="bg-white border border-slate-200 rounded-xl p-4 mb-4">
-      <p v-if="error" class="text-sm text-red-600 mb-2">{{ error }}</p>
+    <div v-if="showForm" class="card p-4 mb-4">
+      <p v-if="error" class="alert-error mb-2">{{ error }}</p>
       <EntryForm :initial="editingEntry" @submit="onSubmit" @cancel="showForm = false" />
     </div>
 
     <p v-if="loading" class="text-slate-500 text-sm">Загрузка...</p>
-    <p v-else-if="!entries.length" class="text-slate-500 text-sm">Записей пока нет.</p>
+    <div v-else-if="!entries.length" class="card p-8 text-center">
+      <div class="text-3xl mb-2">📋</div>
+      <p class="text-slate-500 text-sm">Записей пока нет.</p>
+    </div>
 
     <div v-else class="space-y-2">
-      <div v-for="entry in entries" :key="entry.id" class="bg-white border border-slate-200 rounded-xl p-4">
-        <div class="flex items-start justify-between">
+      <div v-for="entry in entries" :key="entry.id" class="card p-4 flex items-start gap-3">
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-base">
+          {{ entryTypeIcons[entry.type] }}
+        </span>
+        <div class="flex-1 flex items-start justify-between gap-3">
           <div>
             <p class="font-medium text-slate-800">
               {{ entryTypeLabels[entry.type] }}
-              <span v-if="entry.category" class="text-slate-400">· {{ entry.category.name }}</span>
+              <span v-if="entry.category" class="text-slate-400 font-normal">· {{ entry.category.name }}</span>
             </p>
             <p class="text-sm text-slate-500">{{ entry.date }} <span v-if="entry.mileage != null">· {{ entry.mileage.toLocaleString('ru-RU') }} км</span></p>
             <p v-if="entry.description" class="text-sm text-slate-700 mt-1">{{ entry.description }}</p>
             <p v-if="entry.place" class="text-sm text-slate-400 mt-1">{{ entry.place }}</p>
           </div>
-          <div class="text-right shrink-0 ml-3">
+          <div class="text-right shrink-0">
             <p v-if="entry.cost != null" class="font-medium text-slate-800">{{ formatCost(entry) }}</p>
-            <div class="flex gap-2 mt-2 text-xs">
-              <button class="text-slate-500 hover:underline" @click="openEdit(entry)">Изменить</button>
-              <button class="text-red-600 hover:underline" @click="onDelete(entry)">Удалить</button>
+            <div class="flex gap-3 mt-2 text-xs">
+              <button class="text-slate-500 hover:text-slate-800 transition-colors" @click="openEdit(entry)">Изменить</button>
+              <button class="text-red-600 hover:text-red-700 transition-colors" @click="onDelete(entry)">Удалить</button>
             </div>
           </div>
         </div>

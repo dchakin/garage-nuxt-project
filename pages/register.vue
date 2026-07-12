@@ -30,31 +30,32 @@ async function onSubmit() {
 
 <template>
   <div class="max-w-sm mx-auto mt-16">
+    <div class="flex justify-center mb-4">
+      <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600 text-white text-xl">🚗</span>
+    </div>
     <h1 class="text-xl font-semibold text-slate-800 mb-6 text-center">Регистрация</h1>
-    <form class="space-y-4" @submit.prevent="onSubmit">
-      <div>
-        <label class="block text-sm text-slate-600 mb-1">Имя</label>
-        <input v-model="name" type="text" required class="w-full rounded-lg border border-slate-300 px-3 py-2" />
-      </div>
-      <div>
-        <label class="block text-sm text-slate-600 mb-1">Email</label>
-        <input v-model="email" type="email" required class="w-full rounded-lg border border-slate-300 px-3 py-2" />
-      </div>
-      <div>
-        <label class="block text-sm text-slate-600 mb-1">Пароль</label>
-        <input v-model="password" type="password" required minlength="6" class="w-full rounded-lg border border-slate-300 px-3 py-2" />
-      </div>
-      <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
-      <button
-        type="submit"
-        :disabled="loading"
-        class="w-full rounded-lg bg-slate-800 text-white py-2 font-medium hover:bg-slate-700 disabled:opacity-50"
-      >
-        Зарегистрироваться
-      </button>
-    </form>
+    <div class="card p-6 shadow-sm">
+      <form class="space-y-4" @submit.prevent="onSubmit">
+        <div>
+          <label class="label">Имя</label>
+          <input v-model="name" type="text" required class="input" />
+        </div>
+        <div>
+          <label class="label">Email</label>
+          <input v-model="email" type="email" required class="input" />
+        </div>
+        <div>
+          <label class="label">Пароль</label>
+          <input v-model="password" type="password" required minlength="6" class="input" />
+        </div>
+        <p v-if="error" class="alert-error">{{ error }}</p>
+        <button type="submit" :disabled="loading" class="btn-primary w-full py-2">
+          Зарегистрироваться
+        </button>
+      </form>
+    </div>
     <p class="text-sm text-slate-500 text-center mt-4">
-      Уже есть аккаунт? <NuxtLink to="/login" class="text-slate-800 underline">Войти</NuxtLink>
+      Уже есть аккаунт? <NuxtLink to="/login" class="link">Войти</NuxtLink>
     </p>
   </div>
 </template>

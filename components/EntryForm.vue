@@ -29,53 +29,53 @@ function onSubmit() {
 
 <template>
   <form class="space-y-3" @submit.prevent="onSubmit">
-    <div class="grid grid-cols-2 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div>
-        <label class="block text-sm text-slate-600 mb-1">Дата</label>
-        <input v-model="form.date" type="date" required class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+        <label class="label">Дата</label>
+        <input v-model="form.date" type="date" required class="input" />
       </div>
       <div>
-        <label class="block text-sm text-slate-600 mb-1">Тип</label>
-        <select v-model="form.type" class="w-full rounded-lg border border-slate-300 px-3 py-2">
+        <label class="label">Тип</label>
+        <select v-model="form.type" class="input">
           <option v-for="t in entryTypes" :key="t" :value="t">{{ entryTypeLabels[t] }}</option>
         </select>
       </div>
     </div>
 
     <div>
-      <label class="block text-sm text-slate-600 mb-1">Категория</label>
-      <select v-model.number="form.categoryId" class="w-full rounded-lg border border-slate-300 px-3 py-2">
+      <label class="label">Категория</label>
+      <select v-model.number="form.categoryId" class="input">
         <option :value="null">Без категории</option>
         <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
       </select>
     </div>
 
     <div>
-      <label class="block text-sm text-slate-600 mb-1">Описание</label>
-      <textarea v-model="form.description" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2"></textarea>
+      <label class="label">Описание</label>
+      <textarea v-model="form.description" rows="2" class="input"></textarea>
     </div>
 
-    <div class="grid grid-cols-2 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div>
-        <label class="block text-sm text-slate-600 mb-1">Пробег, км</label>
-        <input v-model.number="form.mileage" type="number" min="0" class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+        <label class="label">Пробег, км</label>
+        <input v-model.number="form.mileage" type="number" min="0" class="input" />
       </div>
       <div>
-        <label class="block text-sm text-slate-600 mb-1">Стоимость</label>
-        <input v-model.number="form.cost" type="number" min="0" step="0.01" class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+        <label class="label">Стоимость</label>
+        <input v-model.number="form.cost" type="number" min="0" step="0.01" class="input" />
       </div>
     </div>
 
     <div>
-      <label class="block text-sm text-slate-600 mb-1">Место (сервис/магазин)</label>
-      <input v-model="form.place" class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+      <label class="label">Место (сервис/магазин)</label>
+      <input v-model="form.place" class="input" />
     </div>
 
     <div class="flex gap-3 pt-2">
-      <button type="submit" class="flex-1 rounded-lg bg-slate-800 text-white py-2 font-medium hover:bg-slate-700">
+      <button type="submit" class="btn-primary flex-1 py-2">
         Сохранить
       </button>
-      <button type="button" class="flex-1 rounded-lg border border-slate-300 py-2 font-medium" @click="emit('cancel')">
+      <button type="button" class="btn-secondary flex-1 py-2" @click="emit('cancel')">
         Отмена
       </button>
     </div>
