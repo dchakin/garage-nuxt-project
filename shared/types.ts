@@ -1,4 +1,5 @@
 import type { EntryType } from './schemas/entry'
+import type { ReminderTriggerType } from './schemas/reminder'
 
 export interface Car {
   id: number
@@ -45,3 +46,22 @@ export interface Entry {
   place: string | null
   createdAt: string
 }
+
+export interface Reminder {
+  id: number
+  carId: number
+  title: string
+  categoryId: number | null
+  category: Category | null
+  triggerType: ReminderTriggerType
+  intervalMonths: number | null
+  intervalKm: number | null
+  lastEntryId: number | null
+  lastEntry: Entry | null
+  nextDueDate: string | null
+  nextDueMileage: number | null
+  isActive: boolean
+  createdAt: string
+}
+
+export type ReminderStatus = 'overdue' | 'soon' | 'ok' | 'inactive'

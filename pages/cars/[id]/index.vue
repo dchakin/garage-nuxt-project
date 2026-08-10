@@ -1,70 +1,38 @@
 <script setup lang="ts">
+import { getReminderStatus } from '~~/shared/utils/reminderStatus'
+
 definePageMeta({ middleware: 'auth' })
 
 const route = useRoute()
 const carId = Number(route.params.id)
-const { fetchCar, updateCar, deleteCar } = useCars()
+const { fetchCar } = useCars()
+const { reminders, fetchReminders } = useReminders(carId)
 
 const car = reactive(await fetchCar(carId))
-const editing = ref(false)
-const error = ref('')
+await fetchReminders({ isActive: true })
 
-const inviteEmail = ref('')
-const inviteError = ref('')
-const inviteSuccess = ref('')
+const alertCount = computed(
+  () => reminders.value.filter((r) => ['overdue', 'soon'].includes(getReminderStatus(r, car.currentMileage))).length
+)
 
-async function onUpdate(input: any) {
-  error.value = ''
-  try {
-    await updateCar(carId, input)
-    editing.value = false
-    await refresh()
-  } catch (e: any) {
-    error.value = e?.data?.statusMessage || 'Не удалось сохранить'
-  }
-}
-
-async function refresh() {
-  Object.assign(car, await fetchCar(carId))
-}
-
-async function onDelete() {
-  if (!confirm('Удалить автомобиль вместе со всеми записями?')) return
-  await deleteCar(carId)
-  await navigateTo('/cars')
-}
-
-async function onInvite() {
-  inviteError.value = ''
-  inviteSuccess.value = ''
-  try {
-    await $fetch(`/api/cars/${carId}/invite`, { method: 'POST', body: { email: inviteEmail.value } })
-    inviteSuccess.value = 'Приглашение отправлено'
-    inviteEmail.value = ''
-    await refresh()
-  } catch (e: any) {
-    inviteError.value = e?.data?.statusMessage || 'Не удалось пригласить'
-  }
-}
+const tab = ref<'journal' | 'reminders'>(route.query.tab === 'reminders' ? 'reminders' : 'journal')
+watch(tab, (value) => {
+  navigateTo({ path: route.path, query: { ...route.query, tab: value } }, { replace: true })
+})
 </script>
 
 <template>
-  <div>
+  <div class="pb-20">
     <NuxtLink to="/cars" class="text-sm text-slate-500 hover:text-slate-800 transition-colors">← Все автомобили</NuxtLink>
 
     <div class="flex items-center justify-between mt-2 mb-4">
       <h1 class="text-lg font-semibold text-slate-800">{{ car.brand }} {{ car.model }}</h1>
-      <button v-if="car.role === 'owner'" class="text-sm text-slate-500 hover:text-slate-800 transition-colors" @click="editing = !editing">
-        {{ editing ? 'Отмена' : 'Изменить' }}
-      </button>
+      <NuxtLink v-if="car.role === 'owner'" :to="`/cars/${carId}/edit`" class="text-sm text-slate-500 hover:text-slate-800 transition-colors">
+        Изменить
+      </NuxtLink>
     </div>
 
-    <div v-if="editing" class="card p-4 mb-4">
-      <p v-if="error" class="alert-error mb-2">{{ error }}</p>
-      <CarForm :initial="car" @submit="onUpdate" @cancel="editing = false" />
-    </div>
-
-    <div class="grid grid-cols-2 gap-3 mb-4">
+    <div class="grid grid-cols-2 gap-3 mb-6">
       <div class="card p-4">
         <p class="text-xs text-slate-500">Пробег</p>
         <p class="text-xl font-semibold text-slate-800">{{ car.currentMileage.toLocaleString('ru-RU') }} км</p>
@@ -75,30 +43,43 @@ async function onInvite() {
       </div>
     </div>
 
-    <nav class="flex gap-4 border-b border-slate-200 mb-4 text-sm">
-      <NuxtLink :to="`/cars/${carId}/entries`" class="pb-2 border-b-2 border-indigo-600 text-slate-800 font-medium">
-        Журнал
-      </NuxtLink>
-    </nav>
-
-    <div v-if="car.role === 'owner'" class="card p-4 mb-4">
-      <h2 class="font-medium text-slate-800 mb-2">Участники</h2>
-      <ul class="text-sm text-slate-600 mb-3 space-y-1">
-        <li>Владелец: вы</li>
-        <li v-for="m in car.members" :key="m.id">{{ m.user.name }} ({{ m.user.email }})</li>
-      </ul>
-      <form class="flex gap-2" @submit.prevent="onInvite">
-        <input v-model="inviteEmail" type="email" placeholder="email@example.com" class="input flex-1" />
-        <button type="submit" class="btn-primary px-3 py-1.5 text-sm">Пригласить</button>
-      </form>
-      <p v-if="inviteError" class="alert-error mt-2">{{ inviteError }}</p>
-      <p v-if="inviteSuccess" class="alert-success mt-2">{{ inviteSuccess }}</p>
+    <div v-if="alertCount" class="mb-4 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-800">
+      ⏰ {{ alertCount }} {{ alertCount === 1 ? 'напоминание требует внимания' : 'напоминаний требуют внимания' }}
     </div>
 
-    <div v-if="car.role === 'owner'" class="pt-4 border-t border-slate-200">
-      <button class="btn-danger px-3 py-1.5 text-sm" @click="onDelete">
-        Удалить автомобиль
-      </button>
+    <EntryJournal v-if="tab === 'journal'" :car-id="carId" />
+    <ReminderList v-else :car-id="carId" :current-mileage="car.currentMileage" />
+
+    <div
+      class="fixed inset-x-0 bottom-0 z-20 px-4"
+      :style="{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }"
+    >
+      <nav
+        class="max-w-3xl mx-auto grid grid-cols-2 rounded-[28px] border border-white/30 bg-white/20 backdrop-blur-md shadow-[0_8px_32px_rgba(15,23,42,0.16)] overflow-hidden"
+      >
+        <button
+          class="flex flex-col items-center gap-0.5 py-2.5 text-xs font-medium transition-colors"
+          :class="tab === 'journal' ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'"
+          @click="tab = 'journal'"
+        >
+          <span class="text-lg leading-none">📋</span>
+          Журнал
+        </button>
+        <button
+          class="flex flex-col items-center gap-0.5 py-2.5 text-xs font-medium transition-colors"
+          :class="tab === 'reminders' ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'"
+          @click="tab = 'reminders'"
+        >
+          <span class="relative text-lg leading-none">
+            ⏰
+            <span
+              v-if="alertCount"
+              class="absolute -top-1.5 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white"
+            >{{ alertCount }}</span>
+          </span>
+          Напоминания
+        </button>
+      </nav>
     </div>
   </div>
 </template>

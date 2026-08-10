@@ -46,11 +46,12 @@ async function onSubmit() {
         </div>
         <div>
           <label class="label">Пароль</label>
-          <input v-model="password" type="password" required minlength="6" class="input" />
+          <PasswordInput v-model="password" :minlength="6" />
         </div>
         <p v-if="error" class="alert-error">{{ error }}</p>
         <button type="submit" :disabled="loading" class="btn-primary w-full py-2">
-          Зарегистрироваться
+          <Spinner v-if="loading" />
+          {{ loading ? 'Регистрация...' : 'Зарегистрироваться' }}
         </button>
       </form>
     </div>

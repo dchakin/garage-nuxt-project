@@ -3,7 +3,7 @@ import type { CarInput } from '~~/shared/schemas/car'
 
 definePageMeta({ middleware: 'auth' })
 
-const { cars, loading, fetchCars, createCar } = useCars()
+const { cars, loading, saving, fetchCars, createCar } = useCars()
 const showForm = ref(false)
 const error = ref('')
 
@@ -32,10 +32,12 @@ async function onCreate(input: CarInput) {
 
     <div v-if="showForm" class="card p-4 mb-4">
       <p v-if="error" class="alert-error mb-2">{{ error }}</p>
-      <CarForm @submit="onCreate" @cancel="showForm = false" />
+      <CarForm :saving="saving" @submit="onCreate" @cancel="showForm = false" />
     </div>
 
-    <p v-if="loading" class="text-slate-500 text-sm">Загрузка...</p>
+    <div v-if="loading" class="flex items-center justify-center py-8 text-slate-500">
+      <Spinner size="md" />
+    </div>
 
     <div v-else-if="!cars.length" class="card p-8 text-center">
       <div class="text-3xl mb-2">🚗</div>

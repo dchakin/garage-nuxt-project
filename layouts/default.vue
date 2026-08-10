@@ -1,11 +1,25 @@
 <script setup lang="ts">
 const { user, loggedIn, clear } = useUserSession()
 const router = useRouter()
+const { confirm } = useConfirmDialog()
+const loggingOut = ref(false)
 
 async function logout() {
-  await $fetch('/api/auth/logout', { method: 'POST' })
-  clear()
-  router.push('/login')
+  const ok = await confirm({
+    title: 'Выйти из аккаунта?',
+    message: 'Вам нужно будет снова войти, чтобы продолжить пользоваться приложением.',
+    confirmText: 'Выйти'
+  })
+  if (!ok) return
+
+  loggingOut.value = true
+  try {
+    await $fetch('/api/auth/logout', { method: 'POST' })
+    await clear()
+    router.push('/login')
+  } finally {
+    loggingOut.value = false
+  }
 }
 </script>
 
@@ -19,12 +33,21 @@ async function logout() {
         </NuxtLink>
         <div class="flex items-center gap-3 text-sm">
           <span class="text-slate-500 hidden sm:inline">{{ user?.name }}</span>
-          <button class="text-slate-500 hover:text-slate-800 transition-colors" @click="logout">Выйти</button>
+          <button
+            :disabled="loggingOut"
+            class="inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-800 disabled:opacity-50 transition-colors"
+            @click="logout"
+          >
+            <Spinner v-if="loggingOut" />
+            Выйти
+          </button>
         </div>
       </div>
     </header>
     <main class="max-w-3xl mx-auto px-4 py-6">
       <slot />
     </main>
+
+    <ConfirmDialog />
   </div>
 </template>

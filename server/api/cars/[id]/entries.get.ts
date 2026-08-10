@@ -18,11 +18,22 @@ export default defineEventHandler(async (event) => {
   const sortColumn = query.sortBy === 'mileage' ? schema.entries.mileage : schema.entries.date
   const orderFn = query.sortDir === 'asc' ? asc : desc
 
-  const list = await db.query.entries.findMany({
+  let list = await db.query.entries.findMany({
     where: and(...conditions),
     orderBy: orderFn(sortColumn),
     with: { category: true }
   })
+
+  // SQLite's LIKE is only case-insensitive for ASCII, so Cyrillic search
+  // needs a JS-side case-insensitive filter instead.
+  if (query.search) {
+    const term = query.search.toLocaleLowerCase('ru')
+    list = list.filter(
+      (e) =>
+        e.description?.toLocaleLowerCase('ru').includes(term)
+        || e.place?.toLocaleLowerCase('ru').includes(term)
+    )
+  }
 
   return list
 })

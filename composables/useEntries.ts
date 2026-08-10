@@ -4,32 +4,51 @@ import type { EntryInput, EntryFilterInput } from '~~/shared/schemas/entry'
 export function useEntries(carId: MaybeRefOrGetter<number>) {
   const entries = ref<Entry[]>([])
   const loading = ref(false)
+  const saving = ref(false)
+  const deletingId = ref<number | null>(null)
+  // useRequestFetch пробрасывает cookie при SSR (обычный $fetch — нет, что давало 401)
+  const requestFetch = useRequestFetch()
 
   async function fetchEntries(filters: Partial<EntryFilterInput> = {}) {
     loading.value = true
     try {
-      entries.value = await $fetch<Entry[]>(`/api/cars/${toValue(carId)}/entries`, { query: filters })
+      entries.value = await requestFetch<Entry[]>(`/api/cars/${toValue(carId)}/entries`, { query: filters })
     } finally {
       loading.value = false
     }
   }
 
   async function createEntry(input: EntryInput) {
-    const entry = await $fetch<Entry>(`/api/cars/${toValue(carId)}/entries`, { method: 'POST', body: input })
-    entries.value = [entry, ...entries.value]
-    return entry
+    saving.value = true
+    try {
+      const entry = await $fetch<Entry>(`/api/cars/${toValue(carId)}/entries`, { method: 'POST', body: input })
+      entries.value = [entry, ...entries.value]
+      return entry
+    } finally {
+      saving.value = false
+    }
   }
 
   async function updateEntry(id: number, input: Partial<EntryInput>) {
-    const updated = await $fetch<Entry>(`/api/entries/${id}`, { method: 'PATCH', body: input })
-    entries.value = entries.value.map((e) => (e.id === id ? updated : e))
-    return updated
+    saving.value = true
+    try {
+      const updated = await $fetch<Entry>(`/api/entries/${id}`, { method: 'PATCH', body: input })
+      entries.value = entries.value.map((e) => (e.id === id ? updated : e))
+      return updated
+    } finally {
+      saving.value = false
+    }
   }
 
   async function deleteEntry(id: number) {
-    await $fetch(`/api/entries/${id}`, { method: 'DELETE' })
-    entries.value = entries.value.filter((e) => e.id !== id)
+    deletingId.value = id
+    try {
+      await $fetch(`/api/entries/${id}`, { method: 'DELETE' })
+      entries.value = entries.value.filter((e) => e.id !== id)
+    } finally {
+      deletingId.value = null
+    }
   }
 
-  return { entries, loading, fetchEntries, createEntry, updateEntry, deleteEntry }
+  return { entries, loading, saving, deletingId, fetchEntries, createEntry, updateEntry, deleteEntry }
 }

@@ -28,6 +28,7 @@ export const entryFilterSchema = z.object({
   categoryId: z.coerce.number().int().optional(),
   dateFrom: z.string().optional(),
   dateTo: z.string().optional(),
+  search: z.string().optional(),
   sortBy: z.enum(['date', 'mileage']).default('date'),
   sortDir: z.enum(['asc', 'desc']).default('desc')
 })

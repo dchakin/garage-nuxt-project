@@ -2,7 +2,7 @@
 import type { Car } from '~~/shared/types'
 import type { CarInput } from '~~/shared/schemas/car'
 
-const props = defineProps<{ initial?: Car | null }>()
+const props = defineProps<{ initial?: Car | null; saving?: boolean }>()
 const emit = defineEmits<{ submit: [CarInput]; cancel: [] }>()
 
 const form = reactive<CarInput>({
@@ -53,10 +53,11 @@ function onSubmit() {
       </div>
     </div>
     <div class="flex gap-3 pt-2">
-      <button type="submit" class="btn-primary flex-1 py-2">
-        Сохранить
+      <button type="submit" :disabled="saving" class="btn-primary flex-1 py-2">
+        <Spinner v-if="saving" />
+        {{ saving ? 'Сохранение...' : 'Сохранить' }}
       </button>
-      <button type="button" class="btn-secondary flex-1 py-2" @click="emit('cancel')">
+      <button type="button" :disabled="saving" class="btn-secondary flex-1 py-2" @click="emit('cancel')">
         Отмена
       </button>
     </div>

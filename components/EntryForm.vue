@@ -3,7 +3,7 @@ import type { Entry } from '~~/shared/types'
 import type { EntryInput } from '~~/shared/schemas/entry'
 import { entryTypes, entryTypeLabels } from '~~/shared/schemas/entry'
 
-const props = defineProps<{ initial?: Entry | null }>()
+const props = defineProps<{ initial?: Entry | null; saving?: boolean }>()
 const emit = defineEmits<{ submit: [EntryInput]; cancel: [] }>()
 
 const { categories, fetchCategories } = useCategories()
@@ -36,7 +36,7 @@ function onSubmit() {
       </div>
       <div>
         <label class="label">Тип</label>
-        <select v-model="form.type" class="input">
+        <select v-model="form.type" class="select">
           <option v-for="t in entryTypes" :key="t" :value="t">{{ entryTypeLabels[t] }}</option>
         </select>
       </div>
@@ -44,7 +44,7 @@ function onSubmit() {
 
     <div>
       <label class="label">Категория</label>
-      <select v-model.number="form.categoryId" class="input">
+      <select v-model.number="form.categoryId" class="select">
         <option :value="null">Без категории</option>
         <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
       </select>
@@ -52,7 +52,7 @@ function onSubmit() {
 
     <div>
       <label class="label">Описание</label>
-      <textarea v-model="form.description" rows="2" class="input"></textarea>
+      <textarea v-model="form.description" rows="2" class="textarea"></textarea>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -72,10 +72,11 @@ function onSubmit() {
     </div>
 
     <div class="flex gap-3 pt-2">
-      <button type="submit" class="btn-primary flex-1 py-2">
-        Сохранить
+      <button type="submit" :disabled="saving" class="btn-primary flex-1 py-2">
+        <Spinner v-if="saving" />
+        {{ saving ? 'Сохранение...' : 'Сохранить' }}
       </button>
-      <button type="button" class="btn-secondary flex-1 py-2" @click="emit('cancel')">
+      <button type="button" :disabled="saving" class="btn-secondary flex-1 py-2" @click="emit('cancel')">
         Отмена
       </button>
     </div>

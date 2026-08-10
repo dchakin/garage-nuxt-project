@@ -2,14 +2,15 @@
 
 Nuxt 3 + TypeScript + Tailwind + Drizzle (SQLite) + nuxt-auth-utils.
 
-Реализовано в этой версии (v1, по этапам 1–2 из ТЗ):
+Реализовано в этой версии (v1, по этапам 1–3 из ТЗ):
 
 - Авторизация (регистрация/логин/логаут, сессии на куках).
 - CRUD автомобилей, список, карточка авто, приглашение участников по email.
 - Журнал записей: создание/просмотр/редактирование/удаление, фильтры по типу/категории/датам, сортировка по дате/пробегу.
 - Категории (сидятся по умолчанию).
+- Напоминания: создание/редактирование/удаление, привязка к последней записи журнала (авто-расчёт следующей даты/пробега по интервалу), статусы «скоро/просрочено/ок», бейдж-уведомление на карточке авто.
 
-Пока не реализовано (следующие этапы): напоминания, аналитика/графики, вложения к записям.
+Пока не реализовано (следующие этапы): аналитика/графики, вложения к записям.
 
 ## Запуск локально
 
@@ -50,15 +51,16 @@ Nuxt 3 + TypeScript + Tailwind + Drizzle (SQLite) + nuxt-auth-utils.
 
 ```
 server/
-  api/          — Nitro API-роуты (auth, cars, entries, categories)
+  api/          — Nitro API-роуты (auth, cars, entries, reminders, categories)
   database/     — схема Drizzle, миграции, seed
-  utils/        — access.ts — проверка доступа к автомобилю (owner/member)
+  utils/        — access.ts (проверка доступа к авто), reminderDue.ts (расчёт next due)
 shared/
   schemas/      — Zod-схемы (общие для фронта и бэка)
   types.ts      — TS-типы сущностей для фронта
-pages/          — экраны (login, register, cars, cars/[id], cars/[id]/entries)
-components/     — CarForm, EntryForm
-composables/    — useCars, useEntries, useCategories
+  utils/        — reminderStatus.ts — расчёт статуса напоминания (скоро/просрочено/ок)
+pages/          — экраны (login, register, cars, cars/[id], cars/[id]/entries, cars/[id]/reminders)
+components/     — CarForm, EntryForm, EntryJournal, ReminderForm, ReminderList
+composables/    — useCars, useEntries, useReminders, useCategories
 middleware/     — auth.ts — редиректы неавторизованных
 ```
 
