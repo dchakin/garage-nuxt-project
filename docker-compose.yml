@@ -1,6 +1,6 @@
 services:
   garage:
-    build: .
+    image: ghcr.io/dchakin/garage-nuxt-project:latest
     container_name: garage
     restart: unless-stopped
     environment:
