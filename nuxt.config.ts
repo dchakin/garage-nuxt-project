@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     host: '0.0.0.0'
   },
 
-  modules: ['@nuxtjs/tailwindcss', 'nuxt-auth-utils'],
+  modules: ['@nuxtjs/tailwindcss', 'nuxt-auth-utils', '@vite-pwa/nuxt'],
 
   css: ['~/assets/css/main.css'],
 
@@ -43,6 +43,37 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' }
       ]
+    }
+  },
+
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'Гараж — учёт авто',
+      short_name: 'Гараж',
+      description: 'Учёт обслуживания, ремонтов и расходов на автомобиль',
+      theme_color: '#4f46e5',
+      background_color: '#ffffff',
+      display: 'standalone',
+      start_url: '/',
+      lang: 'ru',
+      icons: [
+        { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
+        { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+        { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+        { src: 'maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+      ]
+    },
+    workbox: {
+      // Только прекэш статики приложения — API-запросы (данные пользователя)
+      // намеренно не кэшируются офлайн-воркером, оффлайн-режим не входит в ТЗ.
+      navigateFallback: null,
+      globPatterns: ['**/*.{js,css,html,ico,png,svg}']
+    },
+    devOptions: {
+      // Включаем SW и в dev, чтобы можно было проверить "Установить приложение" локально
+      enabled: true,
+      type: 'module'
     }
   }
 })

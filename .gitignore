@@ -5,4 +5,5 @@ node_modules
 *.db
 *.db-journal
 dist
+dev-dist
 .DS_Store
