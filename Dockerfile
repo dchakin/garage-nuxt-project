@@ -7,6 +7,9 @@ RUN apt-get update \
 
 WORKDIR /app
 
+# npm ci требует ту же версию npm, что генерировала package-lock.json (npm 11.x, см. package.json engines)
+RUN npm install -g npm@11
+
 COPY package.json package-lock.json* ./
 RUN npm ci
 
