@@ -1,4 +1,4 @@
-FROM node:20-bookworm-slim
+FROM node:22-bookworm-slim
 
 # python3/make/g++ нужны для сборки нативного модуля better-sqlite3
 RUN apt-get update \
