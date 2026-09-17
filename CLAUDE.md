@@ -6,7 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 "Гараж" — a Nuxt 3 app for tracking car maintenance/expenses (repairs, part replacements, purchases, scheduled maintenance) with reminders and spending analytics. Personal/pet project, Russian-language UI. Full spec is in `TZ.md` — read it for feature scope, data model rationale, and what's explicitly out of scope (multi-currency, push notifications, attachments, etc.). `README.md` has setup/run instructions and a running "known limitations" note — keep both in sync when scope changes.
 
-Stack: Nuxt 3 (Vue 3 Composition API) + TypeScript (strict) + Tailwind + Drizzle ORM over SQLite (`better-sqlite3`) + `nuxt-auth-utils` for cookie-session auth + Zod for validation + chart.js/vue-chartjs for analytics.
+Stack: Nuxt 3 (Vue 3 Composition API) + TypeScript (strict) + Tailwind + Drizzle ORM over SQLite (`better-sqlite3`) + `nuxt-auth-utils` for cookie-session auth + Zod for validation + chart.js/vue-chartjs for analytics + `@vite-pwa/nuxt` (installable PWA — manifest/icons generated from `public/logo.svg` via `pwa-assets.config.ts`, no offline API caching).
+
+## Branching & deploy
+
+`master` is production; day-to-day work happens on `dev`, merged into `master` when ready to ship. Pushing to `master` triggers `.github/workflows/deploy.yml`, which SSHes into the prod server (root@195.19.209.224) and runs `/opt/garage/deploy.sh` (`git reset --hard origin/master` + `docker compose up -d --build`). The deploy SSH key is scoped in the server's `authorized_keys` to only run that one script (`command="/opt/garage/deploy.sh"`), stored as GitHub secrets `DEPLOY_HOST`/`DEPLOY_SSH_KEY`. `deploy.sh` is versioned in the repo and self-updates (it re-fetches itself along with the rest of the checkout), so changes to the deploy flow just need a commit to `master`.
 
 ## Commands
 
