@@ -22,10 +22,10 @@ export default defineNuxtConfig({
       maxAge: 60 * 60 * 24 * 30,
       cookie: {
         sameSite: 'lax',
-        // secure: false — иначе кука не сохраняется при доступе по http
-        // с других устройств (например, http://192.168.x.x с телефона).
-        // При деплое за https стоит вернуть true (или вынести в env).
-        secure: false
+        // secure: false по умолчанию — иначе кука не сохраняется при доступе по http
+        // с других устройств (например, http://192.168.x.x с телефона) в dev.
+        // За https (прод, см. docker-compose.yml) включается через NUXT_SESSION_COOKIE_SECURE=true.
+        secure: process.env.NUXT_SESSION_COOKIE_SECURE === 'true'
       }
     }
   },
