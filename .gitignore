@@ -9,3 +9,6 @@ dev-dist
 .DS_Store
 *.db-shm
 *.db-wal
+
+# Claude Code personal settings
+.claude/settings.local.json
