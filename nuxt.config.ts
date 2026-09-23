@@ -16,6 +16,12 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    // Web Push (VAPID): задаются через NUXT_VAPID_PRIVATE_KEY / NUXT_VAPID_SUBJECT / NUXT_PUBLIC_VAPID_PUBLIC_KEY
+    vapidPrivateKey: '',
+    vapidSubject: 'mailto:admin@example.com',
+    public: {
+      vapidPublicKey: ''
+    },
     dbFileName: process.env.DB_FILE_NAME || 'server/database/garage.db',
     session: {
       // 30 дней — явный срок жизни сессии, чтобы не зависеть от дефолтов модуля
@@ -32,7 +38,12 @@ export default defineNuxtConfig({
 
   nitro: {
     experimental: {
-      wasm: false
+      wasm: false,
+      tasks: true
+    },
+    // Ежедневная проверка напоминаний: 06:00 UTC = 09:00 МСК
+    scheduledTasks: {
+      '0 6 * * *': ['reminders:notify']
     }
   },
 
@@ -56,6 +67,11 @@ export default defineNuxtConfig({
 
   pwa: {
     registerType: 'autoUpdate',
+    // Свой service worker (service-worker/sw.ts) — нужен обработчик push-событий,
+    // который автогенерируемый воркер (generateSW) не умеет
+    strategies: 'injectManifest',
+    srcDir: 'service-worker',
+    filename: 'sw.ts',
     manifest: {
       name: 'Гараж — учёт авто',
       short_name: 'Гараж',
@@ -72,10 +88,9 @@ export default defineNuxtConfig({
         { src: 'maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
       ]
     },
-    workbox: {
+    injectManifest: {
       // Только прекэш статики приложения — API-запросы (данные пользователя)
       // намеренно не кэшируются офлайн-воркером, оффлайн-режим не входит в ТЗ.
-      navigateFallback: null,
       globPatterns: ['**/*.{js,css,html,ico,png,svg}']
     },
     devOptions: {

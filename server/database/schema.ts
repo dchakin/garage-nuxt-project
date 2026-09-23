@@ -1,5 +1,5 @@
 import { sql, relations } from 'drizzle-orm'
-import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, real, uniqueIndex } from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -66,10 +66,36 @@ export const reminders = sqliteTable('reminders', {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
 })
 
+// Подписки Web Push: у пользователя может быть несколько устройств/браузеров
+export const pushSubscriptions = sqliteTable('push_subscriptions', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  endpoint: text('endpoint').notNull().unique(),
+  p256dh: text('p256dh').notNull(),
+  auth: text('auth').notNull(),
+  userAgent: text('user_agent'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+})
+
+// Журнал отправленных push-уведомлений о напоминаниях — чтобы не слать одно и то же
+// каждый день. dueKey фиксирует срок (дата|пробег), на который уже уведомили:
+// после продления напоминания срок меняется и уведомление придёт снова.
+export const reminderNotifications = sqliteTable('reminder_notifications', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  reminderId: integer('reminder_id').notNull().references(() => reminders.id, { onDelete: 'cascade' }),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  status: text('status', { enum: ['soon', 'overdue'] }).notNull(),
+  dueKey: text('due_key').notNull(),
+  sentAt: integer('sent_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+}, (t) => [
+  uniqueIndex('reminder_notifications_unique').on(t.reminderId, t.userId, t.status, t.dueKey)
+])
+
 export const usersRelations = relations(users, ({ many }) => ({
   cars: many(cars),
   carMemberships: many(carMembers),
-  entries: many(entries)
+  entries: many(entries),
+  pushSubscriptions: many(pushSubscriptions)
 }))
 
 export const carsRelations = relations(cars, ({ one, many }) => ({
@@ -99,4 +125,8 @@ export const remindersRelations = relations(reminders, ({ one }) => ({
   car: one(cars, { fields: [reminders.carId], references: [cars.id] }),
   category: one(categories, { fields: [reminders.categoryId], references: [categories.id] }),
   lastEntry: one(entries, { fields: [reminders.lastEntryId], references: [entries.id] })
+}))
+
+export const pushSubscriptionsRelations = relations(pushSubscriptions, ({ one }) => ({
+  user: one(users, { fields: [pushSubscriptions.userId], references: [users.id] })
 }))

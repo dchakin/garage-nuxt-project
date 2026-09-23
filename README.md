@@ -9,7 +9,8 @@ Nuxt 3 + TypeScript + Tailwind + Drizzle (SQLite) + nuxt-auth-utils.
 - Журнал записей: создание/просмотр/редактирование/удаление, фильтры по типу/категории/датам, сортировка по дате/пробегу.
 - Категории (сидятся по умолчанию).
 - Напоминания: создание/редактирование/удаление, привязка к последней записи журнала (авто-расчёт следующей даты/пробега по интервалу), статусы «скоро/просрочено/ок», бейдж-уведомление на карточке авто.
-- PWA: манифест и service worker (`@vite-pwa/nuxt`), браузер предлагает установить приложение на главный экран; иконки сгенерированы из `public/logo.svg`.
+- PWA: манифест и свой service worker (`@vite-pwa/nuxt`, `service-worker/sw.ts`), браузер предлагает установить приложение на главный экран; иконки сгенерированы из `public/logo.svg`.
+- Push-уведомления о напоминаниях (Web Push, VAPID): включаются кнопкой на странице «Мои автомобили». Проверка идёт раз в день в 09:00 МСК (Nitro scheduled task) и сразу после записи с новым пробегом. Одно уведомление на каждый статус «скоро»/«просрочено» по каждому сроку.
 
 Пока не реализовано (следующие этапы): аналитика/графики, вложения к записям.
 
@@ -25,6 +26,12 @@ Nuxt 3 + TypeScript + Tailwind + Drizzle (SQLite) + nuxt-auth-utils.
 
    ```bash
    cp .env.example .env
+   ```
+
+   Для push-уведомлений сгенерировать VAPID-ключи и вписать их в `NUXT_PUBLIC_VAPID_PUBLIC_KEY` / `NUXT_VAPID_PRIVATE_KEY` (без них push просто отключён):
+
+   ```bash
+   npx web-push generate-vapid-keys
    ```
 
 3. Сгенерировать и применить миграции БД:
@@ -54,14 +61,16 @@ Nuxt 3 + TypeScript + Tailwind + Drizzle (SQLite) + nuxt-auth-utils.
 server/
   api/          — Nitro API-роуты (auth, cars, entries, reminders, categories)
   database/     — схема Drizzle, миграции, seed
-  utils/        — access.ts (проверка доступа к авто), reminderDue.ts (расчёт next due)
+  tasks/        — reminders/notify.ts — ежедневная задача рассылки push о напоминаниях
+  utils/        — access.ts (проверка доступа к авто), reminderDue.ts (расчёт next due), push.ts (Web Push)
+service-worker/ — sw.ts — service worker (прекэш + обработка push/кликов по уведомлениям)
 shared/
   schemas/      — Zod-схемы (общие для фронта и бэка)
   types.ts      — TS-типы сущностей для фронта
   utils/        — reminderStatus.ts — расчёт статуса напоминания (скоро/просрочено/ок)
 pages/          — экраны (login, register, cars, cars/[id], cars/[id]/entries, cars/[id]/reminders)
-components/     — CarForm, EntryForm, EntryJournal, ReminderForm, ReminderList
-composables/    — useCars, useEntries, useReminders, useCategories
+components/     — CarForm, EntryForm, EntryJournal, ReminderForm, ReminderList, PushSettings
+composables/    — useCars, useEntries, useReminders, useCategories, usePush
 middleware/     — auth.ts — редиректы неавторизованных
 ```
 
@@ -69,4 +78,6 @@ middleware/     — auth.ts — редиректы неавторизованн�
 
 - Проверка сборки (`npm run build`/`npm run typecheck`) не выполнялась в среде разработки — не было доступа к shell-песочнице (не хватило диска). Файлы написаны аккуратно по документации Nuxt/Drizzle/nuxt-auth-utils, но перед деплоем стоит прогнать `npm install && npm run typecheck && npm run build` локально и поправить, если всплывут мелкие несостыковки типов.
 - Вложения (фото чеков), напоминания и аналитика — не реализованы, это следующие этапы по ТЗ.
+- Push на iPhone работает только в установленном на экран «Домой» приложении (iOS 16.4+), в обычной вкладке Safari — нет. Нужен HTTPS (локально — `localhost`).
+- Push о просроченном напоминании приходит один раз; повторных «напоминаний о напоминании» нет, пока срок не продлят.
 - Мультивалютность не поддерживается (валюта хранится в записи, но конвертации нет — как и заявлено в ТЗ).

@@ -30,6 +30,9 @@ export default defineEventHandler(async (event) => {
     const car = await db.query.cars.findFirst({ where: eq(schema.cars.id, carId) })
     if (car && body.mileage > car.currentMileage) {
       await db.update(schema.cars).set({ currentMileage: body.mileage }).where(eq(schema.cars.id, carId))
+      // Пробег вырос — напоминания по км могли стать «скоро»/«просрочено».
+      // Не ждём отправку, чтобы не задерживать ответ.
+      notifyDueReminders({ carId }).catch((e) => console.error('[push] проверка напоминаний', e))
     }
   }
 

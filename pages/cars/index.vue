@@ -30,6 +30,8 @@ async function onCreate(input: CarInput) {
       </button>
     </div>
 
+    <PushSettings />
+
     <div v-if="showForm" class="card p-4 mb-4">
       <p v-if="error" class="alert-error mb-2">{{ error }}</p>
       <CarForm :saving="saving" @submit="onCreate" @cancel="showForm = false" />

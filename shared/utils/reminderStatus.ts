@@ -8,7 +8,11 @@ const SOON_KM_RATIO = 0.1 // 10% от интервала пробега счит
  * Вычисляет статус напоминания относительно текущей даты и пробега авто.
  * Если сработало и по дате, и по пробегу — берётся более "срочный" статус.
  */
-export function getReminderStatus(reminder: Reminder, currentMileage: number, today: string = new Date().toISOString().slice(0, 10)): ReminderStatus {
+export function getReminderStatus(
+  reminder: Pick<Reminder, 'isActive' | 'nextDueDate' | 'nextDueMileage' | 'intervalKm'>,
+  currentMileage: number,
+  today: string = new Date().toISOString().slice(0, 10)
+): ReminderStatus {
   if (!reminder.isActive) return 'inactive'
 
   const statuses: ReminderStatus[] = []
