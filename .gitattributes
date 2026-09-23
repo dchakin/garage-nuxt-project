@@ -1,1 +1,3 @@
 docker-entrypoint.sh text eol=lf
+# Shell-скрипты всегда с LF, иначе bash падает на  (Windows + autocrlf)
+*.sh text eol=lf
