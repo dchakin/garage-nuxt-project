@@ -19,3 +19,8 @@ dev-dist
 
 # Ralph loop: логи и служебные файлы
 .ralph/
+
+# Playwright: отчёты и скриншоты e2e
+test-results/
+playwright-report/
+blob-report/
