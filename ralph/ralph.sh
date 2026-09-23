@@ -113,12 +113,14 @@ context_block() {
 # Возвращает 1, если запуск нужно прервать целиком (лимит подписки, сеть и т.п.).
 settle() {
   local out="$1" rc="$2" what="$3" c health
-  c="$(field "$out" cost)"; add_cost "$c"
   if [ "$rc" = 124 ]; then
-    log "$what: превышено время ($([ "$what" = ревью ] && echo "$REVIEW_TIMEOUT" || echo "$IMPL_TIMEOUT"))"
+    # Убитый процесс не сообщает стоимость — считаем пессимистично, по потолку шага.
+    c="$([ "$what" = ревью ] && echo "$REVIEW_BUDGET" || echo "$IMPL_BUDGET")"; add_cost "$c"
+    log "$what: превышено время ($([ "$what" = ревью ] && echo "$REVIEW_TIMEOUT" || echo "$IMPL_TIMEOUT")), учтено до \$$c"
     TIMED_OUT=1
     return 0
   fi
+  c="$(field "$out" cost)"; add_cost "$c"
   health="$(field "$out" health)"
   if [ "$health" != ok ]; then
     ABORT="$what: $health (stderr: $(head -c 300 "$out.stderr" 2>/dev/null | tr '\n' ' '))"
