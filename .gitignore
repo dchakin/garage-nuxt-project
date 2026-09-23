@@ -12,3 +12,10 @@ dev-dist
 
 # Claude Code personal settings
 .claude/settings.local.json
+
+
+# Playwright MCP artifacts (snapshots, console logs)
+.playwright-mcp/
+
+# Ralph loop: логи и служебные файлы
+.ralph/

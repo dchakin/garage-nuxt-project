@@ -12,6 +12,10 @@ Stack: Nuxt 3 (Vue 3 Composition API) + TypeScript (strict) + Tailwind + Drizzle
 
 `master` is production; day-to-day work happens on `dev`, merged into `master` when ready to ship. Pushing to `master` triggers `.github/workflows/deploy.yml`, which runs two jobs: **build** (GitHub runner builds the Docker image and pushes it to `ghcr.io/dchakin/garage-nuxt-project:latest` + a `:<sha>` tag, with buildx layer caching via `type=gha`) and **deploy** (SSHes into the prod server, root@195.19.209.224, triggering `/opt/garage/deploy.sh`). The image is never built on the prod server — `deploy.sh` only does `git reset --hard origin/master` + `docker compose pull` + `docker compose up -d`, so the SSH session lasts seconds instead of minutes. `docker-compose.yml` references the GHCR image by tag and has no `build:` section; a local `docker compose build` is therefore not part of the deploy path. The server must be logged in to GHCR once (`docker login ghcr.io` with a PAT that has `read:packages`) unless the package is public. The deploy SSH key is scoped in the server's `authorized_keys` to only run that one script (`command="/opt/garage/deploy.sh"`), stored as GitHub secrets `DEPLOY_HOST`/`DEPLOY_SSH_KEY`. `deploy.sh` is versioned in the repo and self-updates (it re-fetches itself along with the rest of the checkout), so changes to the deploy flow just need a commit to `master`.
 
+## Plans & autonomous work
+
+`docs/plans/` holds per-stage feature plans (`stage-N-*.md`) and cross-cutting `conventions.md` — the durable memory between tasks: decisions and contracts (components, utils, routes, API shapes) that later issues rely on. When a task makes such a decision or creates such a contract, update the relevant plan in the same commit (format in `docs/plans/README.md`). A task is done only when it matches its issue and `TZ.md`, has tests for new/changed behavior, and `npm test` + `typecheck` + `build` pass. `ralph/` is an autonomous loop that implements GitHub issues one at a time — see `ralph/README.md`.
+
 ## Commands
 
 ```bash
