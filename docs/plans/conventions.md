@@ -8,7 +8,13 @@
 
 ## Тесты
 
-_Заполняется в #26 (Vitest): где лежат тесты, как поднимается тестовая БД, как мокать web-push._
+- `vitest.config.ts`: проект `node` (`tests/unit/**`, `tests/server/**`, `tests/integration/**`) и зарезервированный проект `nuxt` (happy-dom, `tests/nuxt/**`) для будущих тестов компонентов/composables.
+- `tests/unit/` — чистая логика и Zod-схемы, без БД и без Nitro-окружения.
+- `tests/server/` — прямой импорт `server/utils/*.ts` (`access.ts`, `push.ts`) на временной SQLite (`tests/helpers/testDb.ts`: файл в `os.tmpdir()`, миграции из `server/database/migrations`, сид одной категории). Эти файлы написаны в расчёте на авто-импорты Nitro (`createError` и т.п.), поэтому `tests/setup/node-globals.ts` кладёт `createError` из `h3` в `globalThis` — без этого их нельзя импортировать напрямую. `server/database/index.ts` открывает соединение по `DB_FILE_NAME` в момент импорта — в тестах нужно сначала выставить `process.env.DB_FILE_NAME`, затем сделать `await import('../../server/database')` (динамически, не статическим import).
+- `tests/integration/api.test.ts` — API-роуты (`server/api/**`) нельзя импортировать напрямую: они используют `requireUserSession`/`setUserSession` из `nuxt-auth-utils`, которые тянут `useRuntimeConfig` через виртуальный алиас `#imports`, недоступный вне сборки Nuxt. Поэтому тестируются через реальный dev-сервер (`@nuxt/test-utils/e2e`, `setup({ dev: true, env: {...} })`), с отдельной временной БД и `NUXT_IGNORE_LOCK=1` (чтобы не конфликтовать с уже запущенным `npm run dev`). `useTestContext()` (на нём построены `$fetch`/`fetch` из пакета) доступен только внутри тела `it()` — не в `beforeAll` соседнего/внешнего `describe`; кросс-запросную подготовку (логин и т.п.) делать в первом `it()` блока, а не в `beforeAll`.
+- Сессия — стейтлес подписанная кука без серверного хранилища: старая кука остаётся валидной, даже если ей уже прислали logout. Тест на logout должен переслать именно ту (уже просроченную) куку, которую вернул сам ответ `/api/auth/logout`.
+- Web-push мокается через `vi.mock('web-push', ...)` + `globalThis.useRuntimeConfig = () => ({...})` (единственный авто-импорт, которым пользуется `server/utils/push.ts`); `db`/`schema` — обычные импорты, стабить не нужно.
+- `computeNextDue` (`server/utils/reminderDue.ts`) строит даты через `new Date(...).toISOString()` в локальном часовом поясе машины — тесты дат должны фиксировать `TZ=UTC` (сделано в `vitest.config.ts` и в `env` интеграционного теста), иначе результат зависит от TZ CI/машины разработчика.
 
 ## E2E
 
