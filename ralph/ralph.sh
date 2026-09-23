@@ -194,7 +194,7 @@ for ((done_count = 1; done_count <= MAX_ISSUES; done_count++)); do
     fi
 
     if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
-      git add -A && git commit -q -m "chore(ralph): незакоммиченные изменения (#$N)"
+      git add -A && git commit -q -m "chore(ralph): commit leftover changes (#$N)"
     fi
     if [ "$(git rev-parse HEAD)" = "$START_SHA" ]; then
       FEEDBACK="Предыдущая попытка не создала ни одного коммита. Реализуй задачу и закоммить изменения."
