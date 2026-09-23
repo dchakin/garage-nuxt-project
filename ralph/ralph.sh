@@ -48,7 +48,7 @@ DENY=(Agent WebSearch WebFetch "Bash(git push:*)" "Bash(git checkout:*)" "Bash(g
   "Bash(git reset:*)" "Bash(git rebase:*)" "Bash(git merge:*)" "Bash(gh:*)" "Bash(rm -rf:*)")
 IMPL_TOOLS=(Read Edit Write Glob Grep
   "Bash(npm test:*)" "Bash(npm run:*)" "Bash(npm install:*)" "Bash(npm i:*)"
-  "Bash(npx vitest:*)" "Bash(npx nuxi:*)" "Bash(npx drizzle-kit:*)" "Bash(npx tsx:*)"
+  "Bash(npx vitest:*)" "Bash(npx playwright:*)" "Bash(npx nuxi:*)" "Bash(npx drizzle-kit:*)" "Bash(npx tsx:*)"
   "Bash(git status:*)" "Bash(git diff:*)" "Bash(git log:*)" "Bash(git show:*)"
   "Bash(git add:*)" "Bash(git commit:*)" "Bash(ls:*)" "Bash(mkdir:*)")
 REVIEW_TOOLS=(Read Glob Grep "Bash(git diff:*)" "Bash(git log:*)" "Bash(git show:*)")
@@ -118,6 +118,12 @@ review() {
     cat "$DIR/prompts/review.md"
     context_block
     printf '\n\n# Что ревьюить\n\nИзменения: `git diff %s...HEAD`, коммиты: `git log --oneline %s..HEAD`.\n' "$START_SHA" "$START_SHA"
+    local shots; shots="$(ls test-results/screens/*.png 2>/dev/null || true)"
+    if [ -n "$shots" ]; then
+      printf '\n# Скриншоты экранов из e2e (390px)\n\n%s\n' "$shots"
+    else
+      printf '\n# Скриншоты экранов\n\nСкриншотов нет.\n'
+    fi
   } | claude -p "${COMMON[@]}" --max-budget-usd "$REVIEW_BUDGET" \
       --allowedTools "${REVIEW_TOOLS[@]}" --disallowedTools "${DENY[@]}" \
       --output-format json --json-schema "$(cat "$DIR/review-schema.json")" >"$out" 2>"$out.stderr" || true
@@ -140,7 +146,8 @@ open_pr() {
     if [ "$BASE" != "$BASE_BRANCH" ]; then
       printf '> ⚠️ Ветка основана на `%s`, PR которой ещё не смёржен. Мёржите по порядку и способом **Create a merge commit** — иначе коммиты задвоятся.\n\n' "$BASE"
     fi
-    printf -- '- Проверки: `npm test`, `typecheck`, `build` — зелёные\n'
+    printf -- '- Проверки: `npm test`, `typecheck`, `build`, e2e — зелёные\n'
+    [ -d "$LOGS/issue-$N-screens" ] && printf -- '- Скриншоты экранов (локально): `.ralph/logs/%s/issue-%s-screens/`\n' "$RUN_ID" "$N"
     printf -- '- Попыток: %s, модель: %s\n\n' "$ATTEMPT" "$MODEL"
     printf '🤖 Generated with [Claude Code](https://claude.com/claude-code) — Ralph loop\n'
   } >"$body"
@@ -203,6 +210,10 @@ for ((done_count = 1; done_count <= MAX_ISSUES; done_count++)); do
 $(tail -n 80 "$CHECK_LOG")
 \`\`\`"
       continue
+    fi
+
+    if ls test-results/screens/*.png >/dev/null 2>&1; then
+      mkdir -p "$LOGS/issue-$N-screens" && cp test-results/screens/*.png "$LOGS/issue-$N-screens/"
     fi
 
     log "#$N попытка $ATTEMPT: ревью"

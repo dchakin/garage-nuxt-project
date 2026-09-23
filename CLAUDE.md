@@ -14,7 +14,7 @@ Stack: Nuxt 3 (Vue 3 Composition API) + TypeScript (strict) + Tailwind + Drizzle
 
 ## Plans & autonomous work
 
-`docs/plans/` holds per-stage feature plans (`stage-N-*.md`) and cross-cutting `conventions.md` — the durable memory between tasks: decisions and contracts (components, utils, routes, API shapes) that later issues rely on. When a task makes such a decision or creates such a contract, update the relevant plan in the same commit (format in `docs/plans/README.md`). A task is done only when it matches its issue and `TZ.md`, has tests for new/changed behavior, and `npm test` + `typecheck` + `build` pass. `ralph/` is an autonomous loop that implements GitHub issues one at a time — see `ralph/README.md`.
+`docs/plans/` holds per-stage feature plans (`stage-N-*.md`) and cross-cutting `conventions.md` — the durable memory between tasks: decisions and contracts (components, utils, routes, API shapes) that later issues rely on. When a task makes such a decision or creates such a contract, update the relevant plan in the same commit (format in `docs/plans/README.md`). A task is done only when it matches its issue and `TZ.md`, has tests for new/changed behavior, and `npm test` + `typecheck` + `build` + `test:e2e` pass; UI tasks also need a Playwright e2e scenario with screenshots of affected screens (390px). After UI changes in an interactive session, also check the running app via Playwright MCP. `ralph/` is an autonomous loop that implements GitHub issues one at a time — see `ralph/README.md`.
 
 ## Commands
 
