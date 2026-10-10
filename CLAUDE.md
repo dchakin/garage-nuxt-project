@@ -28,6 +28,8 @@ npm run typecheck            # nuxt typecheck (tsc) — note: nuxt.config.ts has
 npm run db:generate          # drizzle-kit generate — create a migration from schema.ts changes
 npm run db:migrate           # apply migrations (tsx server/database/migrate.ts)
 npm run db:seed              # seed default categories (tsx server/database/seed.ts)
+npm run format               # prettier --write . (форматирует весь репозиторий)
+npm run format:check         # prettier --check . (проверка без записи)
 ```
 
 There is no test suite and no lint script configured in `package.json` as of this writing — don't assume `npm test` or `npm run lint` exist; check `package.json` before relying on either.
@@ -42,7 +44,7 @@ Since `typecheck`/`build` are not run automatically during dev, run both after n
 - Node >= 22, npm >= 11 (`engines` in `package.json`).
 - Schema changes go through all layers together: `server/database/schema.ts` → Zod schema in `shared/schemas/` → `shared/types.ts` → migration.
 - Prefer `<script setup lang="ts">` with the Composition API; no Options API.
-- There are no git hooks, linter or formatter configured — match the style of the surrounding code, and run `typecheck` before committing.
+- **Prettier** (`.prettierrc.json`: без `;`, одинарные кавычки, trailing comma, printWidth 100; исключения в `.prettierignore`) — единый форматтер. **Husky** + **lint-staged**: pre-commit hook (`.husky/pre-commit`) запускает `prettier --write` на staged-файлах, поэтому вручную форматировать не нужно; не обходи хук (`--no-verify`). Хуки ставятся скриптом `prepare` при `npm install`. Линтера нет — run `typecheck` before committing.
 
 ### Naming
 
@@ -83,7 +85,7 @@ Documentation must not fall behind the code: a discrepancy is a bug. In the same
 
 **Auth & access control:** `nuxt-auth-utils` handles cookie sessions (`useUserSession()` client-side, `requireUserSession(event)` / `getUserSession(event)` server-side). Every non-auth API route must resolve the car in question and call `requireCarAccess(carId, userId)` from `server/utils/access.ts`, which throws 404 (car not found) or 403 (not owner/member) and returns `{ car, role }`. This is the only access-control gate — there's no per-route middleware doing it, so new routes must call it explicitly. Client-side route protection is per-page: pages call `definePageMeta({ middleware: 'auth' })` individually (see `middleware/auth.ts`) rather than a global middleware; new protected pages need this line added.
 
-**Database:** `server/database/schema.ts` defines all tables and their `relations()` (users, cars, carMembers, categories, entries, reminders) — read this file first to understand entity relationships (e.g. `entries.categoryId` is nullable, `reminders.lastEntryId` links back to the entry a reminder's next-due calc is based on). `server/database/index.ts` opens the SQLite connection once per process (WAL mode, foreign keys on) and exports `db`/`schema` for reuse everywhere. `migrate.ts` and `seed.ts` open their *own* separate connections and are meant to be run as standalone scripts (`tsx`), not imported into the app.
+**Database:** `server/database/schema.ts` defines all tables and their `relations()` (users, cars, carMembers, categories, entries, reminders) — read this file first to understand entity relationships (e.g. `entries.categoryId` is nullable, `reminders.lastEntryId` links back to the entry a reminder's next-due calc is based on). `server/database/index.ts` opens the SQLite connection once per process (WAL mode, foreign keys on) and exports `db`/`schema` for reuse everywhere. `migrate.ts` and `seed.ts` open their _own_ separate connections and are meant to be run as standalone scripts (`tsx`), not imported into the app.
 
 **Push notifications:** browser subscribes via `composables/usePush.ts` (UI: `components/PushSettings.vue` on `/cars`) → `POST /api/push/subscribe` → `push_subscriptions` table. `server/utils/push.ts` has `sendPushToUser` (deletes subscriptions on 404/410) and `notifyDueReminders({ carId? })`, which uses `getReminderStatus` and dedupes via the `reminder_notifications` table (unique on reminder+user+status+dueKey). It runs from the Nitro scheduled task `server/tasks/reminders/notify.ts` (daily 06:00 UTC, `nitro.scheduledTasks`) and fire-and-forget after `POST /api/cars/[id]/entries` raises the car's mileage. Needs `NUXT_PUBLIC_VAPID_PUBLIC_KEY`/`NUXT_VAPID_PRIVATE_KEY`/`NUXT_VAPID_SUBJECT`; without them push is silently disabled. iOS only supports it in the installed PWA (16.4+).
 

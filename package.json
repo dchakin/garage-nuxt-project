@@ -15,7 +15,10 @@
     "typecheck": "nuxt typecheck",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx server/database/migrate.ts",
-    "db:seed": "tsx server/database/seed.ts"
+    "db:seed": "tsx server/database/seed.ts",
+    "prepare": "husky || true",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@vueuse/core": "^11.3.0",
@@ -37,9 +40,15 @@
     "@vite-pwa/assets-generator": "^1.0.4",
     "@vite-pwa/nuxt": "^1.1.1",
     "drizzle-kit": "^0.30.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.9.10",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vue-tsc": "^3.3.7",
     "workbox-precaching": "^7.4.1"
+  },
+  "lint-staged": {
+    "*.{ts,vue,js,mjs,json,css,yml,yaml,md}": "prettier --write"
   }
 }

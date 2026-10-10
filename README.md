@@ -55,6 +55,10 @@ Nuxt 3 + TypeScript + Tailwind + Drizzle (SQLite) + nuxt-auth-utils.
 
 Приложение будет доступно на http://localhost:3000. Первый экран — регистрация, после неё сразу открывается список автомобилей.
 
+## Форматирование
+
+Код форматируется Prettier (`npm run format`, проверка — `npm run format:check`). Husky при коммите запускает `lint-staged` и форматирует staged-файлы автоматически; хуки устанавливаются при `npm install` (скрипт `prepare`).
+
 ## Структура
 
 ```

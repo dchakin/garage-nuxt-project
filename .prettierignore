@@ -1,0 +1,15 @@
+node_modules
+.nuxt
+.output
+dist
+dev-dist
+public
+drizzle
+package-lock.json
+*.pen
+.ralph
+.playwright-mcp
+test-results
+playwright-report
+server/database/migrations
+.claude/skills
