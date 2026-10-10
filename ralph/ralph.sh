@@ -98,14 +98,8 @@ base_ref() {
   if [ -n "$head" ]; then echo "$head"; else echo "$BASE_BRANCH"; fi
 }
 
-plan_file() {
-  [ -n "$STAGE" ] && ls docs/plans/stage-"$STAGE"-*.md 2>/dev/null | head -n 1 || true
-}
-
 context_block() {
   printf '\n\n# Задача #%s: %s\n\n%s\n' "$N" "$TITLE" "$BODY"
-  local plan; plan="$(plan_file)"
-  if [ -n "$plan" ]; then printf '\n\n# План этапа (%s)\n\n' "$plan"; cat "$plan"; fi
   if [ -f docs/plans/conventions.md ]; then printf '\n\n# Договорённости (docs/plans/conventions.md)\n\n'; cat docs/plans/conventions.md; fi
 }
 
@@ -211,7 +205,7 @@ for ((done_count = 1; done_count <= MAX_ISSUES; done_count++)); do
 
   PICK="$(pick_issue)"
   if [ -z "$PICK" ]; then log "открытых задач для Ralph нет"; break; fi
-  IFS=$'\t' read -r N STAGE <<<"$PICK"
+  IFS=$'\t' read -r N _ <<<"$PICK"
   if [[ "$SEEN" == *" $N "* ]]; then
     log "задача #$N выбрана повторно за один запуск (метка не поставилась?) — останавливаюсь"; break
   fi
