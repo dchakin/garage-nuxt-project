@@ -36,6 +36,45 @@ Setup from scratch: copy `.env.example` to `.env` (needs `NUXT_SESSION_PASSWORD`
 
 Since `typecheck`/`build` are not run automatically during dev, run both after non-trivial changes to catch type errors before considering work done — the codebase has previously shipped without this having been verified.
 
+## Conventions
+
+- **Do not edit by hand** generated files: `.nuxt/**`, `.output/**`, `public/` icons generated from `public/logo.svg` (change the source/`pwa-assets.config.ts` instead), and applied Drizzle migrations (add a new one via `npm run db:generate`).
+- Node >= 22, npm >= 11 (`engines` in `package.json`).
+- Schema changes go through all layers together: `server/database/schema.ts` → Zod schema in `shared/schemas/` → `shared/types.ts` → migration.
+- Prefer `<script setup lang="ts">` with the Composition API; no Options API.
+- There are no git hooks, linter or formatter configured — match the style of the surrounding code, and run `typecheck` before committing.
+
+### Naming
+
+- Files follow Nuxt conventions: components `PascalCase.vue`, composables `useXxx.ts`, pages kebab-case, API routes `name.method.ts` under `server/api/`, utils `camelCase.ts`.
+- Functions describe an action (`createEntryWithReminders`); variables are meaningful (`carId`, not `id`/`x`/`data`).
+- Use Zod enums / union types instead of bare strings (`EntryType`, not `'repair'` scattered around); extract magic numbers into named constants (`MAX_MILEAGE_KM`).
+
+### Size & refactoring
+
+- File > 250 lines → decompose before adding code (split large pages into components/composables).
+- Function > 40 lines → extract private helpers.
+- Nesting > 3 levels → refactor.
+- Before adding code to a large file, decompose it first; keep tests green at every refactoring step.
+
+## Token economy
+
+- `git diff` always with `--unified=0`
+- `git log` always with `--oneline -10`
+- `gh issue list` always with `--json number,title`
+- `npm test` always with `--silent` (when the script exists)
+- `npm run typecheck 2>&1 | tail -20`
+
+## Keeping documentation up to date
+
+Documentation must not fall behind the code: a discrepancy is a bug. In the same change:
+
+- stack, framework or major version change → update this file and `README.md`;
+- new/changed commands, scripts, ports or env variables → update `package.json` (`scripts`), `.env.example`, `README.md` and the Commands section here;
+- new/renamed API routes, composables, components or tables → update the Architecture section here and `TZ.md` if scope changed;
+- decisions and contracts that later tasks rely on → `docs/plans/conventions.md`;
+- deploy flow changes (`Dockerfile`, `docker-compose.yml`, `deploy.sh`, workflow) → update "Branching & deploy" here.
+
 ## Architecture
 
 **Data flow / layering:** `pages/*.vue` → `composables/use*.ts` (client-side state + `$fetch` calls, each holds its own `useState` slice, e.g. `useCars`, `useEntries`, `useCategories`) → `server/api/**/*.ts` (Nitro event handlers) → `server/database/index.ts` (single shared `db` + `schema` export, drizzle over better-sqlite3) → SQLite file at `DB_FILE_NAME`.
