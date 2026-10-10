@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
       mileage: body.mileage ?? null,
       cost: body.cost ?? null,
       currency: body.currency,
-      place: body.place ?? null
+      place: body.place ?? null,
     })
     .returning()
 
@@ -29,7 +29,10 @@ export default defineEventHandler(async (event) => {
   if (body.mileage != null) {
     const car = await db.query.cars.findFirst({ where: eq(schema.cars.id, carId) })
     if (car && body.mileage > car.currentMileage) {
-      await db.update(schema.cars).set({ currentMileage: body.mileage }).where(eq(schema.cars.id, carId))
+      await db
+        .update(schema.cars)
+        .set({ currentMileage: body.mileage })
+        .where(eq(schema.cars.id, carId))
       // Пробег вырос — напоминания по км могли стать «скоро»/«просрочено».
       // Не ждём отправку, чтобы не задерживать ответ.
       notifyDueReminders({ carId }).catch((e) => console.error('[push] проверка напоминаний', e))

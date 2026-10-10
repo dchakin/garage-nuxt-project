@@ -6,7 +6,9 @@ export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
   const reminderId = Number(getRouterParam(event, 'id'))
 
-  const reminder = await db.query.reminders.findFirst({ where: eq(schema.reminders.id, reminderId) })
+  const reminder = await db.query.reminders.findFirst({
+    where: eq(schema.reminders.id, reminderId),
+  })
   if (!reminder) {
     throw createError({ statusCode: 404, statusMessage: 'Напоминание не найдено' })
   }
@@ -18,19 +20,26 @@ export default defineEventHandler(async (event) => {
     title: body.title ?? reminder.title,
     categoryId: body.categoryId !== undefined ? body.categoryId : reminder.categoryId,
     triggerType: body.triggerType ?? reminder.triggerType,
-    intervalMonths: body.intervalMonths !== undefined ? body.intervalMonths : reminder.intervalMonths,
+    intervalMonths:
+      body.intervalMonths !== undefined ? body.intervalMonths : reminder.intervalMonths,
     intervalKm: body.intervalKm !== undefined ? body.intervalKm : reminder.intervalKm,
     lastEntryId: body.lastEntryId !== undefined ? body.lastEntryId : reminder.lastEntryId,
     nextDueDate: body.nextDueDate !== undefined ? body.nextDueDate : reminder.nextDueDate,
-    nextDueMileage: body.nextDueMileage !== undefined ? body.nextDueMileage : reminder.nextDueMileage,
-    isActive: body.isActive !== undefined ? body.isActive : reminder.isActive
+    nextDueMileage:
+      body.nextDueMileage !== undefined ? body.nextDueMileage : reminder.nextDueMileage,
+    isActive: body.isActive !== undefined ? body.isActive : reminder.isActive,
   }
 
   let lastEntry: { date: string; mileage: number | null } | null = null
   if (merged.lastEntryId) {
-    const entry = await db.query.entries.findFirst({ where: eq(schema.entries.id, merged.lastEntryId) })
+    const entry = await db.query.entries.findFirst({
+      where: eq(schema.entries.id, merged.lastEntryId),
+    })
     if (!entry || entry.carId !== reminder.carId) {
-      throw createError({ statusCode: 400, statusMessage: 'Запись не найдена для этого автомобиля' })
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Запись не найдена для этого автомобиля',
+      })
     }
     lastEntry = { date: entry.date, mileage: entry.mileage }
   }
@@ -41,7 +50,7 @@ export default defineEventHandler(async (event) => {
     intervalKm: merged.intervalKm,
     lastEntry,
     nextDueDateOverride: merged.nextDueDate,
-    nextDueMileageOverride: merged.nextDueMileage
+    nextDueMileageOverride: merged.nextDueMileage,
   })
 
   const [updated] = await db
@@ -55,7 +64,7 @@ export default defineEventHandler(async (event) => {
       lastEntryId: merged.lastEntryId,
       nextDueDate,
       nextDueMileage,
-      isActive: merged.isActive
+      isActive: merged.isActive,
     })
     .where(eq(schema.reminders.id, reminderId))
     .returning()

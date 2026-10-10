@@ -7,7 +7,7 @@ import { db, schema } from '../database'
  */
 export async function requireCarAccess(carId: number, userId: number) {
   const car = await db.query.cars.findFirst({
-    where: eq(schema.cars.id, carId)
+    where: eq(schema.cars.id, carId),
   })
 
   if (!car) {
@@ -19,7 +19,7 @@ export async function requireCarAccess(carId: number, userId: number) {
   }
 
   const member = await db.query.carMembers.findFirst({
-    where: and(eq(schema.carMembers.carId, carId), eq(schema.carMembers.userId, userId))
+    where: and(eq(schema.carMembers.carId, carId), eq(schema.carMembers.userId, userId)),
   })
 
   if (!member) {

@@ -33,7 +33,7 @@ async function onDelete() {
     title: 'Удалить автомобиль?',
     message: `Автомобиль «${car.brand} ${car.model}» и все записи по нему будут удалены безвозвратно.`,
     confirmText: 'Удалить',
-    danger: true
+    danger: true,
   })
   if (!ok) return
   await deleteCar(carId)
@@ -45,7 +45,10 @@ async function onInvite() {
   inviteSuccess.value = ''
   inviting.value = true
   try {
-    await $fetch(`/api/cars/${carId}/invite`, { method: 'POST', body: { email: inviteEmail.value } })
+    await $fetch(`/api/cars/${carId}/invite`, {
+      method: 'POST',
+      body: { email: inviteEmail.value },
+    })
     inviteSuccess.value = 'Приглашение отправлено'
     inviteEmail.value = ''
     await refresh()
@@ -59,13 +62,22 @@ async function onInvite() {
 
 <template>
   <div>
-    <NuxtLink :to="`/cars/${carId}`" class="text-sm text-slate-500 hover:text-slate-800 transition-colors">← {{ car.brand }} {{ car.model }}</NuxtLink>
+    <NuxtLink
+      :to="`/cars/${carId}`"
+      class="text-sm text-slate-500 hover:text-slate-800 transition-colors"
+      >← {{ car.brand }} {{ car.model }}</NuxtLink
+    >
 
     <h1 class="text-lg font-semibold text-slate-800 mt-2 mb-4">Редактирование автомобиля</h1>
 
     <div class="card p-4 mb-4">
       <p v-if="error" class="alert-error mb-2">{{ error }}</p>
-      <CarForm :initial="car" :saving="saving" @submit="onUpdate" @cancel="navigateTo(`/cars/${carId}`)" />
+      <CarForm
+        :initial="car"
+        :saving="saving"
+        @submit="onUpdate"
+        @cancel="navigateTo(`/cars/${carId}`)"
+      />
     </div>
 
     <div v-if="car.role === 'owner'" class="card p-4 mb-4">
@@ -75,7 +87,13 @@ async function onInvite() {
         <li v-for="m in car.members" :key="m.id">{{ m.user.name }} ({{ m.user.email }})</li>
       </ul>
       <form class="flex gap-2" @submit.prevent="onInvite">
-        <input v-model="inviteEmail" type="email" placeholder="email@example.com" :disabled="inviting" class="input flex-1" />
+        <input
+          v-model="inviteEmail"
+          type="email"
+          placeholder="email@example.com"
+          :disabled="inviting"
+          class="input flex-1"
+        />
         <button type="submit" :disabled="inviting" class="btn-primary h-10 px-3 text-sm">
           <Spinner v-if="inviting" />
           {{ inviting ? 'Отправка...' : 'Пригласить' }}
@@ -86,7 +104,11 @@ async function onInvite() {
     </div>
 
     <div v-if="car.role === 'owner'" class="pt-4 border-t border-slate-200">
-      <button :disabled="deletingId === carId" class="btn-danger px-3 py-1.5 text-sm" @click="onDelete">
+      <button
+        :disabled="deletingId === carId"
+        class="btn-danger px-3 py-1.5 text-sm"
+        @click="onDelete"
+      >
         <Spinner v-if="deletingId === carId" />
         {{ deletingId === carId ? 'Удаление...' : 'Удалить автомобиль' }}
       </button>

@@ -20,7 +20,7 @@ const form = reactive<ReminderInput>({
   lastEntryId: props.initial?.lastEntryId ?? null,
   nextDueDate: props.initial?.nextDueDate ?? null,
   nextDueMileage: props.initial?.nextDueMileage ?? null,
-  isActive: props.initial?.isActive ?? true
+  isActive: props.initial?.isActive ?? true,
 })
 
 const showDate = computed(() => form.triggerType === 'date' || form.triggerType === 'both')
@@ -55,7 +55,9 @@ function onSubmit() {
       <div>
         <label class="label">Условие срабатывания</label>
         <select v-model="form.triggerType" class="select">
-          <option v-for="t in reminderTriggerTypes" :key="t" :value="t">{{ reminderTriggerTypeLabels[t] }}</option>
+          <option v-for="t in reminderTriggerTypes" :key="t" :value="t">
+            {{ reminderTriggerTypeLabels[t] }}
+          </option>
         </select>
       </div>
     </div>
@@ -78,7 +80,12 @@ function onSubmit() {
       </div>
       <div>
         <label class="label">Или конкретная дата</label>
-        <input v-model="form.nextDueDate" type="date" :disabled="!!form.lastEntryId && !!form.intervalMonths" class="input" />
+        <input
+          v-model="form.nextDueDate"
+          type="date"
+          :disabled="!!form.lastEntryId && !!form.intervalMonths"
+          class="input"
+        />
       </div>
     </div>
 
@@ -109,7 +116,12 @@ function onSubmit() {
         <Spinner v-if="saving" />
         {{ saving ? 'Сохранение...' : 'Сохранить' }}
       </button>
-      <button type="button" :disabled="saving" class="btn-secondary flex-1 py-2" @click="emit('cancel')">
+      <button
+        type="button"
+        :disabled="saving"
+        class="btn-secondary flex-1 py-2"
+        @click="emit('cancel')"
+      >
         Отмена
       </button>
     </div>

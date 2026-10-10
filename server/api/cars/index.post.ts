@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
       plateNumber: body.plateNumber ?? null,
       vin: body.vin ?? null,
       currentMileage: body.currentMileage,
-      photoUrl: body.photoUrl || null
+      photoUrl: body.photoUrl || null,
     })
     .returning()
 

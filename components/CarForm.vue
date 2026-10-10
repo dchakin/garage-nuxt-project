@@ -12,7 +12,7 @@ const form = reactive<CarInput>({
   plateNumber: props.initial?.plateNumber ?? '',
   vin: props.initial?.vin ?? '',
   currentMileage: props.initial?.currentMileage ?? 0,
-  photoUrl: props.initial?.photoUrl ?? ''
+  photoUrl: props.initial?.photoUrl ?? '',
 })
 
 function onSubmit() {
@@ -57,7 +57,12 @@ function onSubmit() {
         <Spinner v-if="saving" />
         {{ saving ? 'Сохранение...' : 'Сохранить' }}
       </button>
-      <button type="button" :disabled="saving" class="btn-secondary flex-1 py-2" @click="emit('cancel')">
+      <button
+        type="button"
+        :disabled="saving"
+        class="btn-secondary flex-1 py-2"
+        @click="emit('cancel')"
+      >
         Отмена
       </button>
     </div>

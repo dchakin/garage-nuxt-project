@@ -5,7 +5,9 @@ export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
   const reminderId = Number(getRouterParam(event, 'id'))
 
-  const reminder = await db.query.reminders.findFirst({ where: eq(schema.reminders.id, reminderId) })
+  const reminder = await db.query.reminders.findFirst({
+    where: eq(schema.reminders.id, reminderId),
+  })
   if (!reminder) {
     throw createError({ statusCode: 404, statusMessage: 'Напоминание не найдено' })
   }

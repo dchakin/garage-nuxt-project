@@ -38,9 +38,10 @@ const out = {
   issues: () => (r?.structured_output?.issues ?? []).map((i) => `- ${i}`).join('\n'),
   health: () => {
     if (!r) return 'fatal: нет итогового сообщения (процесс упал или убит по таймауту)'
-    if (r.api_error_status) return `fatal: ошибка API ${r.api_error_status}: ${String(r.result ?? '').slice(0, 200)}`
+    if (r.api_error_status)
+      return `fatal: ошибка API ${r.api_error_status}: ${String(r.result ?? '').slice(0, 200)}`
     return 'ok'
-  }
+  },
 }[field]
 
 if (!out) {

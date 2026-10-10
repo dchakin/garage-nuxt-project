@@ -6,10 +6,13 @@ export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, registerSchema.parse)
 
   const existing = await db.query.users.findFirst({
-    where: eq(schema.users.email, body.email)
+    where: eq(schema.users.email, body.email),
   })
   if (existing) {
-    throw createError({ statusCode: 409, statusMessage: 'Пользователь с таким email уже существует' })
+    throw createError({
+      statusCode: 409,
+      statusMessage: 'Пользователь с таким email уже существует',
+    })
   }
 
   const passwordHash = await hashPassword(body.password)
@@ -20,7 +23,7 @@ export default defineEventHandler(async (event) => {
     .returning()
 
   await setUserSession(event, {
-    user: { id: user.id, email: user.email, name: user.name }
+    user: { id: user.id, email: user.email, name: user.name },
   })
 
   return { id: user.id, email: user.email, name: user.name }

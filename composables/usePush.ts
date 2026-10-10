@@ -1,5 +1,7 @@
 function urlBase64ToUint8Array(base64: string) {
-  const padded = (base64 + '='.repeat((4 - (base64.length % 4)) % 4)).replace(/-/g, '+').replace(/_/g, '/')
+  const padded = (base64 + '='.repeat((4 - (base64.length % 4)) % 4))
+    .replace(/-/g, '+')
+    .replace(/_/g, '/')
   const raw = atob(padded)
   return Uint8Array.from(raw, (c) => c.charCodeAt(0))
 }
@@ -23,10 +25,15 @@ export function usePush() {
 
   async function refresh() {
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent)
-    const standalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone === true
+    const standalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (navigator as any).standalone === true
     needsInstall.value = ios && !standalone
-    supported.value = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
-      && !!config.public.vapidPublicKey
+    supported.value =
+      'serviceWorker' in navigator &&
+      'PushManager' in window &&
+      'Notification' in window &&
+      !!config.public.vapidPublicKey
     if (!supported.value) return
 
     permission.value = Notification.permission
@@ -46,11 +53,12 @@ export function usePush() {
       if (permission.value !== 'granted') return false
 
       const registration = await getRegistration()
-      const sub = await registration.pushManager.getSubscription()
-        ?? await registration.pushManager.subscribe({
+      const sub =
+        (await registration.pushManager.getSubscription()) ??
+        (await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(String(config.public.vapidPublicKey))
-        })
+          applicationServerKey: urlBase64ToUint8Array(String(config.public.vapidPublicKey)),
+        }))
       await $fetch('/api/push/subscribe', { method: 'POST', body: sub.toJSON() })
       subscribed.value = true
       return true
@@ -64,7 +72,10 @@ export function usePush() {
     try {
       const sub = await (await getRegistration()).pushManager.getSubscription()
       if (sub) {
-        await $fetch('/api/push/subscribe', { method: 'DELETE', body: { endpoint: sub.endpoint } }).catch(() => {})
+        await $fetch('/api/push/subscribe', {
+          method: 'DELETE',
+          body: { endpoint: sub.endpoint },
+        }).catch(() => {})
         await sub.unsubscribe()
       }
       subscribed.value = false

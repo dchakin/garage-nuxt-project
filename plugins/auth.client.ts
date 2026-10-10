@@ -19,6 +19,6 @@ export default defineNuxtPlugin(() => {
 
       await clear()
       await navigateTo('/login')
-    }
+    },
   })
 })

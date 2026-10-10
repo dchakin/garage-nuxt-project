@@ -19,7 +19,7 @@ const form = reactive<EntryInput>({
   mileage: props.initial?.mileage ?? null,
   cost: props.initial?.cost ?? null,
   currency: props.initial?.currency ?? 'RUB',
-  place: props.initial?.place ?? ''
+  place: props.initial?.place ?? '',
 })
 
 function onSubmit() {
@@ -76,7 +76,12 @@ function onSubmit() {
         <Spinner v-if="saving" />
         {{ saving ? 'Сохранение...' : 'Сохранить' }}
       </button>
-      <button type="button" :disabled="saving" class="btn-secondary flex-1 py-2" @click="emit('cancel')">
+      <button
+        type="button"
+        :disabled="saving"
+        class="btn-secondary flex-1 py-2"
+        @click="emit('cancel')"
+      >
         Отмена
       </button>
     </div>

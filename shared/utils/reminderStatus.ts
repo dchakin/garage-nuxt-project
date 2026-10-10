@@ -11,7 +11,7 @@ const SOON_KM_RATIO = 0.1 // 10% от интервала пробега счит
 export function getReminderStatus(
   reminder: Pick<Reminder, 'isActive' | 'nextDueDate' | 'nextDueMileage' | 'intervalKm'>,
   currentMileage: number,
-  today: string = new Date().toISOString().slice(0, 10)
+  today: string = new Date().toISOString().slice(0, 10),
 ): ReminderStatus {
   if (!reminder.isActive) return 'inactive'
 
@@ -27,7 +27,9 @@ export function getReminderStatus(
   }
 
   if (reminder.nextDueMileage != null) {
-    const soonKm = reminder.intervalKm ? Math.max(SOON_KM_FALLBACK, Math.round(reminder.intervalKm * SOON_KM_RATIO)) : SOON_KM_FALLBACK
+    const soonKm = reminder.intervalKm
+      ? Math.max(SOON_KM_FALLBACK, Math.round(reminder.intervalKm * SOON_KM_RATIO))
+      : SOON_KM_FALLBACK
     const diffKm = reminder.nextDueMileage - currentMileage
     if (diffKm < 0) statuses.push('overdue')
     else if (diffKm <= soonKm) statuses.push('soon')
@@ -44,5 +46,5 @@ export const reminderStatusLabels: Record<ReminderStatus, string> = {
   overdue: 'Просрочено',
   soon: 'Скоро',
   ok: 'Ок',
-  inactive: 'Неактивно'
+  inactive: 'Неактивно',
 }

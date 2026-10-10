@@ -25,7 +25,10 @@ function addMonths(dateStr: string, months: number): string {
  * Если есть привязанная запись (lastEntry) и задан интервал — считаем от неё,
  * иначе используем то, что явно указал пользователь.
  */
-export function computeNextDue(input: ComputeNextDueInput): { nextDueDate: string | null; nextDueMileage: number | null } {
+export function computeNextDue(input: ComputeNextDueInput): {
+  nextDueDate: string | null
+  nextDueMileage: number | null
+} {
   const wantsDate = input.triggerType === 'date' || input.triggerType === 'both'
   const wantsMileage = input.triggerType === 'mileage' || input.triggerType === 'both'
 

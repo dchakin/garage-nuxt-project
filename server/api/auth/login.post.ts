@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, loginSchema.parse)
 
   const user = await db.query.users.findFirst({
-    where: eq(schema.users.email, body.email)
+    where: eq(schema.users.email, body.email),
   })
   if (!user) {
     throw createError({ statusCode: 401, statusMessage: 'Неверный email или пароль' })
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
   }
 
   await setUserSession(event, {
-    user: { id: user.id, email: user.email, name: user.name }
+    user: { id: user.id, email: user.email, name: user.name },
   })
 
   return { id: user.id, email: user.email, name: user.name }

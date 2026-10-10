@@ -9,7 +9,10 @@ export default defineEventHandler(async (event) => {
 
   const { car, role } = await requireCarAccess(carId, user.id)
   if (role !== 'owner') {
-    throw createError({ statusCode: 403, statusMessage: 'Редактировать автомобиль может только владелец' })
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Редактировать автомобиль может только владелец',
+    })
   }
 
   const [updated] = await db
@@ -21,7 +24,7 @@ export default defineEventHandler(async (event) => {
       ...(body.plateNumber !== undefined && { plateNumber: body.plateNumber }),
       ...(body.vin !== undefined && { vin: body.vin }),
       ...(body.currentMileage !== undefined && { currentMileage: body.currentMileage }),
-      ...(body.photoUrl !== undefined && { photoUrl: body.photoUrl || null })
+      ...(body.photoUrl !== undefined && { photoUrl: body.photoUrl || null }),
     })
     .where(eq(schema.cars.id, carId))
     .returning()

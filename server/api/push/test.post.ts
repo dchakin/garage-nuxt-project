@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     title: 'Гараж',
     body: 'Тестовое уведомление: push работает 👍',
     url: '/cars',
-    tag: 'test'
+    tag: 'test',
   })
   if (!delivered) {
     throw createError({ statusCode: 400, statusMessage: 'Нет активных подписок на уведомления' })

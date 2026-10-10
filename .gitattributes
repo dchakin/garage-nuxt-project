@@ -3,3 +3,4 @@ docker-entrypoint.sh text eol=lf
 *.sh text eol=lf
 # Макеты Pencil: не нормализовать переводы строк и не показывать текстовый diff
 *.pen binary
+.husky/* text eol=lf

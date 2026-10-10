@@ -1,5 +1,6 @@
 <script setup lang="ts">
-const { supported, permission, subscribed, busy, needsInstall, subscribe, unsubscribe, sendTest } = usePush()
+const { supported, permission, subscribed, busy, needsInstall, subscribe, unsubscribe, sendTest } =
+  usePush()
 const message = ref('')
 const error = ref('')
 
@@ -29,18 +30,33 @@ async function onEnable() {
         <div>
           <p class="font-medium text-slate-800">🔔 Push-уведомления</p>
           <p class="text-sm text-slate-500">
-            <template v-if="needsInstall">На iPhone сначала добавьте приложение на экран «Домой» (Поделиться → На экран «Домой»)</template>
+            <template v-if="needsInstall"
+              >На iPhone сначала добавьте приложение на экран «Домой» (Поделиться → На экран
+              «Домой»)</template
+            >
             <template v-else-if="!supported">Браузер не поддерживает push-уведомления</template>
-            <template v-else-if="permission === 'denied'">Уведомления запрещены в настройках браузера</template>
+            <template v-else-if="permission === 'denied'"
+              >Уведомления запрещены в настройках браузера</template
+            >
             <template v-else-if="subscribed">Включены на этом устройстве</template>
             <template v-else>Напомним, когда подойдёт срок ТО или замены расходников</template>
           </p>
         </div>
         <template v-if="supported && !needsInstall && permission !== 'denied'">
-          <button v-if="!subscribed" :disabled="busy" class="btn-primary px-3 py-1.5 text-sm shrink-0" @click="onEnable">
+          <button
+            v-if="!subscribed"
+            :disabled="busy"
+            class="btn-primary px-3 py-1.5 text-sm shrink-0"
+            @click="onEnable"
+          >
             <Spinner v-if="busy" /> Включить
           </button>
-          <button v-else :disabled="busy" class="btn-secondary px-3 py-1.5 text-sm shrink-0" @click="run(unsubscribe, 'Уведомления выключены')">
+          <button
+            v-else
+            :disabled="busy"
+            class="btn-secondary px-3 py-1.5 text-sm shrink-0"
+            @click="run(unsubscribe, 'Уведомления выключены')"
+          >
             Выключить
           </button>
         </template>

@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
       ...(body.mileage !== undefined && { mileage: body.mileage }),
       ...(body.cost !== undefined && { cost: body.cost }),
       ...(body.currency !== undefined && { currency: body.currency }),
-      ...(body.place !== undefined && { place: body.place })
+      ...(body.place !== undefined && { place: body.place }),
     })
     .where(eq(schema.entries.id, entryId))
     .returning()

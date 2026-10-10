@@ -15,14 +15,11 @@ const defaultCategories = [
   'Кузов',
   'Электрика',
   'Подвеска',
-  'Прочее'
+  'Прочее',
 ]
 
 for (const name of defaultCategories) {
-  db.insert(categories)
-    .values({ name, isDefault: true })
-    .onConflictDoNothing()
-    .run()
+  db.insert(categories).values({ name, isDefault: true }).onConflictDoNothing().run()
 }
 
 console.log('Категории по умолчанию добавлены')

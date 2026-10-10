@@ -12,7 +12,9 @@ export function useEntries(carId: MaybeRefOrGetter<number>) {
   async function fetchEntries(filters: Partial<EntryFilterInput> = {}) {
     loading.value = true
     try {
-      entries.value = await requestFetch<Entry[]>(`/api/cars/${toValue(carId)}/entries`, { query: filters })
+      entries.value = await requestFetch<Entry[]>(`/api/cars/${toValue(carId)}/entries`, {
+        query: filters,
+      })
     } finally {
       loading.value = false
     }
@@ -21,7 +23,10 @@ export function useEntries(carId: MaybeRefOrGetter<number>) {
   async function createEntry(input: EntryInput) {
     saving.value = true
     try {
-      const entry = await $fetch<Entry>(`/api/cars/${toValue(carId)}/entries`, { method: 'POST', body: input })
+      const entry = await $fetch<Entry>(`/api/cars/${toValue(carId)}/entries`, {
+        method: 'POST',
+        body: input,
+      })
       entries.value = [entry, ...entries.value]
       return entry
     } finally {
@@ -50,5 +55,14 @@ export function useEntries(carId: MaybeRefOrGetter<number>) {
     }
   }
 
-  return { entries, loading, saving, deletingId, fetchEntries, createEntry, updateEntry, deleteEntry }
+  return {
+    entries,
+    loading,
+    saving,
+    deletingId,
+    fetchEntries,
+    createEntry,
+    updateEntry,
+    deleteEntry,
+  }
 }

@@ -12,7 +12,9 @@ export function useReminders(carId: MaybeRefOrGetter<number>) {
   async function fetchReminders(filters: Partial<ReminderFilterInput> = {}) {
     loading.value = true
     try {
-      reminders.value = await requestFetch<Reminder[]>(`/api/cars/${toValue(carId)}/reminders`, { query: filters })
+      reminders.value = await requestFetch<Reminder[]>(`/api/cars/${toValue(carId)}/reminders`, {
+        query: filters,
+      })
     } finally {
       loading.value = false
     }
@@ -21,7 +23,10 @@ export function useReminders(carId: MaybeRefOrGetter<number>) {
   async function createReminder(input: ReminderInput) {
     saving.value = true
     try {
-      const reminder = await $fetch<Reminder>(`/api/cars/${toValue(carId)}/reminders`, { method: 'POST', body: input })
+      const reminder = await $fetch<Reminder>(`/api/cars/${toValue(carId)}/reminders`, {
+        method: 'POST',
+        body: input,
+      })
       reminders.value = [reminder, ...reminders.value]
       return reminder
     } finally {
@@ -32,7 +37,10 @@ export function useReminders(carId: MaybeRefOrGetter<number>) {
   async function updateReminder(id: number, input: Partial<ReminderInput>) {
     saving.value = true
     try {
-      const updated = await $fetch<Reminder>(`/api/reminders/${id}`, { method: 'PATCH', body: input })
+      const updated = await $fetch<Reminder>(`/api/reminders/${id}`, {
+        method: 'PATCH',
+        body: input,
+      })
       reminders.value = reminders.value.map((r) => (r.id === id ? updated : r))
       return updated
     } finally {
@@ -50,5 +58,14 @@ export function useReminders(carId: MaybeRefOrGetter<number>) {
     }
   }
 
-  return { reminders, loading, saving, deletingId, fetchReminders, createReminder, updateReminder, deleteReminder }
+  return {
+    reminders,
+    loading,
+    saving,
+    deletingId,
+    fetchReminders,
+    createReminder,
+    updateReminder,
+    deleteReminder,
+  }
 }

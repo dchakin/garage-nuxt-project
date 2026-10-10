@@ -17,7 +17,7 @@ function confirmState() {
     message: '',
     confirmText: 'Подтвердить',
     cancelText: 'Отмена',
-    danger: false
+    danger: false,
   }))
 }
 
@@ -37,7 +37,7 @@ export function useConfirmDialog() {
       message: options.message,
       confirmText: options.confirmText ?? 'Подтвердить',
       cancelText: options.cancelText ?? 'Отмена',
-      danger: options.danger ?? false
+      danger: options.danger ?? false,
     }
 
     return new Promise((resolve) => {

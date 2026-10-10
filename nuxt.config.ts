@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   devServer: {
-    host: '0.0.0.0'
+    host: '0.0.0.0',
   },
 
   modules: ['@nuxtjs/tailwindcss', 'nuxt-auth-utils', '@vite-pwa/nuxt'],
@@ -12,7 +12,7 @@ export default defineNuxtConfig({
 
   typescript: {
     strict: true,
-    typeCheck: false
+    typeCheck: false,
   },
 
   runtimeConfig: {
@@ -20,7 +20,7 @@ export default defineNuxtConfig({
     vapidPrivateKey: '',
     vapidSubject: 'mailto:admin@example.com',
     public: {
-      vapidPublicKey: ''
+      vapidPublicKey: '',
     },
     dbFileName: process.env.DB_FILE_NAME || 'server/database/garage.db',
     session: {
@@ -31,20 +31,20 @@ export default defineNuxtConfig({
         // secure: false по умолчанию — иначе кука не сохраняется при доступе по http
         // с других устройств (например, http://192.168.x.x с телефона) в dev.
         // За https (прод, см. docker-compose.yml) включается через NUXT_SESSION_COOKIE_SECURE=true.
-        secure: process.env.NUXT_SESSION_COOKIE_SECURE === 'true'
-      }
-    }
+        secure: process.env.NUXT_SESSION_COOKIE_SECURE === 'true',
+      },
+    },
   },
 
   nitro: {
     experimental: {
       wasm: false,
-      tasks: true
+      tasks: true,
     },
     // Ежедневная проверка напоминаний: 06:00 UTC = 09:00 МСК
     scheduledTasks: {
-      '0 6 * * *': ['reminders:notify']
-    }
+      '0 6 * * *': ['reminders:notify'],
+    },
   },
 
   app: {
@@ -55,14 +55,14 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'theme-color', content: '#4f46e5' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
-        { name: 'apple-mobile-web-app-title', content: 'Гараж' }
+        { name: 'apple-mobile-web-app-title', content: 'Гараж' },
       ],
       link: [
         { rel: 'icon', href: '/favicon.ico', sizes: 'any' },
         { rel: 'icon', href: '/logo.svg', type: 'image/svg+xml' },
-        { rel: 'apple-touch-icon', href: '/apple-touch-icon-180x180.png' }
-      ]
-    }
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon-180x180.png' },
+      ],
+    },
   },
 
   pwa: {
@@ -85,18 +85,23 @@ export default defineNuxtConfig({
         { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
         { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
         { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
-        { src: 'maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
-      ]
+        {
+          src: 'maskable-icon-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'maskable',
+        },
+      ],
     },
     injectManifest: {
       // Только прекэш статики приложения — API-запросы (данные пользователя)
       // намеренно не кэшируются офлайн-воркером, оффлайн-режим не входит в ТЗ.
-      globPatterns: ['**/*.{js,css,html,ico,png,svg}']
+      globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
     },
     devOptions: {
       // Включаем SW и в dev, чтобы можно было проверить "Установить приложение" локально
       enabled: true,
-      type: 'module'
-    }
-  }
+      type: 'module',
+    },
+  },
 })

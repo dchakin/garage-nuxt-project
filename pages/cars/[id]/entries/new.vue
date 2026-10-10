@@ -22,7 +22,11 @@ async function onSubmit(input: EntryInput) {
 
 <template>
   <div>
-    <NuxtLink :to="`/cars/${carId}`" class="text-sm text-slate-500 hover:text-slate-800 transition-colors">← К автомобилю</NuxtLink>
+    <NuxtLink
+      :to="`/cars/${carId}`"
+      class="text-sm text-slate-500 hover:text-slate-800 transition-colors"
+      >← К автомобилю</NuxtLink
+    >
 
     <h1 class="text-lg font-semibold text-slate-800 mt-2 mb-4">Новая запись</h1>
 

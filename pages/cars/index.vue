@@ -56,10 +56,21 @@ async function onCreate(input: CarInput) {
         class="card p-4 flex items-center justify-between hover:border-indigo-300 hover:shadow-sm transition"
       >
         <div>
-          <p class="font-medium text-slate-800">{{ car.brand }} {{ car.model }} <span v-if="car.year">({{ car.year }})</span></p>
-          <p class="text-sm text-slate-500">{{ car.plateNumber || 'Без номера' }} · {{ car.currentMileage.toLocaleString('ru-RU') }} км</p>
+          <p class="font-medium text-slate-800">
+            {{ car.brand }} {{ car.model }} <span v-if="car.year">({{ car.year }})</span>
+          </p>
+          <p class="text-sm text-slate-500">
+            {{ car.plateNumber || 'Без номера' }} ·
+            {{ car.currentMileage.toLocaleString('ru-RU') }} км
+          </p>
         </div>
-        <svg class="h-4 w-4 text-slate-400 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          class="h-4 w-4 text-slate-400 shrink-0"
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M7 5l5 5-5 5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </NuxtLink>

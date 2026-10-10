@@ -9,12 +9,16 @@ export default defineEventHandler(async (event) => {
 
   const members = await db.query.carMembers.findMany({
     where: eq(schema.carMembers.carId, carId),
-    with: { user: true }
+    with: { user: true },
   })
 
   return {
     ...car,
     role,
-    members: members.map((m) => ({ id: m.id, role: m.role, user: { id: m.user.id, email: m.user.email, name: m.user.name } }))
+    members: members.map((m) => ({
+      id: m.id,
+      role: m.role,
+      user: { id: m.user.id, email: m.user.email, name: m.user.name },
+    })),
   }
 })

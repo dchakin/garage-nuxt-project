@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const list = await db.query.reminders.findMany({
     where: and(...conditions),
     orderBy: desc(schema.reminders.createdAt),
-    with: { category: true, lastEntry: true }
+    with: { category: true, lastEntry: true },
   })
 
   return list

@@ -14,7 +14,7 @@ const statusStyles: Record<string, string> = {
   overdue: 'bg-red-100 text-red-700',
   soon: 'bg-amber-100 text-amber-700',
   ok: 'bg-emerald-100 text-emerald-700',
-  inactive: 'bg-slate-100 text-slate-500'
+  inactive: 'bg-slate-100 text-slate-500',
 }
 
 function status(reminder: Reminder) {
@@ -31,7 +31,7 @@ async function onDelete(reminder: Reminder) {
     title: 'Удалить напоминание?',
     message: `«${reminder.title}» будет удалено безвозвратно.`,
     confirmText: 'Удалить',
-    danger: true
+    danger: true,
   })
   if (!ok) return
   await deleteReminder(reminder.id)
@@ -40,7 +40,8 @@ async function onDelete(reminder: Reminder) {
 function dueText(reminder: Reminder) {
   const parts: string[] = []
   if (reminder.nextDueDate) parts.push(reminder.nextDueDate)
-  if (reminder.nextDueMileage != null) parts.push(`${reminder.nextDueMileage.toLocaleString('ru-RU')} км`)
+  if (reminder.nextDueMileage != null)
+    parts.push(`${reminder.nextDueMileage.toLocaleString('ru-RU')} км`)
   return parts.length ? parts.join(' · ') : 'Не задано'
 }
 </script>
@@ -69,7 +70,10 @@ function dueText(reminder: Reminder) {
             <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
               <p class="font-medium text-slate-800 leading-snug flex-1 min-w-[140px]">
                 {{ reminder.title }}
-                <span class="ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium" :class="statusStyles[status(reminder)]">
+                <span
+                  class="ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                  :class="statusStyles[status(reminder)]"
+                >
                   {{ reminderStatusLabels[status(reminder)] }}
                 </span>
               </p>
@@ -81,7 +85,15 @@ function dueText(reminder: Reminder) {
                   title="Изменить"
                   aria-label="Изменить"
                 >
-                  <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <svg
+                    class="h-3.5 w-3.5"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
                     <path d="M13.5 3.5a1.5 1.5 0 0 1 2 2l-9 9-3 1 1-3 9-9Z" />
                   </svg>
                 </NuxtLink>
@@ -93,13 +105,26 @@ function dueText(reminder: Reminder) {
                   @click="onDelete(reminder)"
                 >
                   <Spinner v-if="deletingId === reminder.id" />
-                  <svg v-else class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 6h12M8 6V4.5A1.5 1.5 0 0 1 9.5 3h1A1.5 1.5 0 0 1 12 4.5V6m2 0-.6 9.4a1.5 1.5 0 0 1-1.5 1.4H8.1a1.5 1.5 0 0 1-1.5-1.4L6 6" />
+                  <svg
+                    v-else
+                    class="h-3.5 w-3.5"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M4 6h12M8 6V4.5A1.5 1.5 0 0 1 9.5 3h1A1.5 1.5 0 0 1 12 4.5V6m2 0-.6 9.4a1.5 1.5 0 0 1-1.5 1.4H8.1a1.5 1.5 0 0 1-1.5-1.4L6 6"
+                    />
                   </svg>
                 </button>
               </div>
             </div>
-            <p v-if="reminder.category" class="text-sm text-slate-400 mt-0.5">{{ reminder.category.name }}</p>
+            <p v-if="reminder.category" class="text-sm text-slate-400 mt-0.5">
+              {{ reminder.category.name }}
+            </p>
             <p class="text-sm text-slate-500 mt-0.5">
               {{ reminderTriggerTypeLabels[reminder.triggerType] }} · {{ dueText(reminder) }}
             </p>

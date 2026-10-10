@@ -11,9 +11,14 @@ export default defineEventHandler(async (event) => {
 
   let lastEntry: { date: string; mileage: number | null } | null = null
   if (body.lastEntryId) {
-    const entry = await db.query.entries.findFirst({ where: eq(schema.entries.id, body.lastEntryId) })
+    const entry = await db.query.entries.findFirst({
+      where: eq(schema.entries.id, body.lastEntryId),
+    })
     if (!entry || entry.carId !== carId) {
-      throw createError({ statusCode: 400, statusMessage: 'Запись не найдена для этого автомобиля' })
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Запись не найдена для этого автомобиля',
+      })
     }
     lastEntry = { date: entry.date, mileage: entry.mileage }
   }
@@ -24,7 +29,7 @@ export default defineEventHandler(async (event) => {
     intervalKm: body.intervalKm,
     lastEntry,
     nextDueDateOverride: body.nextDueDate,
-    nextDueMileageOverride: body.nextDueMileage
+    nextDueMileageOverride: body.nextDueMileage,
   })
 
   const [reminder] = await db
@@ -39,7 +44,7 @@ export default defineEventHandler(async (event) => {
       lastEntryId: body.lastEntryId ?? null,
       nextDueDate,
       nextDueMileage,
-      isActive: body.isActive
+      isActive: body.isActive,
     })
     .returning()
 

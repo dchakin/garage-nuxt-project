@@ -16,7 +16,7 @@ async function onSubmit() {
   try {
     await $fetch('/api/auth/register', {
       method: 'POST',
-      body: { name: name.value, email: email.value, password: password.value }
+      body: { name: name.value, email: email.value, password: password.value },
     })
     await refreshSession()
     router.push('/cars')
@@ -31,7 +31,10 @@ async function onSubmit() {
 <template>
   <div class="max-w-sm mx-auto mt-16">
     <div class="flex justify-center mb-4">
-      <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600 text-white text-xl">🚗</span>
+      <span
+        class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600 text-white text-xl"
+        >🚗</span
+      >
     </div>
     <h1 class="text-xl font-semibold text-slate-800 mb-6 text-center">Регистрация</h1>
     <div class="card p-6 shadow-sm">

@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   const entry = await db.query.entries.findFirst({
     where: eq(schema.entries.id, entryId),
-    with: { category: true }
+    with: { category: true },
   })
   if (!entry) {
     throw createError({ statusCode: 404, statusMessage: 'Запись не найдена' })

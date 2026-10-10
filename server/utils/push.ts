@@ -30,26 +30,32 @@ export async function sendPushToUser(userId: number, payload: PushPayload): Prom
   if (!ensureConfigured()) return 0
 
   const subs = await db.query.pushSubscriptions.findMany({
-    where: eq(schema.pushSubscriptions.userId, userId)
+    where: eq(schema.pushSubscriptions.userId, userId),
   })
 
   let delivered = 0
-  await Promise.all(subs.map(async (sub) => {
-    try {
-      await webpush.sendNotification(
-        { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-        JSON.stringify(payload),
-        { TTL: 60 * 60 * 24 }
-      )
-      delivered++
-    } catch (e: any) {
-      if (e?.statusCode === 404 || e?.statusCode === 410) {
-        await db.delete(schema.pushSubscriptions).where(eq(schema.pushSubscriptions.id, sub.id))
-      } else {
-        console.error('[push] не удалось отправить уведомление', e?.statusCode, e?.body || e?.message)
+  await Promise.all(
+    subs.map(async (sub) => {
+      try {
+        await webpush.sendNotification(
+          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+          JSON.stringify(payload),
+          { TTL: 60 * 60 * 24 },
+        )
+        delivered++
+      } catch (e: any) {
+        if (e?.statusCode === 404 || e?.statusCode === 410) {
+          await db.delete(schema.pushSubscriptions).where(eq(schema.pushSubscriptions.id, sub.id))
+        } else {
+          console.error(
+            '[push] не удалось отправить уведомление',
+            e?.statusCode,
+            e?.body || e?.message,
+          )
+        }
       }
-    }
-  }))
+    }),
+  )
   return delivered
 }
 
@@ -75,13 +81,16 @@ export async function notifyDueReminders(options: { carId?: number } = {}) {
 
   const list = await db.query.reminders.findMany({
     where: and(...conditions),
-    with: { car: { with: { members: true } } }
+    with: { car: { with: { members: true } } },
   })
 
   // Уведомляем только тех, у кого есть хоть одна подписка
   const subscribed = new Set(
-    (await db.selectDistinct({ userId: schema.pushSubscriptions.userId }).from(schema.pushSubscriptions))
-      .map((r) => r.userId)
+    (
+      await db
+        .selectDistinct({ userId: schema.pushSubscriptions.userId })
+        .from(schema.pushSubscriptions)
+    ).map((r) => r.userId),
   )
 
   let sent = 0
@@ -89,22 +98,26 @@ export async function notifyDueReminders(options: { carId?: number } = {}) {
     const status = getReminderStatus(reminder, reminder.car.currentMileage)
     if (status !== 'soon' && status !== 'overdue') continue
 
-    const recipients = [...new Set([reminder.car.ownerId, ...reminder.car.members.map((m) => m.userId)])]
-      .filter((id) => subscribed.has(id))
+    const recipients = [
+      ...new Set([reminder.car.ownerId, ...reminder.car.members.map((m) => m.userId)]),
+    ].filter((id) => subscribed.has(id))
     if (!recipients.length) continue
 
     const dueKey = `${reminder.nextDueDate ?? ''}|${reminder.nextDueMileage ?? ''}`
     const car = reminder.car
     const due = [
       reminder.nextDueDate && `до ${formatDate(reminder.nextDueDate)}`,
-      reminder.nextDueMileage != null && `на ${formatKm(reminder.nextDueMileage)} (сейчас ${formatKm(car.currentMileage)})`
-    ].filter(Boolean).join(' или ')
+      reminder.nextDueMileage != null &&
+        `на ${formatKm(reminder.nextDueMileage)} (сейчас ${formatKm(car.currentMileage)})`,
+    ]
+      .filter(Boolean)
+      .join(' или ')
 
     const payload: PushPayload = {
       title: `${status === 'overdue' ? '⚠️ Просрочено' : '🔧 Скоро'}: ${reminder.title}`,
       body: `${car.brand} ${car.model}${due ? ` — ${due}` : ''}`,
       url: `/cars/${car.id}?tab=reminders`,
-      tag: `reminder-${reminder.id}`
+      tag: `reminder-${reminder.id}`,
     }
 
     for (const userId of recipients) {
@@ -122,7 +135,9 @@ export async function notifyDueReminders(options: { carId?: number } = {}) {
         sent++
       } else {
         // Не доставили ни на одно устройство — пробуем снова при следующей проверке
-        await db.delete(schema.reminderNotifications).where(eq(schema.reminderNotifications.id, logged.id))
+        await db
+          .delete(schema.reminderNotifications)
+          .where(eq(schema.reminderNotifications.id, logged.id))
       }
     }
   }

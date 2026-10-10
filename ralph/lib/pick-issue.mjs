@@ -15,12 +15,13 @@ process.stdin.on('end', () => {
     .map((i) => ({
       number: i.number,
       stage: stageOf(i),
-      tests: i.labels.some((l) => l.name === 'tests')
+      tests: i.labels.some((l) => l.name === 'tests'),
     }))
-    .sort((a, b) =>
-      Number(b.tests) - Number(a.tests) ||
-      (a.stage ?? 99) - (b.stage ?? 99) ||
-      a.number - b.number
+    .sort(
+      (a, b) =>
+        Number(b.tests) - Number(a.tests) ||
+        (a.stage ?? 99) - (b.stage ?? 99) ||
+        a.number - b.number,
     )
 
   const next = candidates[0]

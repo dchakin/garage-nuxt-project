@@ -5,6 +5,6 @@ export default defineConfig({
   out: './server/database/migrations',
   dialect: 'sqlite',
   dbCredentials: {
-    url: process.env.DB_FILE_NAME || 'server/database/garage.db'
-  }
+    url: process.env.DB_FILE_NAME || 'server/database/garage.db',
+  },
 })

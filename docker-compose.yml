@@ -6,7 +6,7 @@ services:
     environment:
       DB_FILE_NAME: /app/data/garage.db
       NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD}
-      NUXT_SESSION_COOKIE_SECURE: "true"
+      NUXT_SESSION_COOKIE_SECURE: 'true'
       NUXT_PUBLIC_VAPID_PUBLIC_KEY: ${NUXT_PUBLIC_VAPID_PUBLIC_KEY}
       NUXT_VAPID_PRIVATE_KEY: ${NUXT_VAPID_PRIVATE_KEY}
       NUXT_VAPID_SUBJECT: ${NUXT_VAPID_SUBJECT}
@@ -14,4 +14,4 @@ services:
     volumes:
       - ./data:/app/data
     ports:
-      - "127.0.0.1:3000:3000"
+      - '127.0.0.1:3000:3000'

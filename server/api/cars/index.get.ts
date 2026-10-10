@@ -5,12 +5,12 @@ export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
 
   const owned = await db.query.cars.findMany({
-    where: eq(schema.cars.ownerId, user.id)
+    where: eq(schema.cars.ownerId, user.id),
   })
 
   const memberships = await db.query.carMembers.findMany({
     where: eq(schema.carMembers.userId, user.id),
-    with: { car: true }
+    with: { car: true },
   })
 
   const memberCars = memberships.map((m) => m.car).filter(Boolean)

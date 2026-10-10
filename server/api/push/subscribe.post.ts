@@ -13,11 +13,11 @@ export default defineEventHandler(async (event) => {
       endpoint: body.endpoint,
       p256dh: body.keys.p256dh,
       auth: body.keys.auth,
-      userAgent: getRequestHeader(event, 'user-agent') ?? null
+      userAgent: getRequestHeader(event, 'user-agent') ?? null,
     })
     .onConflictDoUpdate({
       target: schema.pushSubscriptions.endpoint,
-      set: { userId: user.id, p256dh: body.keys.p256dh, auth: body.keys.auth }
+      set: { userId: user.id, p256dh: body.keys.p256dh, auth: body.keys.auth },
     })
 
   return { ok: true }

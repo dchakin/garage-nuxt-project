@@ -8,7 +8,7 @@ export const entryTypeLabels: Record<EntryType, string> = {
   replacement: 'Замена расходника',
   purchase: 'Покупка',
   maintenance: 'Плановое ТО',
-  other: 'Прочее'
+  other: 'Прочее',
 }
 
 export const entrySchema = z.object({
@@ -19,7 +19,7 @@ export const entrySchema = z.object({
   mileage: z.number().int().min(0).nullish(),
   cost: z.number().min(0).nullish(),
   currency: z.string().default('RUB'),
-  place: z.string().nullish()
+  place: z.string().nullish(),
 })
 export type EntryInput = z.infer<typeof entrySchema>
 
@@ -30,6 +30,6 @@ export const entryFilterSchema = z.object({
   dateTo: z.string().optional(),
   search: z.string().optional(),
   sortBy: z.enum(['date', 'mileage']).default('date'),
-  sortDir: z.enum(['asc', 'desc']).default('desc')
+  sortDir: z.enum(['asc', 'desc']).default('desc'),
 })
 export type EntryFilterInput = z.infer<typeof entryFilterSchema>

@@ -6,7 +6,7 @@ export type ReminderTriggerType = (typeof reminderTriggerTypes)[number]
 export const reminderTriggerTypeLabels: Record<ReminderTriggerType, string> = {
   date: 'По дате',
   mileage: 'По пробегу',
-  both: 'По дате или пробегу'
+  both: 'По дате или пробегу',
 }
 
 // Базовая форма без кросс-полевой валидации — нужна отдельно, чтобы можно было
@@ -20,7 +20,7 @@ export const reminderBaseSchema = z.object({
   lastEntryId: z.number().int().nullish(),
   nextDueDate: z.string().nullish(),
   nextDueMileage: z.number().int().min(0).nullish(),
-  isActive: z.boolean().default(true)
+  isActive: z.boolean().default(true),
 })
 
 function validateTrigger(data: z.infer<typeof reminderBaseSchema>, ctx: z.RefinementCtx) {
@@ -28,10 +28,18 @@ function validateTrigger(data: z.infer<typeof reminderBaseSchema>, ctx: z.Refine
   const needsMileage = data.triggerType === 'mileage' || data.triggerType === 'both'
 
   if (needsDate && !data.intervalMonths && !data.nextDueDate) {
-    ctx.addIssue({ code: 'custom', message: 'Укажите интервал в месяцах или дату', path: ['intervalMonths'] })
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Укажите интервал в месяцах или дату',
+      path: ['intervalMonths'],
+    })
   }
   if (needsMileage && !data.intervalKm && data.nextDueMileage == null) {
-    ctx.addIssue({ code: 'custom', message: 'Укажите интервал в км или пробег', path: ['intervalKm'] })
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Укажите интервал в км или пробег',
+      path: ['intervalKm'],
+    })
   }
 }
 
@@ -39,6 +47,6 @@ export const reminderSchema = reminderBaseSchema.superRefine(validateTrigger)
 export type ReminderInput = z.infer<typeof reminderBaseSchema>
 
 export const reminderFilterSchema = z.object({
-  isActive: z.coerce.boolean().optional()
+  isActive: z.coerce.boolean().optional(),
 })
 export type ReminderFilterInput = z.infer<typeof reminderFilterSchema>

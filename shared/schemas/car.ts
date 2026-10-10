@@ -7,11 +7,11 @@ export const carSchema = z.object({
   plateNumber: z.string().nullish(),
   vin: z.string().nullish(),
   currentMileage: z.number().int().min(0).default(0),
-  photoUrl: z.string().url().nullish().or(z.literal(''))
+  photoUrl: z.string().url().nullish().or(z.literal('')),
 })
 export type CarInput = z.infer<typeof carSchema>
 
 export const inviteSchema = z.object({
-  email: z.string().email('Некорректный email')
+  email: z.string().email('Некорректный email'),
 })
 export type InviteInput = z.infer<typeof inviteSchema>

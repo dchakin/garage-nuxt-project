@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   const reminder = await db.query.reminders.findFirst({
     where: eq(schema.reminders.id, reminderId),
-    with: { category: true, lastEntry: true }
+    with: { category: true, lastEntry: true },
   })
   if (!reminder) {
     throw createError({ statusCode: 404, statusMessage: 'Напоминание не найдено' })

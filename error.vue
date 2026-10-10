@@ -17,25 +17,26 @@ const content = computed(() => {
       return {
         emoji: '🔒',
         title: 'Сессия истекла',
-        text: 'Похоже, вы вышли из системы или сессия устарела. Войдите заново, чтобы продолжить.'
+        text: 'Похоже, вы вышли из системы или сессия устарела. Войдите заново, чтобы продолжить.',
       }
     case 403:
       return {
         emoji: '⛔',
         title: 'Нет доступа',
-        text: 'У вас нет прав для просмотра этой страницы или автомобиля.'
+        text: 'У вас нет прав для просмотра этой страницы или автомобиля.',
       }
     case 404:
       return {
         emoji: '🔍',
         title: 'Страница не найдена',
-        text: 'Такой страницы не существует или она была удалена.'
+        text: 'Такой страницы не существует или она была удалена.',
       }
     default:
       return {
         emoji: '⚠️',
         title: 'Что-то пошло не так',
-        text: props.error?.statusMessage || props.error?.message || 'Произошла непредвиденная ошибка.'
+        text:
+          props.error?.statusMessage || props.error?.message || 'Произошла непредвиденная ошибка.',
       }
   }
 })
@@ -53,7 +54,9 @@ async function goHome() {
 <template>
   <div class="max-w-sm mx-auto mt-16 text-center">
     <div class="flex justify-center mb-4">
-      <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600 text-white text-xl">
+      <span
+        class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600 text-white text-xl"
+      >
         {{ content.emoji }}
       </span>
     </div>
@@ -64,9 +67,7 @@ async function goHome() {
       <button v-if="statusCode === 401" class="btn-primary w-full py-2" @click="goToLogin">
         Войти заново
       </button>
-      <button v-else class="btn-primary w-full py-2" @click="goHome">
-        На главную
-      </button>
+      <button v-else class="btn-primary w-full py-2" @click="goHome">На главную</button>
     </div>
   </div>
 </template>

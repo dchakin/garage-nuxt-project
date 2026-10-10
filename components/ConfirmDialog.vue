@@ -34,7 +34,12 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
           leave-from-class="opacity-100 scale-100"
           leave-to-class="opacity-0 scale-95"
         >
-          <div v-if="dialog.open" class="card w-full max-w-sm p-5 shadow-xl" role="alertdialog" aria-modal="true">
+          <div
+            v-if="dialog.open"
+            class="card w-full max-w-sm p-5 shadow-xl"
+            role="alertdialog"
+            aria-modal="true"
+          >
             <h2 class="font-semibold text-slate-800">{{ dialog.title }}</h2>
             <p class="text-sm text-slate-600 mt-1.5">{{ dialog.message }}</p>
             <div class="flex justify-end gap-2 mt-5">
@@ -43,9 +48,11 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
               </button>
               <button
                 class="inline-flex items-center justify-center gap-1.5 rounded-lg font-medium px-3 py-1.5 text-sm transition-colors"
-                :class="dialog.danger
-                  ? 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800'
-                  : 'bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800'"
+                :class="
+                  dialog.danger
+                    ? 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800'
+                    : 'bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800'
+                "
                 @click="respond(true)"
               >
                 {{ dialog.confirmText }}

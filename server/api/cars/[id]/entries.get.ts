@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   let list = await db.query.entries.findMany({
     where: and(...conditions),
     orderBy: orderFn(sortColumn),
-    with: { category: true }
+    with: { category: true },
   })
 
   // SQLite's LIKE is only case-insensitive for ASCII, so Cyrillic search
@@ -30,8 +30,8 @@ export default defineEventHandler(async (event) => {
     const term = query.search.toLocaleLowerCase('ru')
     list = list.filter(
       (e) =>
-        e.description?.toLocaleLowerCase('ru').includes(term)
-        || e.place?.toLocaleLowerCase('ru').includes(term)
+        e.description?.toLocaleLowerCase('ru').includes(term) ||
+        e.place?.toLocaleLowerCase('ru').includes(term),
     )
   }
 

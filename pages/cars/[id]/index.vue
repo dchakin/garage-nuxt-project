@@ -12,7 +12,10 @@ const car = reactive(await fetchCar(carId))
 await fetchReminders({ isActive: true })
 
 const alertCount = computed(
-  () => reminders.value.filter((r) => ['overdue', 'soon'].includes(getReminderStatus(r, car.currentMileage))).length
+  () =>
+    reminders.value.filter((r) =>
+      ['overdue', 'soon'].includes(getReminderStatus(r, car.currentMileage)),
+    ).length,
 )
 
 const tab = ref<'journal' | 'reminders'>(route.query.tab === 'reminders' ? 'reminders' : 'journal')
@@ -23,11 +26,17 @@ watch(tab, (value) => {
 
 <template>
   <div class="pb-20">
-    <NuxtLink to="/cars" class="text-sm text-slate-500 hover:text-slate-800 transition-colors">← Все автомобили</NuxtLink>
+    <NuxtLink to="/cars" class="text-sm text-slate-500 hover:text-slate-800 transition-colors"
+      >← Все автомобили</NuxtLink
+    >
 
     <div class="flex items-center justify-between mt-2 mb-4">
       <h1 class="text-lg font-semibold text-slate-800">{{ car.brand }} {{ car.model }}</h1>
-      <NuxtLink v-if="car.role === 'owner'" :to="`/cars/${carId}/edit`" class="text-sm text-slate-500 hover:text-slate-800 transition-colors">
+      <NuxtLink
+        v-if="car.role === 'owner'"
+        :to="`/cars/${carId}/edit`"
+        class="text-sm text-slate-500 hover:text-slate-800 transition-colors"
+      >
         Изменить
       </NuxtLink>
     </div>
@@ -35,7 +44,9 @@ watch(tab, (value) => {
     <div class="grid grid-cols-2 gap-3 mb-6">
       <div class="card p-4">
         <p class="text-xs text-slate-500">Пробег</p>
-        <p class="text-xl font-semibold text-slate-800">{{ car.currentMileage.toLocaleString('ru-RU') }} км</p>
+        <p class="text-xl font-semibold text-slate-800">
+          {{ car.currentMileage.toLocaleString('ru-RU') }} км
+        </p>
       </div>
       <div class="card p-4">
         <p class="text-xs text-slate-500">Гос. номер</p>
@@ -43,8 +54,12 @@ watch(tab, (value) => {
       </div>
     </div>
 
-    <div v-if="alertCount" class="mb-4 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-800">
-      ⏰ {{ alertCount }} {{ alertCount === 1 ? 'напоминание требует внимания' : 'напоминаний требуют внимания' }}
+    <div
+      v-if="alertCount"
+      class="mb-4 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-800"
+    >
+      ⏰ {{ alertCount }}
+      {{ alertCount === 1 ? 'напоминание требует внимания' : 'напоминаний требуют внимания' }}
     </div>
 
     <EntryJournal v-if="tab === 'journal'" :car-id="carId" />
@@ -75,7 +90,8 @@ watch(tab, (value) => {
             <span
               v-if="alertCount"
               class="absolute -top-1.5 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white"
-            >{{ alertCount }}</span>
+              >{{ alertCount }}</span
+            >
           </span>
           Напоминания
         </button>
