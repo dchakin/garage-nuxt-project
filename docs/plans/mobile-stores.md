@@ -21,6 +21,8 @@
 
 ## Этап 1. Разделение клиента и API
 
+**Статус: реализовано.** Отличия от наброска ниже: `apps/api` — standalone Nitro (маршруты переехали без переписывания), `nuxt-auth-utils` убран — cookie-сессия на h3 `useSession` (имя куки сохранено), добавлены JWT access + одноразовый refresh (`authMode: 'token'`); публичный VAPID-ключ клиент берёт из `GET /api/push/config`; в проде API сам раздаёт собранный клиент (один контейнер, `NUXT_WEB_DIST_DIR`). Контракты — в `conventions.md`.
+
 - Структура монорепы (npm workspaces): `apps/web` — Nuxt-клиент (`ssr: false`, сборка `nuxt generate`), `apps/api` — Nitro + Drizzle + SQLite (текущий `server/`), `packages/shared` — Zod-схемы, типы, утилиты (текущий `shared/`).
 - Базовый URL API в клиенте — из runtime config (`NUXT_PUBLIC_API_BASE`): для веба относительный, для мобильной сборки — абсолютный адрес прода.
 - Авторизация: к cookie-сессии `nuxt-auth-utils` добавить токены (access + refresh, `Authorization: Bearer`) для мобильного клиента. Cookie из WebView с origin `capacitor://localhost` / `https://localhost` ненадёжны. `requireUserSession` заменить общим хелпером, понимающим оба способа.

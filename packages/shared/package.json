@@ -1,0 +1,18 @@
+{
+  "name": "@garage/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Zod-схемы, типы и чистые утилиты, общие для apps/api и apps/web. Исходники TS потребляются напрямую, без сборки.",
+  "exports": {
+    "./types": "./types.ts",
+    "./schemas/*": "./schemas/*.ts",
+    "./utils/*": "./utils/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  }
+}

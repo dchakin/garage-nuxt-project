@@ -66,10 +66,10 @@
 
 ## 5. Технологический стек
 
-- Фронтенд: Nuxt 3, TypeScript, Vue 3 (Composition API), Pinia — для стейта, Tailwind CSS — для стилей (быстро для пет-проекта).
-- Бэкенд: серверные роуты Nuxt на движке Nitro (`server/api/**`) — отдельный бэкенд-проект не нужен, всё в одном Nuxt-приложении.
+- Фронтенд (`apps/web`): Nuxt 3 в режиме SPA (`ssr: false`, сборка `nuxt generate`), TypeScript, Vue 3 (Composition API), Tailwind CSS — для стилей (быстро для пет-проекта).
+- Бэкенд (`apps/api`): отдельное приложение на Nitro (`server/api/**`) без Nuxt. Клиент и API разделены (npm workspaces: `apps/web`, `apps/api`, `packages/shared`), чтобы тот же клиент можно было упаковать в мобильные приложения (`docs/plans/mobile-stores.md`).
 - База данных: SQLite (файл), доступ через Drizzle ORM (типобезопасные запросы, миграции, хорошо сочетается с TS и Nitro).
-- Авторизация: `nuxt-auth-utils` (сессии на куках, простая email+пароль или magic link) — не требует внешних сервисов, подходит для пет-проекта с небольшим числом пользователей.
+- Авторизация: email+пароль; веб — подписанная httpOnly-кука (h3 `useSession`), мобильный клиент — access-токен (JWT, 15 мин) + одноразовый refresh-токен (`Authorization: Bearer`). Не требует внешних сервисов, подходит для пет-проекта с небольшим числом пользователей.
 - Валидация данных: Zod — на входе API-роутов.
 - Графики: `chart.js` + `vue-chartjs` (или `unovis`) для аналитики.
 - Деплой: контейнер/VPS или сервисы вроде Fly.io/Railway с поддержкой персистентного диска для файла SQLite; либо Vercel/Netlify с внешней БД (Turso — SQLite-совместимая) — решается на этапе деплоя.
@@ -84,9 +84,9 @@
 - **EntryAttachment** (опционально в MVP): id, entry_id, file_url.
 - **Reminder**: id, car_id, title, category_id, trigger_type (date/mileage/both), interval_months, interval_km, last_entry_id (nullable, ссылка на Entry, от которой считать), next_due_date, next_due_mileage, is_active, created_at.
 
-## 7. Основные API-роуты (Nitro `server/api`)
+## 7. Основные API-роуты (Nitro, `apps/api/server/api`)
 
-- `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/session`.
+- `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/session`, `POST /api/auth/refresh` (обмен refresh-токена на новую пару; login/register принимают `authMode: 'token'` для мобильного клиента).
 - `GET/POST /api/cars`, `GET/PATCH/DELETE /api/cars/[id]`.
 - `POST /api/cars/[id]/invite` — пригласить участника.
 - `GET/POST /api/cars/[id]/entries`, `GET/PATCH/DELETE /api/entries/[id]`.
@@ -109,17 +109,12 @@
 ## 9. Структура проекта (ориентир)
 
 ```
-garage-nuxt-project/
-├── app/                     # pages, components, composables (Nuxt 3 app dir либо без него)
-│   ├── pages/
-│   ├── components/
-│   └── composables/
-├── server/
-│   ├── api/
-│   ├── database/            # схема Drizzle, миграции
-│   └── utils/
-├── shared/                  # общие типы/схемы Zod для фронта и бэка
-├── nuxt.config.ts
+garage-nuxt-project/         # монорепа (npm workspaces)
+├── apps/
+│   ├── web/                 # Nuxt SPA: pages, components, composables
+│   └── api/                 # Nitro: server/api, server/database (схема Drizzle, миграции), server/utils
+├── packages/
+│   └── shared/              # общие типы/схемы Zod для фронта и бэка (@garage/shared)
 └── package.json
 ```
 

@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1783620446031,
+      "tag": "0000_famous_naoko",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1790189677285,
+      "tag": "0001_sharp_enchantress",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1791636767131,
+      "tag": "0002_useful_multiple_man",
+      "breakpoints": true
+    }
+  ]
+}

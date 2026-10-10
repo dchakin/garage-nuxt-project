@@ -11,5 +11,5 @@ package-lock.json
 .playwright-mcp
 test-results
 playwright-report
-server/database/migrations
+apps/api/server/database/migrations
 .claude/skills
