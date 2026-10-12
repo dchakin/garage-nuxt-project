@@ -14,7 +14,7 @@
     "@garage/shared": "*",
     "@vueuse/core": "^11.3.0",
     "chart.js": "^4.4.7",
-    "nuxt": "^3.14.1592",
+    "nuxt": "^3.21.11",
     "ofetch": "^1.4.1",
     "vue": "latest",
     "vue-chartjs": "^5.3.2",
