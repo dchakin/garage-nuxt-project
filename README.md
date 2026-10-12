@@ -77,7 +77,7 @@ API раздаёт собранный клиент (SPA-фолбэк на `200.h
 | api        | `NUXT_PUBLIC_VAPID_PUBLIC_KEY`, `NUXT_VAPID_PRIVATE_KEY`, `NUXT_VAPID_SUBJECT` | Web Push; публичный ключ клиент получает от `GET /api/push/config`                                       |
 | api        | `NUXT_CORS_ORIGINS`                                                            | доп. origin'ы для CORS через запятую (origin'ы Capacitor разрешены всегда)                               |
 | api        | `NUXT_WEB_DIST_DIR`                                                            | каталог со сборкой клиента; если задан, API раздаёт и статику                                            |
-| web        | `NUXT_API_PROXY_TARGET`                                                        | куда `nuxt dev` проксирует `/api` (по умолчанию `http://localhost:3001/api`)                             |
+| web        | `NUXT_API_PROXY_TARGET`                                                        | куда `nuxt dev` проксирует `/api` (по умолчанию `http://127.0.0.1:3001/api`)                             |
 | web        | `NUXT_PUBLIC_API_BASE`                                                         | базовый URL API; пусто — тот же origin (веб), абсолютный адрес — мобильная сборка. Запекается при сборке |
 | web        | `NUXT_PUBLIC_AUTH_MODE`                                                        | `cookie` (веб, по умолчанию) или `token` (мобильный клиент). Запекается при сборке                       |
 

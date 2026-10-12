@@ -40,7 +40,7 @@ export default defineNuxtConfig({
     // origin и cookie-сессия работает без CORS. Цель переопределяется через NUXT_API_PROXY_TARGET.
     devProxy: {
       '/api': {
-        target: process.env.NUXT_API_PROXY_TARGET || 'http://localhost:3001/api',
+        target: process.env.NUXT_API_PROXY_TARGET || 'http://127.0.0.1:3001/api',
         changeOrigin: true,
         prependPath: true,
       },
