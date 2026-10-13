@@ -46,7 +46,7 @@
   - Контракт: шрифты — из бандла (свой origin, без CDN); у Onest `font-variant-numeric: tabular-nums` для чисел; `font-mono` = JetBrains Mono (госномер, VIN). Иконки — только компоненты `lucide-vue-next`, `plus` — только на кнопках добавления.
   - Готово: в `apps/web` нет эмодзи (проверка-скрипт `scripts/check-no-emoji.mjs` в `npm test` или vitest); сетевые запросы шрифтов в e2e — только на свой origin.
 
-- [ ] **Функции форматирования дат, сумм, пробега и остатка** [decision, frontend] #34
+- [x] **Функции форматирования дат, сумм, пробега и остатка** [decision, frontend] #34
   - Файлы: `packages/shared/utils/format.ts`, `packages/shared/utils/reminderRemaining.ts`, `packages/shared/tests/format.test.ts`, `packages/shared/tests/reminderRemaining.test.ts`; замена всех мест вывода в `apps/web`.
   - Контракт: `formatDate('2026-09-12') → '12 сент'` (год только если не текущий), `formatMoney(6800) → '6 800 ₽'`, `formatMileage(87450) → '87 450 км'`, разделитель — неразрывный пробел ` `; `averageKmPerMonth(entries)`; `formatReminderRemaining(reminder, { currentMileage, today, avgKmPerMonth })` → `'Через 750 км'`, `'Просрочено на 39 дней'`, `'Через 12 550 км, ≈ 10 мес'`. Статус — только через `getReminderStatus` (`reminderStatus.ts`), без второй реализации.
   - Готово: unit-тесты на все примеры из «Эталонных данных» (в т. ч. склонения «день/дня/дней»); в `apps/web` нет `toLocaleString`/ручного форматирования; контракты в `conventions.md`.

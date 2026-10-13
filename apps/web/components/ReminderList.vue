@@ -2,6 +2,7 @@
 import type { Reminder } from '@garage/shared/types'
 import { getReminderStatus, reminderStatusLabels } from '@garage/shared/utils/reminderStatus'
 import { reminderTriggerTypeLabels } from '@garage/shared/schemas/reminder'
+import { formatDate, formatMileage } from '@garage/shared/utils/format'
 import { BellOff, Pencil, Plus, Trash2 } from 'lucide-vue-next'
 
 const props = defineProps<{ carId: number; currentMileage: number }>()
@@ -40,9 +41,8 @@ async function onDelete(reminder: Reminder) {
 
 function dueText(reminder: Reminder) {
   const parts: string[] = []
-  if (reminder.nextDueDate) parts.push(reminder.nextDueDate)
-  if (reminder.nextDueMileage != null)
-    parts.push(`${reminder.nextDueMileage.toLocaleString('ru-RU')} км`)
+  if (reminder.nextDueDate) parts.push(formatDate(reminder.nextDueDate))
+  if (reminder.nextDueMileage != null) parts.push(formatMileage(reminder.nextDueMileage))
   return parts.length ? parts.join(' · ') : 'Не задано'
 }
 </script>

@@ -3,6 +3,12 @@ import type { Reminder, ReminderStatus } from '../types'
 const SOON_DAYS = 14
 const SOON_KM_FALLBACK = 500
 const SOON_KM_RATIO = 0.1 // 10% от интервала пробега считается "скоро"
+const MS_PER_DAY = 1000 * 60 * 60 * 24
+
+/** Сколько дней от `today` до `date` (обе `YYYY-MM-DD`); отрицательное — дата в прошлом. */
+export function daysUntil(date: string, today: string): number {
+  return Math.floor((new Date(date).getTime() - new Date(today).getTime()) / MS_PER_DAY)
+}
 
 /**
  * Вычисляет статус напоминания относительно текущей даты и пробега авто.
@@ -18,9 +24,7 @@ export function getReminderStatus(
   const statuses: ReminderStatus[] = []
 
   if (reminder.nextDueDate) {
-    const dueDate = new Date(reminder.nextDueDate)
-    const now = new Date(today)
-    const diffDays = Math.floor((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    const diffDays = daysUntil(reminder.nextDueDate, today)
     if (diffDays < 0) statuses.push('overdue')
     else if (diffDays <= SOON_DAYS) statuses.push('soon')
     else statuses.push('ok')

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CarFront, ChevronRight, Plus } from 'lucide-vue-next'
 import type { CarInput } from '@garage/shared/schemas/car'
+import { formatMileage } from '@garage/shared/utils/format'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -71,7 +72,7 @@ async function onCreate(input: CarInput) {
               car.plateNumber || 'Без номера'
             }}</span>
             ·
-            {{ car.currentMileage.toLocaleString('ru-RU') }} км
+            {{ formatMileage(car.currentMileage) }}
           </p>
         </div>
         <ChevronRight class="h-5 w-5 text-text-3 shrink-0" aria-hidden="true" />

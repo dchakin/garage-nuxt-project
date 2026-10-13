@@ -2,6 +2,7 @@
 import type { Entry } from '@garage/shared/types'
 import type { EntryFilterInput } from '@garage/shared/schemas/entry'
 import { entryTypes, entryTypeLabels } from '@garage/shared/schemas/entry'
+import { formatDate, formatMileage, formatMoney } from '@garage/shared/utils/format'
 import {
   ChevronDown,
   NotebookPen,
@@ -57,17 +58,12 @@ watch(searchInput, (value) => {
 async function onDelete(entry: Entry) {
   const ok = await confirm({
     title: 'Удалить запись?',
-    message: `«${entryTypeLabels[entry.type]}» от ${entry.date} будет удалена безвозвратно.`,
+    message: `«${entryTypeLabels[entry.type]}» от ${formatDate(entry.date)} будет удалена безвозвратно.`,
     confirmText: 'Удалить',
     danger: true,
   })
   if (!ok) return
   await deleteEntry(entry.id)
-}
-
-function formatCost(entry: Entry) {
-  if (entry.cost == null) return ''
-  return `${entry.cost.toLocaleString('ru-RU')} ${entry.currency}`
 }
 </script>
 
@@ -213,17 +209,15 @@ function formatCost(entry: Entry) {
               {{ entry.category.name }}
             </p>
             <p class="text-sm text-text-2 mt-0.5">
-              {{ entry.date }}
-              <span v-if="entry.mileage != null"
-                >· {{ entry.mileage.toLocaleString('ru-RU') }} км</span
-              >
+              {{ formatDate(entry.date) }}
+              <span v-if="entry.mileage != null">· {{ formatMileage(entry.mileage) }}</span>
             </p>
             <p v-if="entry.description" class="text-sm text-text mt-2">
               {{ entry.description }}
             </p>
             <p v-if="entry.place" class="text-sm text-text-3 mt-1">{{ entry.place }}</p>
             <p v-if="entry.cost != null" class="font-medium text-text text-sm text-right mt-2">
-              {{ formatCost(entry) }}
+              {{ formatMoney(entry.cost) }}
             </p>
           </div>
         </div>

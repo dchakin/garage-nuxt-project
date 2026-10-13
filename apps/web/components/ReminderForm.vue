@@ -3,6 +3,7 @@ import type { Reminder } from '@garage/shared/types'
 import type { ReminderInput } from '@garage/shared/schemas/reminder'
 import { reminderTriggerTypes, reminderTriggerTypeLabels } from '@garage/shared/schemas/reminder'
 import { entryTypeLabels } from '@garage/shared/schemas/entry'
+import { formatDate, formatMileage } from '@garage/shared/utils/format'
 
 const props = defineProps<{ carId: number; initial?: Reminder | null; saving?: boolean }>()
 const emit = defineEmits<{ submit: [ReminderInput]; cancel: [] }>()
@@ -27,8 +28,8 @@ const showDate = computed(() => form.triggerType === 'date' || form.triggerType 
 const showMileage = computed(() => form.triggerType === 'mileage' || form.triggerType === 'both')
 
 function entryLabel(entry: (typeof entries.value)[number]) {
-  const parts = [entry.date, entryTypeLabels[entry.type]]
-  if (entry.mileage != null) parts.push(`${entry.mileage.toLocaleString('ru-RU')} км`)
+  const parts = [formatDate(entry.date), entryTypeLabels[entry.type]]
+  if (entry.mileage != null) parts.push(formatMileage(entry.mileage))
   return parts.join(' · ')
 }
 

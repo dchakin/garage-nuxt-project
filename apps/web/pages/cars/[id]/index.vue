@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatMileage } from '@garage/shared/utils/format'
 import { getReminderStatus } from '@garage/shared/utils/reminderStatus'
 import { Bell, CircleAlert, NotebookText } from 'lucide-vue-next'
 
@@ -43,7 +44,7 @@ watch(tab, (value) => {
     <div class="grid grid-cols-2 gap-3 mb-6">
       <div class="card p-4">
         <p class="text-xs text-text-2">Пробег</p>
-        <p class="text-h2 text-text">{{ car.currentMileage.toLocaleString('ru-RU') }} км</p>
+        <p class="text-h2 text-text">{{ formatMileage(car.currentMileage) }}</p>
       </div>
       <div class="card p-4">
         <p class="text-xs text-text-2">Гос. номер</p>
