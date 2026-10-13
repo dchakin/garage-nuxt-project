@@ -47,7 +47,7 @@ async function onCreate(input: CarInput) {
     </div>
 
     <div v-if="loading" class="flex items-center justify-center py-8 text-text-2">
-      <Spinner size="md" />
+      <UiSpinner size="md" />
     </div>
 
     <div v-else-if="!cars.length" class="card p-8 text-center">

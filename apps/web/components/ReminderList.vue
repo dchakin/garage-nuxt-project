@@ -57,7 +57,7 @@ function dueText(reminder: Reminder) {
     </div>
 
     <div v-if="loading" class="flex items-center justify-center py-8 text-text-2">
-      <Spinner size="md" />
+      <UiSpinner size="md" />
     </div>
     <div v-else-if="!reminders.length" class="card p-8 text-center">
       <BellOff class="mx-auto mb-2 h-7 w-7 text-text-3" aria-hidden="true" />
@@ -95,7 +95,7 @@ function dueText(reminder: Reminder) {
                   aria-label="Удалить"
                   @click="onDelete(reminder)"
                 >
-                  <Spinner v-if="deletingId === reminder.id" />
+                  <UiSpinner v-if="deletingId === reminder.id" />
                   <Trash2 v-else class="h-4 w-4" aria-hidden="true" />
                 </button>
               </div>

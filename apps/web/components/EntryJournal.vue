@@ -161,7 +161,7 @@ async function onDelete(entry: Entry) {
     </div>
 
     <div v-if="loading" class="flex items-center justify-center py-8 text-text-2">
-      <Spinner size="md" />
+      <UiSpinner size="md" />
     </div>
     <div v-else-if="!entries.length" class="card p-8 text-center">
       <NotebookPen class="mx-auto mb-2 h-7 w-7 text-text-3" aria-hidden="true" />
@@ -199,7 +199,7 @@ async function onDelete(entry: Entry) {
                   aria-label="Удалить"
                   @click="onDelete(entry)"
                 >
-                  <Spinner v-if="deletingId === entry.id" />
+                  <UiSpinner v-if="deletingId === entry.id" />
                   <Trash2 v-else class="h-4 w-4" aria-hidden="true" />
                 </button>
               </div>

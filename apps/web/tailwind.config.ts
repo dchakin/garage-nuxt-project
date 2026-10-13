@@ -61,6 +61,8 @@ const COLOR_TOKENS = [
   'chart-bar-muted',
   'scrim',
   'knob',
+  'plate-bg',
+  'plate-text',
   'shadow',
 ] as const
 

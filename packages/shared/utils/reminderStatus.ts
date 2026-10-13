@@ -49,6 +49,6 @@ export function getReminderStatus(
 export const reminderStatusLabels: Record<ReminderStatus, string> = {
   overdue: 'Просрочено',
   soon: 'Скоро',
-  ok: 'Ок',
-  inactive: 'Неактивно',
+  ok: 'В порядке',
+  inactive: 'Выключено',
 }

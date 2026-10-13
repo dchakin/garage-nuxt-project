@@ -3,6 +3,7 @@
 // В прод-образ не попадает: Dockerfile собирает с GARAGE_EXCLUDE_DEV_PAGES=1 (nuxt.config.ts).
 import type { Component } from 'vue'
 import DevShowcaseActions from '~/components/dev/ShowcaseActions.vue'
+import DevShowcaseData from '~/components/dev/ShowcaseData.vue'
 
 definePageMeta({ layout: false })
 useHead({ title: 'UI-кит', meta: [{ name: 'robots', content: 'noindex' }] })
@@ -10,6 +11,7 @@ useHead({ title: 'UI-кит', meta: [{ name: 'robots', content: 'noindex' }] })
 /** Группа витрины = фрейм макета; новые группы (данные, навигация) добавляются сюда */
 const GROUPS: { id: string; title: string; component: Component }[] = [
   { id: 'actions', title: 'Действия и ввод', component: DevShowcaseActions },
+  { id: 'data', title: 'Данные и статусы', component: DevShowcaseData },
 ]
 
 const route = useRoute()

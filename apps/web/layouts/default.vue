@@ -45,7 +45,7 @@ async function logout() {
             class="inline-flex items-center gap-1.5 text-text-2 hover:text-text disabled:opacity-50 transition-colors"
             @click="logout"
           >
-            <Spinner v-if="loggingOut" />
+            <UiSpinner v-if="loggingOut" />
             <LogOut v-else class="h-4 w-4" aria-hidden="true" />
             Выйти
           </button>
