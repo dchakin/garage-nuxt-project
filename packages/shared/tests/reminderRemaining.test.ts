@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { NBSP } from '../utils/format'
-import { averageKmPerMonth, formatReminderRemaining } from '../utils/reminderRemaining'
+import {
+  averageKmPerMonth,
+  formatReminderInterval,
+  formatReminderRemaining,
+  getReminderRemaining,
+} from '../utils/reminderRemaining'
 
 // Неразрывный пробел — внутри чисел, между числом и единицей и после «≈»
 const nb = (text: string) => text.replace(/(?<=\d|≈) (?=\d|км|дн|день|мес)/g, NBSP)
@@ -142,5 +147,72 @@ describe('formatReminderRemaining: прочие случаи', () => {
 
   it('без срока', () => {
     expect(formatReminderRemaining(base, ctx)).toBe('Срок не задан')
+  })
+})
+
+describe('getReminderRemaining: части для карточки', () => {
+  const ctx = {
+    currentMileage: CURRENT_MILEAGE,
+    today: TODAY,
+    avgKmPerMonth: averageKmPerMonth(camryEntryPoints),
+  }
+
+  it('просрочено: «Просрочено» + «на 250 км», полоса заполнена', () => {
+    const oil = { ...base, intervalKm: 10_000, nextDueDate: '2027-02-14', nextDueMileage: 87_200 }
+    expect(getReminderRemaining(oil, ctx)).toEqual({
+      status: 'overdue',
+      dimension: 'mileage',
+      text: nb('Просрочено на 250 км'),
+      headline: 'Просрочено',
+      detail: nb('на 250 км'),
+      progress: 1,
+    })
+  })
+
+  it('по дате: под остатком — дата срока, полоса — доля прошедшего интервала', () => {
+    const osago = { ...base, intervalMonths: 12, nextDueDate: '2026-10-18' }
+    const remaining = getReminderRemaining(osago, ctx)
+    expect(remaining).toMatchObject({
+      status: 'soon',
+      dimension: 'date',
+      text: nb('Через 8 дней'),
+      headline: nb('Через 8 дней'),
+      detail: `18${NBSP}окт`,
+    })
+    expect(remaining.progress).toBeCloseTo(1 - 8 / (12 * 30.44), 5)
+  })
+
+  it('по пробегу: под остатком — оценка в месяцах', () => {
+    const timing = { ...base, intervalKm: 100_000, nextDueMileage: 100_000 }
+    expect(getReminderRemaining(timing, ctx)).toMatchObject({
+      status: 'ok',
+      headline: nb('Через 12 550 км'),
+      detail: nb('≈ 10 мес'),
+      progress: 1 - 12_550 / 100_000,
+    })
+  })
+
+  it('выключено и без срока — одна строка, пустая полоса', () => {
+    expect(getReminderRemaining({ ...base, isActive: false }, ctx)).toMatchObject({
+      headline: 'Выключено',
+      detail: null,
+      dimension: null,
+      progress: 0,
+    })
+    expect(getReminderRemaining(base, ctx)).toMatchObject({
+      headline: 'Срок не задан',
+      progress: 0,
+    })
+  })
+})
+
+describe('formatReminderInterval', () => {
+  it.each([
+    [{ intervalKm: 10_000, intervalMonths: 12 }, 'Каждые 10 000 км или 12 мес'],
+    [{ intervalKm: null, intervalMonths: 12 }, 'Каждые 12 мес'],
+    [{ intervalKm: 100_000, intervalMonths: null }, 'Каждые 100 000 км'],
+    [{ intervalKm: null, intervalMonths: null }, ''],
+  ])('%o → «%s»', (reminder, expected) => {
+    expect(formatReminderInterval(reminder)).toBe(nb(expected))
   })
 })

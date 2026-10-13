@@ -51,3 +51,41 @@ test('UI-кит: действия и ввод', async ({ page }) => {
   await page.getByRole('button', { name: 'Все', exact: true }).click()
   await snap(page, 'ui-actions')
 })
+
+test('UI-кит: данные и статусы', async ({ page }) => {
+  await page.goto('/dev/ui?group=data')
+  await expect(page.getByRole('heading', { name: 'Данные и статусы' })).toBeVisible()
+
+  // Бейджи статусов: иконка + слово
+  for (const label of ['Просрочено', 'Скоро', 'В порядке', 'Выключено']) {
+    await expect(page.getByText(label, { exact: true }).first()).toBeVisible()
+  }
+
+  // Карточки напоминаний: эталонные остатки, «Сделал» — только у просроченных и «скоро»
+  const oil = page.getByRole('article').filter({ hasText: 'Замена масла' })
+  await expect(oil).toContainText('Просрочено на 250 км')
+  await expect(oil).toContainText('Срок был 87 200 км')
+  await expect(page.getByRole('article').filter({ hasText: 'ОСАГО' })).toContainText('Через 8 дней')
+  await expect(page.getByRole('button', { name: 'Сделал' })).toHaveCount(2)
+
+  // Тап по карточке открывает напоминание, «Сделал» — отдельное действие
+  const event = page.getByTestId('reminder-event')
+  await page
+    .getByRole('article')
+    .filter({ hasText: 'Замена ГРМ' })
+    .click({ position: { x: 8, y: 60 } })
+  await expect(event).toHaveText('open: Замена ГРМ')
+  await oil.getByRole('button', { name: 'Сделал' }).click()
+  await expect(event).toHaveText('done: Замена масла')
+
+  // Переключатель строки
+  const toggle = page.getByRole('switch', { name: 'Замена масла' })
+  await expect(toggle).toHaveAttribute('aria-checked', 'true')
+
+  await page
+    .getByRole('article')
+    .first()
+    .click({ position: { x: 8, y: 8 } })
+  await expect(event).toHaveText('open: Замена масла')
+  await snap(page, 'ui-data')
+})

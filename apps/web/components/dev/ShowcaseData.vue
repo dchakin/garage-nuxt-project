@@ -51,7 +51,36 @@ const SOLARIS = {
   currentMileage: 142300,
 }
 
+const CAMRY_AVG_KM_PER_MONTH = 1281
+const REMINDER_BASE = {
+  isActive: true,
+  nextDueDate: null as string | null,
+  nextDueMileage: null as number | null,
+  intervalKm: null as number | null,
+  intervalMonths: null as number | null,
+}
+const REMINDERS = [
+  {
+    ...REMINDER_BASE,
+    title: 'Замена масла',
+    intervalKm: 10000,
+    intervalMonths: 12,
+    nextDueDate: '2027-02-14',
+    nextDueMileage: 87200,
+  },
+  { ...REMINDER_BASE, title: 'ОСАГО', intervalMonths: 12, nextDueDate: '2026-10-18' },
+  { ...REMINDER_BASE, title: 'Замена ГРМ', intervalKm: 100000, nextDueMileage: 100000 },
+  {
+    ...REMINDER_BASE,
+    title: 'Сезонная смена шин',
+    intervalMonths: 6,
+    nextDueDate: '2026-11-02',
+    isActive: false,
+  },
+]
+
 const oilReminderOn = ref(true)
+const reminderEvent = ref('')
 </script>
 
 <template>
@@ -108,6 +137,21 @@ const oilReminderOn = ref(true)
       </UiCard>
       <UiRowCar :car="CAMRY" :overdue-count="2" selected />
       <UiRowCar :car="SOLARIS" :soon-count="1" />
+    </div>
+
+    <div class="space-y-sp-3">
+      <h2 class="text-h2 text-text">Карточка напоминания</h2>
+      <UiReminderCard
+        v-for="reminder in REMINDERS"
+        :key="reminder.title"
+        :reminder="reminder"
+        :current-mileage="CAMRY.currentMileage"
+        :avg-km-per-month="CAMRY_AVG_KM_PER_MONTH"
+        :today="TODAY"
+        @open="reminderEvent = `open: ${reminder.title}`"
+        @done="reminderEvent = `done: ${reminder.title}`"
+      />
+      <p class="text-sm text-text-2" data-testid="reminder-event">{{ reminderEvent }}</p>
     </div>
 
     <div class="space-y-sp-3">

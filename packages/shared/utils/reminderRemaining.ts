@@ -1,5 +1,5 @@
 import type { Entry, Reminder, ReminderStatus } from '../types'
-import { formatDays, formatMileage, NBSP, todayIso } from './format'
+import { formatDate, formatDays, formatMileage, NBSP, todayIso } from './format'
 import { daysUntil, getReminderStatus } from './reminderStatus'
 
 const AVG_DAYS_PER_MONTH = 30.44
@@ -7,7 +7,9 @@ const AVG_DAYS_PER_MONTH = 30.44
 type RemainingReminder = Pick<
   Reminder,
   'isActive' | 'nextDueDate' | 'nextDueMileage' | 'intervalKm'
->
+> & { intervalMonths?: number | null }
+
+type DueDimension = 'date' | 'mileage'
 
 export interface ReminderRemainingContext {
   currentMileage: number
@@ -15,6 +17,21 @@ export interface ReminderRemainingContext {
   today?: string
   /** Средний пробег в месяц (`averageKmPerMonth`); без него оценки «≈ N мес» нет. */
   avgKmPerMonth?: number | null
+}
+
+/** Остаток до срока, разобранный на части для карточки напоминания. */
+export interface ReminderRemaining {
+  status: ReminderStatus
+  /** По какому условию считан остаток; `null` — выключено или срок не задан */
+  dimension: DueDimension | null
+  /** Фраза целиком: «Просрочено на 250 км», «Через 12 550 км, ≈ 10 мес» */
+  text: string
+  /** Крупная часть (цвет статуса): «Просрочено», «Через 8 дней», «Через 12 550 км» */
+  headline: string
+  /** Мелкая строка под ней: «на 250 км», «18 окт» (дата срока), «≈ 10 мес» */
+  detail: string | null
+  /** Доля пройденного интервала 0…1 (полоса): просрочено — 1, выключено/без интервала — 0 */
+  progress: number
 }
 
 /**
@@ -38,17 +55,16 @@ export function averageKmPerMonth(entries: Pick<Entry, 'date' | 'mileage'>[]): n
 }
 
 /**
- * Остаток до срока напоминания: «Через 750 км», «Просрочено на 39 дней»,
- * «Через 12 550 км, ≈ 10 мес». Статус берётся из `getReminderStatus`; если сработали оба
- * условия с одним статусом — показывается то, что наступит раньше (по `avgKmPerMonth`),
+ * Остаток до срока напоминания по частям. Статус берётся из `getReminderStatus`; если сработали
+ * оба условия с одним статусом — берётся то, что наступит раньше (по `avgKmPerMonth`),
  * без среднего пробега — дата.
  */
-export function formatReminderRemaining(
+export function getReminderRemaining(
   reminder: RemainingReminder,
   { currentMileage, today = todayIso(), avgKmPerMonth = null }: ReminderRemainingContext,
-): string {
+): ReminderRemaining {
   const status = getReminderStatus(reminder, currentMileage, today)
-  if (status === 'inactive') return 'Выключено'
+  if (status === 'inactive') return plain(status, 'Выключено')
 
   const daysLeft = reminder.nextDueDate ? daysUntil(reminder.nextDueDate, today) : null
   const kmLeft = reminder.nextDueMileage != null ? reminder.nextDueMileage - currentMileage : null
@@ -58,20 +74,52 @@ export function formatReminderRemaining(
   const kmMatches =
     kmLeft != null && dimensionStatus(reminder, 'mileage', currentMileage, today) === status
 
+  const byDate = (days: number) => {
+    const dueDate = formatDate(reminder.nextDueDate!, today)
+    const intervalDays = reminder.intervalMonths
+      ? reminder.intervalMonths * AVG_DAYS_PER_MONTH
+      : null
+    return describeDays(status, days, dueDate, elapsedShare(days, intervalDays))
+  }
+  const byKm = (km: number) =>
+    describeKm(status, km, avgKmPerMonth, elapsedShare(km, reminder.intervalKm))
+
   if (daysLeft != null && kmLeft != null && dateMatches && kmMatches) {
     return avgKmPerMonth && (kmLeft / avgKmPerMonth) * AVG_DAYS_PER_MONTH < daysLeft
-      ? describeKm(kmLeft, avgKmPerMonth)
-      : describeDays(daysLeft)
+      ? byKm(kmLeft)
+      : byDate(daysLeft)
   }
-  if (kmLeft != null && kmMatches) return describeKm(kmLeft, avgKmPerMonth)
-  if (daysLeft != null) return describeDays(daysLeft)
-  return 'Срок не задан'
+  if (kmLeft != null && kmMatches) return byKm(kmLeft)
+  if (daysLeft != null) return byDate(daysLeft)
+  return plain(status, 'Срок не задан')
+}
+
+/**
+ * Остаток до срока одной фразой: «Через 750 км», «Просрочено на 39 дней»,
+ * «Через 12 550 км, ≈ 10 мес». Правила выбора — `getReminderRemaining`.
+ */
+export function formatReminderRemaining(
+  reminder: RemainingReminder,
+  context: ReminderRemainingContext,
+): string {
+  return getReminderRemaining(reminder, context).text
+}
+
+/** Правило напоминания: «Каждые 10 000 км или 12 мес», «Каждые 12 мес», без интервала — ''. */
+export function formatReminderInterval(
+  reminder: Pick<Reminder, 'intervalKm' | 'intervalMonths'>,
+): string {
+  const parts = [
+    reminder.intervalKm ? formatMileage(reminder.intervalKm) : null,
+    reminder.intervalMonths ? `${reminder.intervalMonths}${NBSP}мес` : null,
+  ].filter(Boolean)
+  return parts.length ? `Каждые ${parts.join(' или ')}` : ''
 }
 
 /** Статус только по одному условию — через тот же `getReminderStatus`. */
 function dimensionStatus(
   reminder: RemainingReminder,
-  dimension: 'date' | 'mileage',
+  dimension: DueDimension,
   currentMileage: number,
   today: string,
 ): ReminderStatus {
@@ -82,17 +130,56 @@ function dimensionStatus(
   return getReminderStatus(only, currentMileage, today)
 }
 
-function describeDays(daysLeft: number): string {
-  if (daysLeft < 0) return `Просрочено на ${formatDays(-daysLeft)}`
-  if (daysLeft === 0) return 'Сегодня'
-  return `Через ${formatDays(daysLeft)}`
+/** Доля пройденного интервала: 1 − остаток / интервал, обрезается в 0…1. */
+function elapsedShare(left: number, interval: number | null | undefined): number {
+  if (!interval) return 0
+  return Math.min(Math.max(1 - left / interval, 0), 1)
 }
 
-function describeKm(kmLeft: number, avgKmPerMonth: number | null): string {
-  if (kmLeft < 0) return `Просрочено на ${formatMileage(-kmLeft)}`
-  if (kmLeft === 0) return 'Пора'
-  const text = `Через ${formatMileage(kmLeft)}`
+function plain(status: ReminderStatus, text: string): ReminderRemaining {
+  return { status, dimension: null, text, headline: text, detail: null, progress: 0 }
+}
+
+function overdue(
+  status: ReminderStatus,
+  dimension: DueDimension,
+  amount: string,
+): ReminderRemaining {
+  const detail = `на ${amount}`
+  return {
+    status,
+    dimension,
+    text: `Просрочено ${detail}`,
+    headline: 'Просрочено',
+    detail,
+    progress: 1,
+  }
+}
+
+function describeDays(
+  status: ReminderStatus,
+  daysLeft: number,
+  dueDate: string,
+  progress: number,
+): ReminderRemaining {
+  if (daysLeft < 0) return overdue(status, 'date', formatDays(-daysLeft))
+  const text = daysLeft === 0 ? 'Сегодня' : `Через ${formatDays(daysLeft)}`
+  return { status, dimension: 'date', text, headline: text, detail: dueDate, progress }
+}
+
+function describeKm(
+  status: ReminderStatus,
+  kmLeft: number,
+  avgKmPerMonth: number | null,
+  progress: number,
+): ReminderRemaining {
+  if (kmLeft < 0) return overdue(status, 'mileage', formatMileage(-kmLeft))
+  const headline = kmLeft === 0 ? 'Пора' : `Через ${formatMileage(kmLeft)}`
   // Меньше месяца езды — оценка «≈ 1 мес» ничего не добавляет
-  if (!avgKmPerMonth || kmLeft < avgKmPerMonth) return text
-  return `${text}, ≈${NBSP}${Math.round(kmLeft / avgKmPerMonth)}${NBSP}мес`
+  const detail =
+    kmLeft > 0 && avgKmPerMonth && kmLeft >= avgKmPerMonth
+      ? `≈${NBSP}${Math.round(kmLeft / avgKmPerMonth)}${NBSP}мес`
+      : null
+  const text = detail ? `${headline}, ${detail}` : headline
+  return { status, dimension: 'mileage', text, headline, detail, progress }
 }

@@ -63,7 +63,7 @@
   - Файлы: `components/ui/Button.vue` (`variant: 'primary'|'secondary'|'tonal'|'danger'|'text'`, `icon?`, `disabled`, `loading`), `IconButton.vue`, `Field.vue` (`label`, `suffix`, `hint`, `error`, `v-model`), `Textarea.vue`, `AmountField.vue`, `SearchField.vue`, `Chip.vue` (`icon?`, `selected`), `Segmented.vue` (`options`, `v-model`), `Toggle.vue`, `TypeOption.vue`; удалить `.btn-*` из `main.css`, заменить использования.
   - Готово: тесты — ошибка поля показывается вместо подсказки и ставит `aria-invalid`; выбор в Segmented/Chip эмитит `update:modelValue`; disabled-кнопка не кликается.
 
-- [ ] **Бейджи, строки, карточки, заголовки** [decision, frontend] #36
+- [x] **Бейджи, строки, карточки, заголовки** [decision, frontend] #36
   - Макет: `06 · Компоненты: данные` (`design/export/06.png`).
   - Файлы: `components/ui/TypeBadge.vue` (по `EntryType`), `StatusBadge.vue` (по `ReminderStatus`: цвет + иконка + слово из `reminderStatusLabels`), `Counter.vue`, `Avatar.vue`, `Plate.vue` (моно), `Spinner.vue` (заменяет `components/Spinner.vue`), `Progress.vue`, `Card.vue`, `RowEntry.vue`, `RowSetting.vue`, `RowKeyValue.vue`, `RowCar.vue`, `RowToggle.vue`, `MonthHeader.vue`, `SectionHeader.vue`, `ReminderCard.vue`.
   - Контракт: строки внутри `UiCard` с разделителем сверху, у первой — без него (CSS `:first-child`). `ReminderCard` принимает `reminder`, `currentMileage`, `avgKmPerMonth` и сам считает статус/остаток через shared-утилиты; эмитит `done` («Сделал») и `open`.
