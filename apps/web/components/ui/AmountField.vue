@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { formatNumber } from '@garage/shared/utils/format'
+import { useNumberInput } from '~/composables/useNumberInput'
 import { useFieldControl } from '~/composables/useFieldControl'
 import FieldFrame from './FieldFrame.vue'
 
@@ -22,32 +21,8 @@ const model = defineModel<number | null>()
 
 const { inputId, helperId, rootAttrs, inputAttrs, invalid, describedBy } = useFieldControl(props)
 
-// Пока поле в фокусе, показываем то, что набрано; после ухода — с разрядами («6 800»)
-const focused = ref(false)
-const draft = ref('')
-
-const displayValue = computed(() => {
-  if (focused.value) return draft.value
-  return model.value == null ? '' : formatNumber(model.value, 2).replace(/,00$/, '')
-})
-
-function parseAmount(raw: string): number | null {
-  const normalized = raw.replace(/[\s ]/g, '').replace(',', '.')
-  if (normalized === '' || Number.isNaN(Number(normalized))) return null
-  return Number(normalized)
-}
-
-function onFocus() {
-  focused.value = true
-  draft.value = model.value == null ? '' : String(model.value).replace('.', ',')
-}
-
-function onInput(event: Event) {
-  // Только цифры и один десятичный разделитель (копейки)
-  const raw = (event.target as HTMLInputElement).value.replace(/[^\d.,]/g, '')
-  draft.value = raw
-  model.value = parseAmount(raw)
-}
+// Разряды расставляются и при вводе («680 000»), копейки — через запятую
+const { text, onNumberInput } = useNumberInput(model, 2)
 </script>
 
 <template>
@@ -75,14 +50,12 @@ function onInput(event: Event) {
         inputmode="decimal"
         autocomplete="off"
         placeholder="0"
-        :value="displayValue"
+        :value="text"
         :disabled="disabled"
         :aria-invalid="invalid || undefined"
         :aria-describedby="describedBy"
         class="h-full min-w-0 flex-1 bg-transparent text-amount text-text outline-none placeholder:text-text disabled:cursor-not-allowed"
-        @focus="onFocus"
-        @blur="focused = false"
-        @input="onInput"
+        @input="onNumberInput"
       />
       <span class="shrink-0 text-[1.75rem] font-semibold text-text-3" aria-hidden="true">₽</span>
     </div>

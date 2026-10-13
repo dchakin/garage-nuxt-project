@@ -16,7 +16,20 @@ test('UI-кит: действия и ввод', async ({ page }) => {
   await expect(wrongMileage).toHaveAccessibleDescription(/Меньше текущего/)
 
   // Сумма: разряды без фокуса
-  await expect(page.getByRole('textbox', { name: 'Сумма' })).toHaveValue('6 800')
+  const amountField = page.getByRole('textbox', { name: 'Сумма' })
+  await expect(amountField).toHaveValue('6 800')
+  // Разряды и при вводе: дописали нули — пробел переехал, Backspace по нему стирает цифру
+  await amountField.click()
+  await amountField.press('End')
+  await amountField.pressSequentially('00')
+  await expect(amountField).toHaveValue('680 000')
+  await amountField.press('ArrowLeft')
+  await amountField.press('ArrowLeft')
+  await amountField.press('ArrowLeft')
+  await amountField.press('Backspace')
+  await expect(amountField).toHaveValue('68 000')
+  await amountField.fill('6800')
+  await expect(amountField).toHaveValue('6 800')
 
   // Сегменты и переключатель
   await page.getByRole('radio', { name: 'Год' }).click()

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, type Component } from 'vue'
+import { computed, ref, type Component, type Ref } from 'vue'
 import { Calendar, ChevronDown, CircleAlert, Eye, EyeOff } from 'lucide-vue-next'
-import { formatNumber } from '@garage/shared/utils/format'
 import { useFieldControl } from '~/composables/useFieldControl'
+import { useNumberInput } from '~/composables/useNumberInput'
 import FieldFrame from './FieldFrame.vue'
 
 export interface FieldOption {
@@ -40,15 +40,11 @@ const model = defineModel<string | number | null>()
 const { inputId, helperId, rootAttrs, inputAttrs, invalid, describedBy } = useFieldControl(props)
 
 const passwordVisible = ref(false)
-const focused = ref(false)
-
-// Число вне фокуса — с разрядами («87 450»), в фокусе — как набрано
-const displayValue = computed(() => {
-  if (props.type === 'number' && !focused.value && typeof model.value === 'number') {
-    return formatNumber(model.value)
-  }
-  return model.value ?? ''
-})
+// type="number": разряды расставляются и при вводе («87 450»)
+const { text: numberText, onNumberInput } = useNumberInput(model as Ref<number | null | undefined>)
+const displayValue = computed(() =>
+  props.type === 'number' ? numberText.value : (model.value ?? ''),
+)
 const inputType = computed(() => {
   if (props.type === 'password') return passwordVisible.value ? 'text' : 'password'
   // number — через text + inputmode: без стрелок и без прокрутки колесом
@@ -57,13 +53,8 @@ const inputType = computed(() => {
 const inputMode = computed(() => (props.type === 'number' ? 'numeric' : undefined))
 
 function onInput(event: Event) {
-  const value = (event.target as HTMLInputElement | HTMLSelectElement).value
-  if (props.type !== 'number') {
-    model.value = value
-    return
-  }
-  const digits = value.replace(/\D/g, '')
-  model.value = digits === '' ? null : Number(digits)
+  if (props.type === 'number') return onNumberInput(event)
+  model.value = (event.target as HTMLInputElement | HTMLSelectElement).value
 }
 
 const boxStateClass = computed(() => {
@@ -122,8 +113,6 @@ const controlClass =
           controlClass,
           { 'font-mono': mono, 'ui-field-date cursor-pointer': type === 'date' },
         ]"
-        @focus="focused = true"
-        @blur="focused = false"
         @input="onInput"
       />
       <span v-if="suffix" class="shrink-0 text-body text-text-2">{{ suffix }}</span>

@@ -45,12 +45,13 @@ describe('UiField', () => {
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([null])
   })
 
-  it('число вне фокуса показывается с разрядами', async () => {
+  it('число с разрядами — и до ввода, и при вводе', async () => {
     const wrapper = mount(UiField, { props: { type: 'number', modelValue: 87450 } })
     const input = wrapper.find('input')
     expect(input.element.value).toBe('87 450')
-    await input.trigger('focus')
-    expect(input.element.value).toBe('87450')
+    await input.setValue('874500')
+    expect(input.element.value).toBe('874 500')
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([874500])
   })
 
   it('пароль: кнопка показывает и скрывает значение', async () => {
@@ -104,11 +105,26 @@ describe('UiAmountField', () => {
     expect(wrapper.find('input').attributes('inputmode')).toBe('decimal')
   })
 
+  it('при вводе расставляет разряды и держит курсор у той же цифры', async () => {
+    const wrapper = mount(UiAmountField, { props: { modelValue: 68000 }, attachTo: document.body })
+    const input = wrapper.find('input')
+    const element = input.element
+    expect(element.value).toBe('68 000')
+    // Дописали 0 в конец
+    element.value = '68 0000'
+    element.setSelectionRange(element.value.length, element.value.length)
+    await input.trigger('input')
+    expect(element.value).toBe('680 000')
+    expect(element.selectionStart).toBe(element.value.length)
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([680000])
+    wrapper.unmount()
+  })
+
   it('разбирает ввод с запятой', async () => {
     const wrapper = mount(UiAmountField, { props: { modelValue: null } })
     const input = wrapper.find('input')
-    await input.trigger('focus')
     await input.setValue('1250,5')
+    expect(input.element.value).toBe('1 250,5')
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([1250.5])
     await input.setValue('')
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([null])
