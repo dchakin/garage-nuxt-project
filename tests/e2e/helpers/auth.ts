@@ -52,6 +52,14 @@ export async function registerViaApi(page: Page, user: TestUser) {
   expect(response.ok(), await response.text()).toBe(true)
 }
 
+/** Быстрый вход через API: кука сессии попадает в контекст страницы. */
+export async function loginViaApi(page: Page, user: Pick<TestUser, 'email' | 'password'>) {
+  const response = await page.request.post('/api/auth/login', {
+    data: { email: user.email, password: user.password },
+  })
+  expect(response.ok(), await response.text()).toBe(true)
+}
+
 /** Выход: удаляет куку сессии из контекста. */
 export async function logout(page: Page) {
   await page.request.post('/api/auth/logout')

@@ -2,7 +2,7 @@
 // на отдельной временной SQLite — как прод (один origin), но без влияния на локальную БД.
 // Запускается Playwright'ом (webServer в playwright.config.ts), сам ничего не собирает.
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdtempSync, readdirSync, rmSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -30,8 +30,12 @@ for (const entry of readdirSync(os.tmpdir())) {
   }
 }
 
-const tmpDir = mkdtempSync(path.join(os.tmpdir(), TMP_PREFIX))
-const dbFileName = path.join(tmpDir, 'garage.db')
+// Путь задаёт playwright.config.ts (E2E_DB_FILE): фикстура seededCar пишет в ту же БД
+const dbFileName =
+  process.env.E2E_DB_FILE ||
+  path.join(os.tmpdir(), `${TMP_PREFIX}${process.env.E2E_PORT || '3100'}`, 'garage.db')
+const tmpDir = path.dirname(dbFileName)
+mkdirSync(tmpDir, { recursive: true })
 
 function runDbScript(script) {
   const result = spawnSync(process.execPath, [tsxCli, `server/database/${script}`], {

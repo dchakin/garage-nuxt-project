@@ -19,12 +19,12 @@
 **Цель:** существующие экраны работают на токенах, шрифтах и иконках макета; есть `npm run test:e2e` со скриншотами в обеих темах.
 **Когда готов:** `test:e2e` проходит и пишет скриншоты в `test-results/screens/`; unit-тесты форматтеров зелёные; в `conventions.md` описаны токены, тема, форматтеры, e2e.
 
-- [ ] **E2e-инфраструктура на Playwright** [decision, frontend] #29
+- [x] **E2e-инфраструктура на Playwright** [decision, frontend] #29
   - Файлы: `playwright.config.ts` (корень), `tests/e2e/helpers/snap.ts`, `tests/e2e/helpers/auth.ts`, `tests/e2e/smoke.spec.ts`, скрипт `test:e2e` в корневом `package.json`, раздел «E2E» в `conventions.md`, `ralph/check.sh` (убрать ссылку на несуществующий #27).
   - Контракт: e2e гоняется по собранному приложению (`npm run build`, API раздаёт клиент из `NUXT_WEB_DIST_DIR`) на отдельной временной SQLite и своём порту. Viewport 390×844. `snap(page, name)` сохраняет `test-results/screens/<name>-light.png` и `<name>-dark.png` (тема переключается через `colorScheme` + класс `dark`, см. задачу темы; до неё — только light). Фиксированное «сейчас»: `page.clock.setFixedTime('2026-10-10T09:41:00+03:00')`.
   - Готово: `npm run test:e2e` проходит сценарий «регистрация → вход → список машин» и сохраняет скриншот; `ralph/check.sh` запускает его; `conventions.md` описывает запуск, `snap()`, БД и время.
 
-- [ ] **E2e-фикстура с эталонными данными макета** [decision] #30
+- [x] **E2e-фикстура с эталонными данными макета** [decision] #30
   - Файлы: `tests/e2e/fixtures/seed.ts`, `tests/e2e/fixtures/reference.ts` (данные), `tests/e2e/fixtures/index.ts` (Playwright fixture `seededCar`).
   - Контракт: сид пишет напрямую в тестовую SQLite (через API нельзя задать произвольные `nextDueDate`/`nextDueMileage` и прошлые даты записей). Состав — ровно «Эталонные данные»: пользователи Дмитрий/Анна/Сергей (пароль общий, в `reference.ts`), Camry с 8 записями 2026 г. и 5 напоминаниями (одно выключено), Kia Rio, Lada Largus (Дмитрий — участник). Фикстура отдаёт `{ carId, users }` и залогиненную страницу.
   - Готово: тест на фикстуре проверяет, что `GET /api/cars/:id/entries` отдаёт 8 записей на 88 500 ₽; описание в разделе «E2E» `conventions.md`.

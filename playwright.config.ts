@@ -1,8 +1,17 @@
+import os from 'node:os'
+import path from 'node:path'
 import { defineConfig, devices } from '@playwright/test'
 
 // E2E по собранному приложению: перед запуском нужен `npm run build` (см. tests/e2e/server.mjs).
 const port = Number(process.env.E2E_PORT || 3100)
 const baseURL = `http://127.0.0.1:${port}`
+// Путь к SQLite знают и сервер, и тесты: фикстура seededCar пишет эталонные данные прямо в неё.
+// process.env наследуют воркеры Playwright
+const dbFile = (process.env.E2E_DB_FILE ||= path.join(
+  os.tmpdir(),
+  `garage-e2e-${port}`,
+  'garage.db',
+))
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -29,7 +38,7 @@ export default defineConfig({
     url: `${baseURL}/api/health`,
     reuseExistingServer: false,
     timeout: 60_000,
-    env: { E2E_PORT: String(port) },
+    env: { E2E_PORT: String(port), E2E_DB_FILE: dbFile },
     stdout: 'ignore',
     stderr: 'pipe',
   },
