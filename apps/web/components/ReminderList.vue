@@ -2,6 +2,7 @@
 import type { Reminder } from '@garage/shared/types'
 import { getReminderStatus, reminderStatusLabels } from '@garage/shared/utils/reminderStatus'
 import { reminderTriggerTypeLabels } from '@garage/shared/schemas/reminder'
+import { BellOff, Pencil, Plus, Trash2 } from 'lucide-vue-next'
 
 const props = defineProps<{ carId: number; currentMileage: number }>()
 
@@ -48,10 +49,11 @@ function dueText(reminder: Reminder) {
 
 <template>
   <div>
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold text-text">Напоминания</h2>
+    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-4">
+      <h2 class="text-h2 text-text">Напоминания</h2>
       <NuxtLink :to="`/cars/${carId}/reminders/new`" class="btn-primary px-3 py-1.5 text-sm">
-        + Добавить напоминание
+        <Plus class="h-4 w-4" aria-hidden="true" />
+        Добавить напоминание
       </NuxtLink>
     </div>
 
@@ -59,7 +61,7 @@ function dueText(reminder: Reminder) {
       <Spinner size="md" />
     </div>
     <div v-else-if="!reminders.length" class="card p-8 text-center">
-      <div class="text-3xl mb-2">⏰</div>
+      <BellOff class="mx-auto mb-2 h-7 w-7 text-text-3" aria-hidden="true" />
       <p class="text-text-2 text-sm">Напоминаний пока нет.</p>
     </div>
 
@@ -85,17 +87,7 @@ function dueText(reminder: Reminder) {
                   title="Изменить"
                   aria-label="Изменить"
                 >
-                  <svg
-                    class="h-3.5 w-3.5"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M13.5 3.5a1.5 1.5 0 0 1 2 2l-9 9-3 1 1-3 9-9Z" />
-                  </svg>
+                  <Pencil class="h-4 w-4" aria-hidden="true" />
                 </NuxtLink>
                 <button
                   :disabled="deletingId === reminder.id"
@@ -105,20 +97,7 @@ function dueText(reminder: Reminder) {
                   @click="onDelete(reminder)"
                 >
                   <Spinner v-if="deletingId === reminder.id" />
-                  <svg
-                    v-else
-                    class="h-3.5 w-3.5"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path
-                      d="M4 6h12M8 6V4.5A1.5 1.5 0 0 1 9.5 3h1A1.5 1.5 0 0 1 12 4.5V6m2 0-.6 9.4a1.5 1.5 0 0 1-1.5 1.4H8.1a1.5 1.5 0 0 1-1.5-1.4L6 6"
-                    />
-                  </svg>
+                  <Trash2 v-else class="h-4 w-4" aria-hidden="true" />
                 </button>
               </div>
             </div>

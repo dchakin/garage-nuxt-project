@@ -1,3 +1,5 @@
+@import '@fontsource-variable/onest/wght.css';
+@import '@fontsource/jetbrains-mono/600.css';
 @import './tokens.css';
 
 @tailwind base;
@@ -6,7 +8,9 @@
 
 @layer base {
   body {
-    @apply antialiased bg-bg text-text;
+    @apply antialiased bg-bg text-text font-sans text-body;
+    /* Табличные цифры: суммы и пробег не «прыгают» при изменении */
+    font-variant-numeric: tabular-nums;
   }
 }
 
@@ -57,7 +61,8 @@
   }
 
   /* Нативный индикатор растянут на всё поле (клик в любом месте открывает календарь),
-     а видимая иконка нарисована маской его же фоном — так её цвет берётся из токена. */
+     а видимая иконка нарисована маской его же фоном — так её цвет берётся из токена.
+     Маска — геометрия Lucide `calendar` (компонент в псевдоэлемент не вставить). */
   input[type='date']::-webkit-calendar-picker-indicator {
     position: absolute;
     inset: 0;
@@ -67,9 +72,9 @@
     padding: 0;
     cursor: pointer;
     background: var(--text-3);
-    --calendar-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4.5' width='14' height='12' rx='2'/%3E%3Cpath d='M6.5 3v3M13.5 3v3M3 8.5h14'/%3E%3C/svg%3E");
-    -webkit-mask: var(--calendar-icon) no-repeat right 0.65rem center / 1.05em 1.05em;
-    mask: var(--calendar-icon) no-repeat right 0.65rem center / 1.05em 1.05em;
+    --calendar-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 2v4M16 2v4'/%3E%3Crect width='18' height='18' x='3' y='4' rx='2'/%3E%3Cpath d='M3 10h18'/%3E%3C/svg%3E");
+    -webkit-mask: var(--calendar-icon) no-repeat right 0.65rem center / 1.25rem 1.25rem;
+    mask: var(--calendar-icon) no-repeat right 0.65rem center / 1.25rem 1.25rem;
   }
 
   .label {

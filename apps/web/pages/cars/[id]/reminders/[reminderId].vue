@@ -26,13 +26,9 @@ async function onSubmit(input: ReminderInput) {
 
 <template>
   <div>
-    <NuxtLink
-      :to="`/cars/${carId}?tab=reminders`"
-      class="text-sm text-text-2 hover:text-text transition-colors"
-      >← К автомобилю</NuxtLink
-    >
+    <BackLink :to="`/cars/${carId}?tab=reminders`">К автомобилю</BackLink>
 
-    <h1 class="text-lg font-semibold text-text mt-2 mb-4">Редактирование напоминания</h1>
+    <h1 class="text-h1 text-text mt-2 mb-4">Редактирование напоминания</h1>
 
     <div class="card p-4">
       <p v-if="error" class="alert-error mb-2">{{ error }}</p>

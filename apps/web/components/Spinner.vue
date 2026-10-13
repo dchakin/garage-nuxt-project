@@ -1,20 +1,13 @@
 <script setup lang="ts">
+import { LoaderCircle } from 'lucide-vue-next'
+
 withDefaults(defineProps<{ size?: 'sm' | 'md' }>(), { size: 'sm' })
 </script>
 
 <template>
-  <svg
+  <LoaderCircle
     class="animate-spin"
-    :class="size === 'sm' ? 'h-3.5 w-3.5' : 'h-5 w-5'"
-    viewBox="0 0 24 24"
-    fill="none"
+    :class="size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'"
     aria-hidden="true"
-  >
-    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-    <path
-      class="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4Z"
-    />
-  </svg>
+  />
 </template>

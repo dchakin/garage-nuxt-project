@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Lock, Map as MapIcon, ShieldX, TriangleAlert } from 'lucide-vue-next'
 const props = defineProps<{
   error: {
     statusCode?: number
@@ -15,25 +16,25 @@ const content = computed(() => {
   switch (statusCode.value) {
     case 401:
       return {
-        emoji: '🔒',
+        icon: Lock,
         title: 'Сессия истекла',
         text: 'Похоже, вы вышли из системы или сессия устарела. Войдите заново, чтобы продолжить.',
       }
     case 403:
       return {
-        emoji: '⛔',
+        icon: ShieldX,
         title: 'Нет доступа',
         text: 'У вас нет прав для просмотра этой страницы или автомобиля.',
       }
     case 404:
       return {
-        emoji: '🔍',
+        icon: MapIcon,
         title: 'Страница не найдена',
         text: 'Такой страницы не существует или она была удалена.',
       }
     default:
       return {
-        emoji: '⚠️',
+        icon: TriangleAlert,
         title: 'Что-то пошло не так',
         text:
           props.error?.statusMessage || props.error?.message || 'Произошла непредвиденная ошибка.',
@@ -54,13 +55,11 @@ async function goHome() {
 <template>
   <div class="max-w-sm mx-auto mt-16 text-center">
     <div class="flex justify-center mb-4">
-      <span
-        class="flex h-11 w-11 items-center justify-center rounded-lg bg-accent text-on-accent text-xl"
-      >
-        {{ content.emoji }}
+      <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-accent text-on-accent">
+        <component :is="content.icon" class="h-6 w-6" aria-hidden="true" />
       </span>
     </div>
-    <h1 class="text-xl font-semibold text-text mb-2">{{ content.title }}</h1>
+    <h1 class="text-h1 text-text mb-2">{{ content.title }}</h1>
     <p class="text-sm text-text-2 mb-6">{{ content.text }}</p>
 
     <div class="card p-6 shadow-sm space-y-3">

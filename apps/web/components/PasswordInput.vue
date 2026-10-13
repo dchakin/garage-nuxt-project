@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Eye, EyeOff } from 'lucide-vue-next'
+
 defineProps<{
   modelValue: string
   minlength?: number
@@ -28,33 +30,8 @@ const visible = ref(false)
       :aria-label="visible ? 'Скрыть пароль' : 'Показать пароль'"
       @click="visible = !visible"
     >
-      <svg
-        v-if="visible"
-        class="h-4 w-4"
-        viewBox="0 0 20 20"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M2.5 10s2.8-5.5 7.5-5.5 7.5 5.5 7.5 5.5-2.8 5.5-7.5 5.5S2.5 10 2.5 10z" />
-        <circle cx="10" cy="10" r="2.25" />
-      </svg>
-      <svg
-        v-else
-        class="h-4 w-4"
-        viewBox="0 0 20 20"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M2.5 10s2.8-5.5 7.5-5.5 7.5 5.5 7.5 5.5-2.8 5.5-7.5 5.5S2.5 10 2.5 10z" />
-        <circle cx="10" cy="10" r="2.25" />
-        <path d="M3 3l14 14" />
-      </svg>
+      <EyeOff v-if="visible" class="h-5 w-5" aria-hidden="true" />
+      <Eye v-else class="h-5 w-5" aria-hidden="true" />
     </button>
   </div>
 </template>

@@ -65,6 +65,20 @@ const COLOR_TOKENS = [
 
 const SPACING_TOKENS = [1, 2, 3, 4, 5, 6, 8, 10, 12] as const
 
+/** Шкала шрифтов макета («02 · Типографика»): размер / межстрочный / трекинг / начертание. */
+const FONT_SIZES = {
+  display: ['2.5rem', { lineHeight: '1.1', letterSpacing: '-1px', fontWeight: '700' }],
+  amount: ['2.125rem', { lineHeight: '1.1', letterSpacing: '-0.8px', fontWeight: '700' }],
+  h1: ['1.625rem', { lineHeight: '1.2', letterSpacing: '-0.5px', fontWeight: '700' }],
+  h2: ['1.25rem', { lineHeight: '1.3', letterSpacing: '-0.2px', fontWeight: '600' }],
+  h3: ['1.0625rem', { lineHeight: '1.3', fontWeight: '600' }],
+  body: ['1rem', { lineHeight: '1.45' }],
+  sm: ['0.875rem', { lineHeight: '1.4' }],
+  xs: ['0.75rem', { lineHeight: '1.3' }],
+  // Только подписи вкладок нижней панели и счётчики на них
+  '2xs': ['0.6875rem', { lineHeight: '1.3' }],
+} satisfies NonNullable<Config['theme']>['fontSize']
+
 const tokenVars = (names: readonly (string | number)[], prefix = '') =>
   Object.fromEntries(names.map((name) => [`${prefix}${name}`, `var(--${prefix}${name})`]))
 
@@ -78,6 +92,14 @@ export default {
       current: 'currentColor',
       inherit: 'inherit',
       ...tokenVars(COLOR_TOKENS),
+    },
+    // Шкала Tailwind (text-base/lg/xl…) заменена шкалой макета
+    fontSize: FONT_SIZES,
+    fontFamily: {
+      // Из бандла (@fontsource, main.css) — свой origin, без CDN
+      sans: ['"Onest Variable"', 'system-ui', 'sans-serif'],
+      // Только госномер и VIN
+      mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
     },
     borderRadius: {
       none: '0',

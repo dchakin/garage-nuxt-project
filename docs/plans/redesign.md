@@ -40,7 +40,7 @@
   - Контракт: `useTheme()` → `{ mode: Ref<'system'|'light'|'dark'>, resolved: Ref<'light'|'dark'>, setMode }`; хранение — `localStorage['garage:theme']`; класс `dark` на `<html>` ставит inline-скрипт до монтирования; `<meta name="theme-color">` = токен фона текущей темы; при `system` следит за `prefers-color-scheme`.
   - Готово: unit-тест на выбор/хранение; e2e: выбор «Тёмная» переживает перезагрузку, `theme-color` меняется; `snap()` умеет обе темы.
 
-- [ ] **Шрифты Onest / JetBrains Mono и иконки Lucide** [decision, frontend] #33
+- [x] **Шрифты Onest / JetBrains Mono и иконки Lucide** [decision, frontend] #33
   - Макет: `02 · Типографика`, `04 · Иконки` (`design/export/02.png`, `04.png`).
   - Файлы: зависимости `@fontsource-variable/onest`, `@fontsource/jetbrains-mono`, `lucide-vue-next` в `apps/web/package.json`; шкала шрифтов в `tailwind.config.ts`; замена эмодзи во всех `components/*.vue`, `pages/**`, `layouts/default.vue`.
   - Контракт: шрифты — из бандла (свой origin, без CDN); у Onest `font-variant-numeric: tabular-nums` для чисел; `font-mono` = JetBrains Mono (госномер, VIN). Иконки — только компоненты `lucide-vue-next`, `plus` — только на кнопках добавления.

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CarFront } from 'lucide-vue-next'
 definePageMeta({ middleware: 'auth' })
 
 const { login } = useAuth()
@@ -26,12 +27,11 @@ async function onSubmit() {
 <template>
   <div class="max-w-sm mx-auto mt-16">
     <div class="flex justify-center mb-4">
-      <span
-        class="flex h-11 w-11 items-center justify-center rounded-lg bg-accent text-on-accent text-xl"
-        >🚗</span
-      >
+      <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-accent text-on-accent">
+        <CarFront class="h-6 w-6" aria-hidden="true" />
+      </span>
     </div>
-    <h1 class="text-xl font-semibold text-text mb-6 text-center">Вход в Гараж</h1>
+    <h1 class="text-h1 text-text mb-6 text-center">Вход в Гараж</h1>
     <div class="card p-6 shadow-sm">
       <form class="space-y-4" @submit.prevent="onSubmit">
         <div>

@@ -11,9 +11,12 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
+    "@fontsource-variable/onest": "^5.3.1",
+    "@fontsource/jetbrains-mono": "^5.3.0",
     "@garage/shared": "*",
     "@vueuse/core": "^11.3.0",
     "chart.js": "^4.4.7",
+    "lucide-vue-next": "^1.0.0",
     "nuxt": "^3.21.11",
     "ofetch": "^1.4.1",
     "vue": "latest",

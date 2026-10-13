@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getReminderStatus } from '@garage/shared/utils/reminderStatus'
+import { Bell, CircleAlert, NotebookText } from 'lucide-vue-next'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -26,12 +27,10 @@ watch(tab, (value) => {
 
 <template>
   <div class="pb-20">
-    <NuxtLink to="/cars" class="text-sm text-text-2 hover:text-text transition-colors"
-      >← Все автомобили</NuxtLink
-    >
+    <BackLink to="/cars">Все автомобили</BackLink>
 
-    <div class="flex items-center justify-between mt-2 mb-4">
-      <h1 class="text-lg font-semibold text-text">{{ car.brand }} {{ car.model }}</h1>
+    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mt-2 mb-4">
+      <h1 class="text-h1 text-text">{{ car.brand }} {{ car.model }}</h1>
       <NuxtLink
         v-if="car.role === 'owner'"
         :to="`/cars/${carId}/edit`"
@@ -44,22 +43,23 @@ watch(tab, (value) => {
     <div class="grid grid-cols-2 gap-3 mb-6">
       <div class="card p-4">
         <p class="text-xs text-text-2">Пробег</p>
-        <p class="text-xl font-semibold text-text">
-          {{ car.currentMileage.toLocaleString('ru-RU') }} км
-        </p>
+        <p class="text-h2 text-text">{{ car.currentMileage.toLocaleString('ru-RU') }} км</p>
       </div>
       <div class="card p-4">
         <p class="text-xs text-text-2">Гос. номер</p>
-        <p class="text-xl font-semibold text-text">{{ car.plateNumber || '—' }}</p>
+        <p class="font-mono text-h2 text-text">{{ car.plateNumber || '—' }}</p>
       </div>
     </div>
 
     <div
       v-if="alertCount"
-      class="mb-4 rounded-md bg-warning-soft border border-warning px-3 py-2 text-sm text-warning-text"
+      class="mb-4 flex items-center gap-2 rounded-md bg-warning-soft border border-warning px-3 py-2 text-sm text-warning-text"
     >
-      ⏰ {{ alertCount }}
-      {{ alertCount === 1 ? 'напоминание требует внимания' : 'напоминаний требуют внимания' }}
+      <CircleAlert class="h-4 w-4 shrink-0" aria-hidden="true" />
+      <span>
+        {{ alertCount }}
+        {{ alertCount === 1 ? 'напоминание требует внимания' : 'напоминаний требуют внимания' }}
+      </span>
     </div>
 
     <EntryJournal v-if="tab === 'journal'" :car-id="carId" />
@@ -77,7 +77,7 @@ watch(tab, (value) => {
           :class="tab === 'journal' ? 'text-accent-text' : 'text-text-2 hover:text-text'"
           @click="tab = 'journal'"
         >
-          <span class="text-lg leading-none">📋</span>
+          <NotebookText class="h-6 w-6" aria-hidden="true" />
           Журнал
         </button>
         <button
@@ -85,11 +85,11 @@ watch(tab, (value) => {
           :class="tab === 'reminders' ? 'text-accent-text' : 'text-text-2 hover:text-text'"
           @click="tab = 'reminders'"
         >
-          <span class="relative text-lg leading-none">
-            ⏰
+          <span class="relative">
+            <Bell class="h-6 w-6" aria-hidden="true" />
             <span
               v-if="alertCount"
-              class="absolute -top-1.5 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold text-on-danger"
+              class="absolute -top-1.5 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-2xs font-semibold text-on-danger"
               >{{ alertCount }}</span
             >
           </span>

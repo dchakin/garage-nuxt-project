@@ -2,6 +2,16 @@
 import type { Entry } from '@garage/shared/types'
 import type { EntryFilterInput } from '@garage/shared/schemas/entry'
 import { entryTypes, entryTypeLabels } from '@garage/shared/schemas/entry'
+import {
+  ChevronDown,
+  NotebookPen,
+  Pencil,
+  Plus,
+  Search,
+  SlidersHorizontal,
+  Trash2,
+  X,
+} from 'lucide-vue-next'
 
 const props = defineProps<{ carId: number }>()
 
@@ -59,39 +69,24 @@ function formatCost(entry: Entry) {
   if (entry.cost == null) return ''
   return `${entry.cost.toLocaleString('ru-RU')} ${entry.currency}`
 }
-
-const entryTypeIcons: Record<string, string> = {
-  repair: '🔧',
-  replacement: '🔩',
-  purchase: '🛒',
-  maintenance: '🛠️',
-  other: '📋',
-}
 </script>
 
 <template>
   <div>
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold text-text">Журнал</h2>
+    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-4">
+      <h2 class="text-h2 text-text">Журнал</h2>
       <NuxtLink :to="`/cars/${carId}/entries/new`" class="btn-primary px-3 py-1.5 text-sm">
-        + Добавить запись
+        <Plus class="h-4 w-4" aria-hidden="true" />
+        Добавить запись
       </NuxtLink>
     </div>
 
     <div class="mb-4">
       <div class="relative mb-2">
-        <svg
+        <Search
           class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-3"
-          viewBox="0 0 20 20"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <circle cx="9" cy="9" r="6" />
-          <path d="M17 17l-3.5-3.5" />
-        </svg>
+          aria-hidden="true"
+        />
         <input
           v-model="searchInput"
           type="text"
@@ -101,18 +96,10 @@ const entryTypeIcons: Record<string, string> = {
         <button
           v-if="searchInput"
           class="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-3 hover:text-text transition-colors"
+          aria-label="Очистить поиск"
           @click="clearSearch"
         >
-          <svg
-            class="h-4 w-4"
-            viewBox="0 0 20 20"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-          >
-            <path d="M6 6l8 8M14 6l-8 8" />
-          </svg>
+          <X class="h-4 w-4" aria-hidden="true" />
         </button>
       </div>
 
@@ -122,34 +109,18 @@ const entryTypeIcons: Record<string, string> = {
           :class="{ 'border-border-strong text-text': showFilters || activeFilterCount }"
           @click="showFilters = !showFilters"
         >
-          <svg
-            class="h-4 w-4"
-            viewBox="0 0 20 20"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-          >
-            <path d="M3 5h14M6 10h8M9 15h2" />
-          </svg>
+          <SlidersHorizontal class="h-4 w-4" aria-hidden="true" />
           Фильтры
           <span
             v-if="activeFilterCount"
             class="ml-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-inverse px-1 text-xs font-medium text-on-inverse"
             >{{ activeFilterCount }}</span
           >
-          <svg
-            class="h-3.5 w-3.5 transition-transform"
+          <ChevronDown
+            class="h-4 w-4 transition-transform"
             :class="{ 'rotate-180': showFilters }"
-            viewBox="0 0 20 20"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M5 8l5 5 5-5" />
-          </svg>
+            aria-hidden="true"
+          />
         </button>
 
         <button
@@ -159,16 +130,7 @@ const entryTypeIcons: Record<string, string> = {
           aria-label="Сбросить фильтры"
           @click="clearFilters"
         >
-          <svg
-            class="h-4 w-4"
-            viewBox="0 0 20 20"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-          >
-            <path d="M5 5l10 10M15 5L5 15" />
-          </svg>
+          <X class="h-4 w-4" aria-hidden="true" />
         </button>
 
         <select v-model="filters.sortBy" class="select w-auto ml-auto">
@@ -207,16 +169,19 @@ const entryTypeIcons: Record<string, string> = {
       <Spinner size="md" />
     </div>
     <div v-else-if="!entries.length" class="card p-8 text-center">
-      <div class="text-3xl mb-2">📋</div>
+      <NotebookPen class="mx-auto mb-2 h-7 w-7 text-text-3" aria-hidden="true" />
       <p class="text-text-2 text-sm">Записей пока нет.</p>
     </div>
 
     <div v-else class="space-y-2">
       <div v-for="entry in entries" :key="entry.id" class="card p-4">
         <div class="flex items-start gap-2.5">
-          <span class="text-base leading-none shrink-0 self-start mt-0.5">{{
-            entryTypeIcons[entry.type]
-          }}</span>
+          <component
+            :is="entryTypeIcons[entry.type].icon"
+            class="h-5 w-5 shrink-0"
+            :class="entryTypeIcons[entry.type].colorClass"
+            aria-hidden="true"
+          />
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
               <p class="font-medium text-text leading-snug flex-1 min-w-[140px]">
@@ -230,17 +195,7 @@ const entryTypeIcons: Record<string, string> = {
                   title="Изменить"
                   aria-label="Изменить"
                 >
-                  <svg
-                    class="h-3.5 w-3.5"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M13.5 3.5a1.5 1.5 0 0 1 2 2l-9 9-3 1 1-3 9-9Z" />
-                  </svg>
+                  <Pencil class="h-4 w-4" aria-hidden="true" />
                 </NuxtLink>
                 <button
                   :disabled="deletingId === entry.id"
@@ -250,20 +205,7 @@ const entryTypeIcons: Record<string, string> = {
                   @click="onDelete(entry)"
                 >
                   <Spinner v-if="deletingId === entry.id" />
-                  <svg
-                    v-else
-                    class="h-3.5 w-3.5"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path
-                      d="M4 6h12M8 6V4.5A1.5 1.5 0 0 1 9.5 3h1A1.5 1.5 0 0 1 12 4.5V6m2 0-.6 9.4a1.5 1.5 0 0 1-1.5 1.4H8.1a1.5 1.5 0 0 1-1.5-1.4L6 6"
-                    />
-                  </svg>
+                  <Trash2 v-else class="h-4 w-4" aria-hidden="true" />
                 </button>
               </div>
             </div>

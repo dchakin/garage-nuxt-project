@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Bell } from 'lucide-vue-next'
 const { supported, permission, subscribed, busy, needsInstall, subscribe, unsubscribe, sendTest } =
   usePush()
 const message = ref('')
@@ -28,7 +29,10 @@ async function onEnable() {
     <div class="card p-4 mb-4">
       <div class="flex items-center justify-between gap-3">
         <div>
-          <p class="font-medium text-text">🔔 Push-уведомления</p>
+          <p class="flex items-center gap-1.5 font-medium text-text">
+            <Bell class="h-5 w-5 text-text-2" aria-hidden="true" />
+            Push-уведомления
+          </p>
           <p class="text-sm text-text-2">
             <template v-if="needsInstall"
               >На iPhone сначала добавьте приложение на экран «Домой» (Поделиться → На экран

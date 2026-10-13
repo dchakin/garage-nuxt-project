@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CarFront, ChevronRight, Plus } from 'lucide-vue-next'
 import type { CarInput } from '@garage/shared/schemas/car'
 
 definePageMeta({ middleware: 'auth' })
@@ -23,10 +24,14 @@ async function onCreate(input: CarInput) {
 
 <template>
   <div>
-    <div class="flex items-center justify-between mb-4">
-      <h1 class="text-lg font-semibold text-text">Мои автомобили</h1>
+    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-4">
+      <h1 class="text-h1 text-text">Мои автомобили</h1>
       <button class="btn-primary px-3 py-1.5 text-sm" @click="showForm = !showForm">
-        {{ showForm ? 'Отмена' : '+ Добавить авто' }}
+        <template v-if="showForm">Отмена</template>
+        <template v-else>
+          <Plus class="h-4 w-4" aria-hidden="true" />
+          Добавить авто
+        </template>
       </button>
     </div>
 
@@ -44,7 +49,7 @@ async function onCreate(input: CarInput) {
     </div>
 
     <div v-else-if="!cars.length" class="card p-8 text-center">
-      <div class="text-3xl mb-2">🚗</div>
+      <CarFront class="mx-auto mb-2 h-7 w-7 text-text-3" aria-hidden="true" />
       <p class="text-text-2 text-sm">
         Пока нет ни одного автомобиля. Добавьте первый, чтобы начать вести журнал.
       </p>
@@ -62,19 +67,14 @@ async function onCreate(input: CarInput) {
             {{ car.brand }} {{ car.model }} <span v-if="car.year">({{ car.year }})</span>
           </p>
           <p class="text-sm text-text-2">
-            {{ car.plateNumber || 'Без номера' }} ·
+            <span :class="{ 'font-mono font-semibold': car.plateNumber }">{{
+              car.plateNumber || 'Без номера'
+            }}</span>
+            ·
             {{ car.currentMileage.toLocaleString('ru-RU') }} км
           </p>
         </div>
-        <svg
-          class="h-4 w-4 text-text-3 shrink-0"
-          viewBox="0 0 20 20"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M7 5l5 5-5 5" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
+        <ChevronRight class="h-5 w-5 text-text-3 shrink-0" aria-hidden="true" />
       </NuxtLink>
     </div>
   </div>

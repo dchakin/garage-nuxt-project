@@ -1,6 +1,6 @@
 # Гараж — учёт обслуживания и трат на автомобиль
 
-Монорепа (npm workspaces): клиент — Nuxt 3 SPA (`apps/web`), API — Nitro + Drizzle (SQLite) (`apps/api`), общие Zod-схемы и типы — `packages/shared`. TypeScript и Tailwind везде, где есть UI.
+Монорепа (npm workspaces): клиент — Nuxt 3 SPA (`apps/web`), API — Nitro + Drizzle (SQLite) (`apps/api`), общие Zod-схемы и типы — `packages/shared`. TypeScript и Tailwind везде, где есть UI; шрифты Onest и JetBrains Mono — из бандла (`@fontsource`), иконки — `lucide-vue-next`.
 
 Реализовано в этой версии (v1, по этапам 1–3 из ТЗ):
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CarFront, LogOut } from 'lucide-vue-next'
 const { user, loggedIn, logout: logoutSession } = useAuth()
 const router = useRouter()
 const { confirm } = useConfirmDialog()
@@ -31,9 +32,10 @@ async function logout() {
       <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
         <NuxtLink to="/cars" class="flex items-center gap-2 font-semibold text-text">
           <span
-            class="flex h-7 w-7 items-center justify-center rounded-md bg-accent text-on-accent text-sm"
-            >🚗</span
+            class="flex h-7 w-7 items-center justify-center rounded-md bg-accent text-on-accent"
           >
+            <CarFront class="h-4 w-4" aria-hidden="true" />
+          </span>
           Гараж
         </NuxtLink>
         <div class="flex items-center gap-3 text-sm">
@@ -44,6 +46,7 @@ async function logout() {
             @click="logout"
           >
             <Spinner v-if="loggingOut" />
+            <LogOut v-else class="h-4 w-4" aria-hidden="true" />
             Выйти
           </button>
         </div>
