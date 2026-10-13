@@ -22,6 +22,8 @@ Root `package.json` only holds workspace config, shared dev tooling (vitest, pre
 
 `docs/plans/conventions.md` is the durable memory between tasks: shared rules, pitfalls, and decisions/contracts (components, utils, routes, API shapes) that later issues rely on. Per-feature scope lives in the GitHub issue text, UI in `design/garage.pen`. When a task makes such a decision or creates such a contract, update `conventions.md` in the same commit (format in its header). `docs/plans/` may also hold roadmaps for larger directions: `mobile-stores.md` — publishing to App Store/Google Play via Capacitor; its stage-0 rules apply to current work (keep the client SPA-compatible, no SSR dependencies). A task is done only when it matches its issue and `TZ.md`, has tests for new/changed behavior, and `npm test` + `typecheck` + `build` + `test:e2e` pass; UI tasks also need a Playwright e2e scenario with screenshots of affected screens (390px). After UI changes in an interactive session, also check the running app via Playwright MCP. `ralph/` is an autonomous loop that implements GitHub issues one at a time — see `ralph/README.md`.
 
+**Design fixes:** «приступи к пункту №X» (without other context) means item X of `docs/plans/design-ux-fixes.md` — read its «Общие правила» and only item X, edit `design/garage.pen` via Pencil MCP (no code changes, no tests/build needed), then mark the item ✅ in the file's status table. These are design-only tasks; the code-task definition of done above does not apply.
+
 ## Commands
 
 ```bash
