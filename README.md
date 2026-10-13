@@ -112,7 +112,11 @@ packages/
 
 ## Тесты
 
-`npm test` (Vitest, три проекта: `api`, `web`, `shared`) — юнит-тесты чистой логики (`computeNextDue`, `getReminderStatus`, токены, раздача статики, клиент API, Zod-схемы), тесты `requireCarAccess`/`notifyDueReminders` на временной SQLite-БД и интеграционные тесты API (`apps/api/tests/integration`) через реальный dev-сервер Nitro (`tests/helpers/apiServer.ts`). `npm run typecheck` гоняется отдельно (см. `CLAUDE.md`). E2E в браузере (Playwright) пока не настроен — следующая задача.
+`npm test` (Vitest, три проекта: `api`, `web`, `shared`) — юнит-тесты чистой логики (`computeNextDue`, `getReminderStatus`, токены, раздача статики, клиент API, Zod-схемы), тесты `requireCarAccess`/`notifyDueReminders` на временной SQLite-БД и интеграционные тесты API (`apps/api/tests/integration`) через реальный dev-сервер Nitro (`tests/helpers/apiServer.ts`). `npm run typecheck` гоняется отдельно (см. `CLAUDE.md`). E2E в браузере — Playwright по собранному приложению на временной SQLite (`tests/e2e`, первый раз нужен `npx playwright install chromium`):
+
+```bash
+npm run build && npm run test:e2e   # скриншоты экранов — в test-results/screens/
+```
 
 ## Известные ограничения этой версии
 

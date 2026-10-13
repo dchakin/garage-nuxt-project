@@ -24,11 +24,11 @@ run npm test --silent
 run npm run typecheck --silent
 run npm run build --silent
 
-# E2E на собранном приложении (появляются в #27). Скриншоты — в test-results/screens/ для ревью.
+# E2E на собранном приложении (Playwright, tests/e2e). Скриншоты — в test-results/screens/ для ревью.
 rm -rf test-results/screens
-if has_script test:e2e; then
-  run npm run test:e2e --silent
-else
-  echo "::: e2e пропущены: скрипта test:e2e ещё нет (issue #27)"
+if ! has_script test:e2e; then
+  echo '::: FAILED: в package.json нет скрипта "test:e2e"'
+  exit 1
 fi
+run npm run test:e2e --silent
 echo "::: ALL GREEN"

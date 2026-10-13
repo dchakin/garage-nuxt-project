@@ -17,7 +17,7 @@
     "build": "npm run build -w @garage/api -w @garage/web",
     "build:api": "npm run build -w @garage/api",
     "build:web": "npm run build -w @garage/web",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present && tsc -p tests/e2e",
     "test": "vitest run",
     "test:watch": "vitest",
     "db:generate": "npm run db:generate -w @garage/api",
@@ -26,9 +26,11 @@
     "postinstall": "npm run postinstall --workspaces --if-present",
     "prepare": "husky || true",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "concurrently": "^9.1.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",

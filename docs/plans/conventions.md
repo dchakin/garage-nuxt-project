@@ -24,7 +24,11 @@
 
 ## E2E
 
-_Заполняется в #27 (Playwright): фикстуры, хелпер `snap()`, тестовая БД, запуск локально._
+- (#29) Запуск: `npm run build && npm run test:e2e` (`playwright test`, конфиг `playwright.config.ts` в корне, сценарии `tests/e2e/*.spec.ts`). Сам `test:e2e` ничего не собирает: гоняется по собранному приложению. Первый раз — `npx playwright install chromium`.
+- (#29) Сервер — `tests/e2e/server.mjs` (его запускает `webServer` Playwright): создаёт временную SQLite в `os.tmpdir()/garage-e2e-*` (каталоги прошлых прогонов удаляет при старте — на Windows сервер гасится без exit-хуков), применяет миграции и сид категорий (`apps/api/server/database/{migrate,seed}.ts`), затем в том же процессе импортирует `apps/api/.output/server/index.mjs` с `NUXT_WEB_DIST_DIR=apps/web/.output/public` на `127.0.0.1:${E2E_PORT:-3100}` — один origin, как на проде. БД общая на весь прогон: пользователи — с уникальным email (`createTestUser()`), один воркер. VAPID не задан — push выключен. Service worker заблокирован (`serviceWorkers: 'block'`).
+- (#29) Окружение браузера: Chromium, viewport 390×844, `locale: ru-RU`, `timezoneId: Europe/Moscow`. Тесты импортируют `test`/`expect` из `tests/e2e/helpers/test.ts`, а не из `@playwright/test`: там `page.clock.setFixedTime(FIXED_NOW)`, `FIXED_NOW = '2026-10-10T09:41:00+03:00'` (таймеры идут, `Date.now()` стоит).
+- (#29) `snap(page, name)` (`tests/e2e/helpers/snap.ts`) → `test-results/screens/<name>-<theme>.png`, full page, анимации выключены. Тема — `emulateMedia({ colorScheme })` + класс `dark` на `<html>`; пока снимается только `light`, в задаче темы добавить `'dark'` в `THEMES`. Прочие артефакты Playwright — `test-results/artifacts/` (трейс при падении).
+- (#29) Авторизация — `tests/e2e/helpers/auth.ts`: `registerViaUi`/`loginViaUi` (форма, итог — `/cars`), `registerViaApi` (быстро, кука в контексте страницы), `logout`. Поля форм ищутся по `type`, т.к. `<label>` не связаны с `input`; после редизайна форм — `getByLabel`.
 
 ## UI
 

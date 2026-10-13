@@ -19,7 +19,7 @@ touch .ralph/STOP        # остановиться после текущей з
 1. **Выбор.** Первый открытый issue: сначала с меткой `tests`, затем по номеру этапа в milestone, затем по номеру. Пропускаются метки `decision`, `ralph:blocked`, `ralph:in-review`.
 2. **Ветка** `ralph/issue-N`: от последнего открытого PR Ralph, если такой есть (цепочка), иначе от `origin/dev`.
 3. **Реализация**: Sonnet, `ralph/prompts/implement.md` + текст issue + `docs/plans/conventions.md`. Модель пишет код и тесты, дописывает решения и контракты в `conventions.md` и коммитит.
-4. **Проверки** (`ralph/check.sh`): `npm test`, `typecheck`, `build`, затем e2e на Playwright по собранному приложению (когда готова #27). Их запускает скрипт, решение принимается по коду возврата. Скриншоты экранов копируются в `.ralph/logs/<запуск>/issue-N-screens/`.
+4. **Проверки** (`ralph/check.sh`): `npm test`, `typecheck`, `build`, затем `npm run test:e2e` (Playwright по собранному приложению). Их запускает скрипт, решение принимается по коду возврата. Скриншоты экранов копируются в `.ralph/logs/<запуск>/issue-N-screens/`.
 5. **Ревью**: отдельный процесс Sonnet с чистым контекстом и доступом только на чтение (`ralph/prompts/review.md`). Для задач с UI открывает скриншоты из e2e и сверяет их с задачей — вместо дорогого Playwright MCP. Возвращает JSON-вердикт `APPROVE` или `CHANGES`.
 6. **Итог**:
    - всё зелёное и ревью одобрило → push, PR в `dev` с `Closes #N`, метка `ralph:in-review`;
