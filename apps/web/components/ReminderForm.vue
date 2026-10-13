@@ -117,18 +117,12 @@ function onSubmit() {
     </label>
 
     <div class="flex gap-3 pt-2">
-      <button type="submit" :disabled="saving" class="btn-primary flex-1 py-2">
-        <Spinner v-if="saving" />
-        {{ saving ? 'Сохранение...' : 'Сохранить' }}
-      </button>
-      <button
-        type="button"
-        :disabled="saving"
-        class="btn-secondary flex-1 py-2"
-        @click="emit('cancel')"
-      >
+      <UiButton type="submit" :loading="saving" class="flex-1">
+        {{ saving ? 'Сохраняем…' : 'Сохранить' }}
+      </UiButton>
+      <UiButton variant="secondary" :disabled="saving" class="flex-1" @click="emit('cancel')">
         Отмена
-      </button>
+      </UiButton>
     </div>
   </form>
 </template>

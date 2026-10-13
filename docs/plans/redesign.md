@@ -58,7 +58,7 @@
 
 Общий контракт этапа: компоненты лежат в `apps/web/components/ui/` и используются как `<Ui…>` (авто-импорт Nuxt с префиксом каталога); тесты — `apps/web/tests/ui/*.test.ts` (`@vue/test-utils`, happy-dom); каждый компонент показан на e2e-странице-витрине `pages/dev/ui.vue` (только в dev и e2e, без `middleware`), с `snap('ui-<группа>')`.
 
-- [ ] **Кнопки, поля и элементы выбора** [decision, frontend] #35
+- [x] **Кнопки, поля и элементы выбора** [decision, frontend] #35
   - Макет: `05 · Компоненты: действия и ввод` (`design/export/05.png`).
   - Файлы: `components/ui/Button.vue` (`variant: 'primary'|'secondary'|'tonal'|'danger'|'text'`, `icon?`, `disabled`, `loading`), `IconButton.vue`, `Field.vue` (`label`, `suffix`, `hint`, `error`, `v-model`), `Textarea.vue`, `AmountField.vue`, `SearchField.vue`, `Chip.vue` (`icon?`, `selected`), `Segmented.vue` (`options`, `v-model`), `Toggle.vue`, `TypeOption.vue`; удалить `.btn-*` из `main.css`, заменить использования.
   - Готово: тесты — ошибка поля показывается вместо подсказки и ставит `aria-invalid`; выбор в Segmented/Chip эмитит `update:modelValue`; disabled-кнопка не кликается.

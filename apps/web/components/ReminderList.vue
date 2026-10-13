@@ -51,10 +51,9 @@ function dueText(reminder: Reminder) {
   <div>
     <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-4">
       <h2 class="text-h2 text-text">Напоминания</h2>
-      <NuxtLink :to="`/cars/${carId}/reminders/new`" class="btn-primary px-3 py-1.5 text-sm">
-        <Plus class="h-4 w-4" aria-hidden="true" />
+      <UiButton :to="`/cars/${carId}/reminders/new`" size="sm" :icon="Plus">
         Добавить напоминание
-      </NuxtLink>
+      </UiButton>
     </div>
 
     <div v-if="loading" class="flex items-center justify-center py-8 text-text-2">

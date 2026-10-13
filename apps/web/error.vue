@@ -63,10 +63,10 @@ async function goHome() {
     <p class="text-sm text-text-2 mb-6">{{ content.text }}</p>
 
     <div class="card p-6 shadow-sm space-y-3">
-      <button v-if="statusCode === 401" class="btn-primary w-full py-2" @click="goToLogin">
+      <UiButton v-if="statusCode === 401" class="w-full" @click="goToLogin">
         Войти заново
-      </button>
-      <button v-else class="btn-primary w-full py-2" @click="goHome">На главную</button>
+      </UiButton>
+      <UiButton v-else class="w-full" @click="goHome">На главную</UiButton>
     </div>
   </div>
 </template>

@@ -60,6 +60,7 @@ const COLOR_TOKENS = [
   'chart-bar',
   'chart-bar-muted',
   'scrim',
+  'knob',
   'shadow',
 ] as const
 

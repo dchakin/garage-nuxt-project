@@ -22,6 +22,10 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  // Витрина UI-кита (/dev/ui) нужна в dev и e2e (там гоняется обычная `npm run build`),
+  // а в прод-образ не попадает: Dockerfile собирает с GARAGE_EXCLUDE_DEV_PAGES=1
+  ignore: process.env.GARAGE_EXCLUDE_DEV_PAGES ? ['pages/dev/**', 'components/dev/**'] : [],
+
   // Воркспейс-пакет отдаёт исходный TS — Vite должен его транспилировать
   build: {
     transpile: ['@garage/shared'],

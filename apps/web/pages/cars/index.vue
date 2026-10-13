@@ -27,13 +27,14 @@ async function onCreate(input: CarInput) {
   <div>
     <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-4">
       <h1 class="text-h1 text-text">Мои автомобили</h1>
-      <button class="btn-primary px-3 py-1.5 text-sm" @click="showForm = !showForm">
-        <template v-if="showForm">Отмена</template>
-        <template v-else>
-          <Plus class="h-4 w-4" aria-hidden="true" />
-          Добавить авто
-        </template>
-      </button>
+      <UiButton
+        :variant="showForm ? 'secondary' : 'primary'"
+        size="sm"
+        :icon="showForm ? undefined : Plus"
+        @click="showForm = !showForm"
+      >
+        {{ showForm ? 'Отмена' : 'Добавить авто' }}
+      </UiButton>
     </div>
 
     <PushSettings />

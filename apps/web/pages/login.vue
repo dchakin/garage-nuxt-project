@@ -43,10 +43,9 @@ async function onSubmit() {
           <PasswordInput v-model="password" />
         </div>
         <p v-if="error" class="alert-error">{{ error }}</p>
-        <button type="submit" :disabled="loading" class="btn-primary w-full py-2">
-          <Spinner v-if="loading" />
-          {{ loading ? 'Вход...' : 'Войти' }}
-        </button>
+        <UiButton type="submit" :loading="loading" class="w-full">
+          {{ loading ? 'Входим…' : 'Войти' }}
+        </UiButton>
       </form>
     </div>
     <p class="text-sm text-text-2 text-center mt-4">

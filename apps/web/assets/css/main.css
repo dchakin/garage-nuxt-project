@@ -15,22 +15,6 @@
 }
 
 @layer components {
-  .btn-primary {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-md bg-accent text-on-accent font-medium
-      hover:bg-accent-pressed active:bg-accent-pressed disabled:opacity-50 disabled:pointer-events-none
-      transition-colors;
-  }
-  .btn-secondary {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-border-strong bg-surface text-text font-medium
-      hover:bg-surface-2 active:bg-surface-2 disabled:opacity-50 disabled:pointer-events-none
-      transition-colors;
-  }
-  .btn-danger {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-md text-danger-text font-medium
-      hover:text-danger-text hover:bg-danger-soft disabled:opacity-50 disabled:pointer-events-none
-      transition-colors;
-  }
-
   .card {
     @apply bg-surface border border-border rounded-lg;
   }
@@ -56,14 +40,15 @@
     @apply input bg-surface pr-2 cursor-pointer;
   }
 
-  input[type='date'] {
-    @apply input relative bg-surface cursor-pointer;
+  /* Только старые поля с .input — у UiField своя иконка календаря */
+  .input[type='date'] {
+    @apply relative bg-surface cursor-pointer;
   }
 
   /* Нативный индикатор растянут на всё поле (клик в любом месте открывает календарь),
      а видимая иконка нарисована маской его же фоном — так её цвет берётся из токена.
      Маска — геометрия Lucide `calendar` (компонент в псевдоэлемент не вставить). */
-  input[type='date']::-webkit-calendar-picker-indicator {
+  .input[type='date']::-webkit-calendar-picker-indicator {
     position: absolute;
     inset: 0;
     width: 100%;

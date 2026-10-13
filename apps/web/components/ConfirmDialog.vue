@@ -43,20 +43,16 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
             <h2 class="font-semibold text-text">{{ dialog.title }}</h2>
             <p class="text-sm text-text-2 mt-1.5">{{ dialog.message }}</p>
             <div class="flex justify-end gap-2 mt-5">
-              <button class="btn-secondary px-3 py-1.5 text-sm" @click="respond(false)">
+              <UiButton variant="secondary" size="sm" @click="respond(false)">
                 {{ dialog.cancelText }}
-              </button>
-              <button
-                class="inline-flex items-center justify-center gap-1.5 rounded-md font-medium px-3 py-1.5 text-sm transition-colors"
-                :class="
-                  dialog.danger
-                    ? 'bg-danger text-on-danger hover:bg-danger-pressed active:bg-danger-pressed'
-                    : 'bg-accent text-on-accent hover:bg-accent-pressed active:bg-accent-pressed'
-                "
+              </UiButton>
+              <UiButton
+                :variant="dialog.danger ? 'danger' : 'primary'"
+                size="sm"
                 @click="respond(true)"
               >
                 {{ dialog.confirmText }}
-              </button>
+              </UiButton>
             </div>
           </div>
         </Transition>

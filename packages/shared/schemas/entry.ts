@@ -11,6 +11,15 @@ export const entryTypeLabels: Record<EntryType, string> = {
   other: 'Прочее',
 }
 
+/** Короткие подписи — плитки выбора типа и фильтры (design/garage.pen, «05 · Компоненты»). */
+export const entryTypeShortLabels: Record<EntryType, string> = {
+  repair: 'Ремонт',
+  replacement: 'Замена',
+  purchase: 'Покупка',
+  maintenance: 'ТО',
+  other: 'Прочее',
+}
+
 export const entrySchema = z.object({
   date: z.string().min(1, 'Укажите дату'),
   type: z.enum(entryTypes),

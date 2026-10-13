@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Trash2 } from 'lucide-vue-next'
+
 definePageMeta({ middleware: 'auth' })
 
 const route = useRoute()
@@ -90,24 +92,23 @@ async function onInvite() {
           :disabled="inviting"
           class="input flex-1"
         />
-        <button type="submit" :disabled="inviting" class="btn-primary h-10 px-3 text-sm">
-          <Spinner v-if="inviting" />
-          {{ inviting ? 'Отправка...' : 'Пригласить' }}
-        </button>
+        <UiButton type="submit" size="sm" :loading="inviting">
+          {{ inviting ? 'Отправляем…' : 'Пригласить' }}
+        </UiButton>
       </form>
       <p v-if="inviteError" class="alert-error mt-2">{{ inviteError }}</p>
       <p v-if="inviteSuccess" class="alert-success mt-2">{{ inviteSuccess }}</p>
     </div>
 
     <div v-if="car.role === 'owner'" class="pt-4 border-t border-border">
-      <button
-        :disabled="deletingId === carId"
-        class="btn-danger px-3 py-1.5 text-sm"
+      <UiButton
+        variant="danger-text"
+        :icon="Trash2"
+        :loading="deletingId === carId"
         @click="onDelete"
       >
-        <Spinner v-if="deletingId === carId" />
-        {{ deletingId === carId ? 'Удаление...' : 'Удалить автомобиль' }}
-      </button>
+        {{ deletingId === carId ? 'Удаляем…' : 'Удалить автомобиль' }}
+      </UiButton>
     </div>
   </div>
 </template>

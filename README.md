@@ -118,6 +118,8 @@ packages/
 npm run build && npm run test:e2e   # скриншоты экранов — в test-results/screens/
 ```
 
+Компоненты UI-кита (`apps/web/components/ui/`) собраны на витрине `/dev/ui` (в `npm run dev` и e2e; в Docker-образ не попадает — сборка с `GARAGE_EXCLUDE_DEV_PAGES=1`).
+
 ## Известные ограничения этой версии
 
 - Вложения (фото чеков) и аналитика — не реализованы, это следующие этапы по ТЗ.

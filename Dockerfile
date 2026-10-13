@@ -19,7 +19,8 @@ RUN npm ci
 
 COPY . .
 # Собираем оба приложения: apps/api (Nitro, .output/server) и apps/web (nuxt generate, .output/public)
-RUN npm run build
+# GARAGE_EXCLUDE_DEV_PAGES — без витрины UI-кита /dev/ui (apps/web/nuxt.config.ts)
+RUN GARAGE_EXCLUDE_DEV_PAGES=1 npm run build
 
 # API раздаёт и собранный клиент — один контейнер и один origin (см. apps/api/server/routes/[...path].get.ts)
 ENV NUXT_WEB_DIST_DIR=/app/apps/web/.output/public

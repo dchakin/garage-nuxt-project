@@ -47,22 +47,18 @@ async function onEnable() {
           </p>
         </div>
         <template v-if="supported && !needsInstall && permission !== 'denied'">
-          <button
-            v-if="!subscribed"
-            :disabled="busy"
-            class="btn-primary px-3 py-1.5 text-sm shrink-0"
-            @click="onEnable"
-          >
-            <Spinner v-if="busy" /> Включить
-          </button>
-          <button
+          <UiButton v-if="!subscribed" size="sm" :loading="busy" @click="onEnable">
+            Включить
+          </UiButton>
+          <UiButton
             v-else
+            variant="secondary"
+            size="sm"
             :disabled="busy"
-            class="btn-secondary px-3 py-1.5 text-sm shrink-0"
             @click="run(unsubscribe, 'Уведомления выключены')"
           >
             Выключить
-          </button>
+          </UiButton>
         </template>
       </div>
       <button
