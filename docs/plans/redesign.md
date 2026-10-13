@@ -69,7 +69,7 @@
   - Контракт: строки внутри `UiCard` с разделителем сверху, у первой — без него (CSS `:first-child`). `ReminderCard` принимает `reminder`, `currentMileage`, `avgKmPerMonth` и сам считает статус/остаток через shared-утилиты; эмитит `done` («Сделал») и `open`.
   - Готово: тесты — StatusBadge для каждого статуса; ReminderCard для эталонных напоминаний показывает «Просрочено на 250 км» и «Через 8 дней».
 
-- [ ] **Графики, скелетоны, переключатель периода** [decision, frontend] #37
+- [x] **Графики, скелетоны, переключатель периода** [decision, frontend] #37
   - Макет: `06 · Компоненты: данные` — группы «Графики», «Загрузка».
   - Файлы: `components/ui/ColumnChart.vue` (chart.js), `CategoryBar.vue`, `MiniBars.vue`, `Skeleton.vue` (`variant: 'line'|'card'|'row'`), `PeriodSwitcher.vue` (`label`, `canPrev`, `canNext`, emits `prev`/`next`).
   - Готово: тесты — неактивная стрелка не эмитит событие; CategoryBar рисует доли из props; цвета графиков читаются из CSS-переменных (переключаются с темой).

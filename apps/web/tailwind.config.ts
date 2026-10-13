@@ -142,6 +142,9 @@ export default {
         enter: 'var(--ease-enter)',
         exit: 'var(--ease-exit)',
       },
+      // Появление полосы категории («Anim · Графики расходов»: scaleX 0 → 1, dur-slow · enter)
+      keyframes: { 'grow-x': { from: { transform: 'scaleX(0)' } } },
+      animation: { 'grow-x': 'grow-x var(--dur-slow) var(--ease-enter) both' },
     },
   },
 } satisfies Partial<Config>

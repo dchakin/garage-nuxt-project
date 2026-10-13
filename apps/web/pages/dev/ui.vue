@@ -4,6 +4,7 @@
 import type { Component } from 'vue'
 import DevShowcaseActions from '~/components/dev/ShowcaseActions.vue'
 import DevShowcaseData from '~/components/dev/ShowcaseData.vue'
+import DevShowcaseCharts from '~/components/dev/ShowcaseCharts.vue'
 
 definePageMeta({ layout: false })
 useHead({ title: 'UI-кит', meta: [{ name: 'robots', content: 'noindex' }] })
@@ -12,6 +13,7 @@ useHead({ title: 'UI-кит', meta: [{ name: 'robots', content: 'noindex' }] })
 const GROUPS: { id: string; title: string; component: Component }[] = [
   { id: 'actions', title: 'Действия и ввод', component: DevShowcaseActions },
   { id: 'data', title: 'Данные и статусы', component: DevShowcaseData },
+  { id: 'charts', title: 'Графики и загрузка', component: DevShowcaseCharts },
 ]
 
 const route = useRoute()

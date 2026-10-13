@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  formatCompactAmount,
   formatDate,
   formatDays,
   formatMileage,
@@ -106,5 +107,18 @@ describe('todayIso', () => {
   it('берёт локальную дату', () => {
     expect(todayIso(new Date(2026, 9, 10, 9, 41))).toBe('2026-10-10')
     expect(todayIso(new Date(2026, 0, 5))).toBe('2026-01-05')
+  })
+})
+
+describe('formatCompactAmount', () => {
+  it.each([
+    [48600, `48,6${NBSP}т`],
+    [12200, `12,2${NBSP}т`],
+    [12000, `12${NBSP}т`],
+    [1250000, `1,3${NBSP}млн`],
+    [800, '800'],
+    [0, '0'],
+  ])('%d → %s', (amount, expected) => {
+    expect(formatCompactAmount(amount)).toBe(expected)
   })
 })

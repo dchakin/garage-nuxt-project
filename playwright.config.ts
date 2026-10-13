@@ -28,6 +28,9 @@ export default defineConfig({
     viewport: { width: 390, height: 844 },
     locale: 'ru-RU',
     timezoneId: 'Europe/Moscow',
+    // Часы зафиксированы (helpers/test.ts), а chart.js считает анимацию по Date.now() — без этого
+    // столбцы навсегда остаются нулевой высоты. С reduce графики рисуются сразу (animation: false)
+    reducedMotion: 'reduce',
     colorScheme: 'light',
     // PWA service worker кеширует бандл между тестами — в e2e не нужен
     serviceWorkers: 'block',

@@ -67,3 +67,19 @@ export const DAY_FORMS = ['день', 'дня', 'дней'] as const
 export function formatDays(days: number): string {
   return `${formatNumber(days)}${NBSP}${pluralize(days, DAY_FORMS)}`
 }
+
+const COMPACT_UNITS = [
+  { size: 1_000_000, suffix: 'млн' },
+  { size: 1_000, suffix: 'т' },
+] as const
+
+/**
+ * Подпись над столбцом графика: `48600` → `48,6 т`, `1250000` → `1,3 млн`, `800` → `800`.
+ * Одна цифра после запятой, `,0` отбрасывается (`12000` → `12 т`).
+ */
+export function formatCompactAmount(amount: number): string {
+  const unit = COMPACT_UNITS.find(({ size }) => Math.abs(amount) >= size)
+  if (!unit) return formatNumber(amount)
+  const scaled = Math.round((amount / unit.size) * 10) / 10
+  return `${formatNumber(scaled, Number.isInteger(scaled) ? 0 : 1)}${NBSP}${unit.suffix}`
+}
