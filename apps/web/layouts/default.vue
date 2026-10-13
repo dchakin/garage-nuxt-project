@@ -23,24 +23,24 @@ async function logout() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50">
+  <div class="min-h-screen bg-bg">
     <header
       v-if="loggedIn"
-      class="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-slate-200"
+      class="sticky top-0 z-10 bg-surface backdrop-blur border-b border-border"
     >
       <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-        <NuxtLink to="/cars" class="flex items-center gap-2 font-semibold text-slate-800">
+        <NuxtLink to="/cars" class="flex items-center gap-2 font-semibold text-text">
           <span
-            class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-white text-sm"
+            class="flex h-7 w-7 items-center justify-center rounded-md bg-accent text-on-accent text-sm"
             >🚗</span
           >
           Гараж
         </NuxtLink>
         <div class="flex items-center gap-3 text-sm">
-          <span class="text-slate-500 hidden sm:inline">{{ user?.name }}</span>
+          <span class="text-text-2 hidden sm:inline">{{ user?.name }}</span>
           <button
             :disabled="loggingOut"
-            class="inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-800 disabled:opacity-50 transition-colors"
+            class="inline-flex items-center gap-1.5 text-text-2 hover:text-text disabled:opacity-50 transition-colors"
             @click="logout"
           >
             <Spinner v-if="loggingOut" />

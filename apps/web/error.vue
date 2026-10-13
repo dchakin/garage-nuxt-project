@@ -55,13 +55,13 @@ async function goHome() {
   <div class="max-w-sm mx-auto mt-16 text-center">
     <div class="flex justify-center mb-4">
       <span
-        class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600 text-white text-xl"
+        class="flex h-11 w-11 items-center justify-center rounded-lg bg-accent text-on-accent text-xl"
       >
         {{ content.emoji }}
       </span>
     </div>
-    <h1 class="text-xl font-semibold text-slate-800 mb-2">{{ content.title }}</h1>
-    <p class="text-sm text-slate-500 mb-6">{{ content.text }}</p>
+    <h1 class="text-xl font-semibold text-text mb-2">{{ content.title }}</h1>
+    <p class="text-sm text-text-2 mb-6">{{ content.text }}</p>
 
     <div class="card p-6 shadow-sm space-y-3">
       <button v-if="statusCode === 401" class="btn-primary w-full py-2" @click="goToLogin">

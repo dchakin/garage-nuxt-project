@@ -1,0 +1,166 @@
+/*
+ * Дизайн-токены из design/garage.pen (страницы «01 · Цвет», «03 · Пространство и движение»).
+ * Единственное место в apps/web, где допустимы значения цветов: Tailwind берёт их через var(--…)
+ * (tailwind.config.ts), nuxt.config.ts читает отсюда --bg для theme-color/манифеста.
+ * Тёмная тема — класс `dark` на <html> (ставит inline-скрипт темы, см. composables/useTheme.ts).
+ */
+:root {
+  color-scheme: light;
+
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --surface-2: #efede8;
+  --surface-3: #e5e2db;
+  --border: #e3e0d8;
+  --border-strong: #c9c5bb;
+  --text: #1c1b19;
+  --text-2: #5e5b54;
+  --text-3: #76736b;
+  --inverse: #1c1b19;
+  --on-inverse: #f5f4f0;
+  --inverse-accent: #a9b6ff;
+  --inverse-success: #5fdda2;
+
+  --accent: #2e4fe0;
+  --accent-pressed: #2440bd;
+  --accent-soft: #e8ecfd;
+  --accent-text: #2e4fe0;
+  --on-accent: #ffffff;
+  --focus-ring: #2e4fe04d;
+
+  --danger: #d92d20;
+  --danger-pressed: #b42318;
+  --danger-soft: #fdecea;
+  --danger-text: #b42318;
+  --on-danger: #ffffff;
+  --warning: #dc8a00;
+  --warning-soft: #fef3d6;
+  --warning-text: #9a5a06;
+  --success: #12915a;
+  --success-soft: #e3f6ec;
+  --success-text: #0b6e44;
+  --info: #2e6be6;
+  --info-soft: #e6effd;
+  --info-text: #1d53c2;
+
+  --status-inactive: #8a877f;
+
+  --type-service: #5b47d6;
+  --type-service-soft: #eeebfc;
+  --type-repair: #d6455b;
+  --type-repair-soft: #fcebee;
+  --type-replace: #d9650f;
+  --type-replace-soft: #fdeee2;
+  --type-purchase: #0e8585;
+  --type-purchase-soft: #e0f4f3;
+  --type-other: #6b6860;
+  --type-other-soft: #efede8;
+
+  --chart-bar-muted: #d6dbf6;
+  --scrim: #1c1b1966;
+  --shadow: #1c1b191a;
+
+  /* Псевдонимы — общие для обеих тем, разрешаются в текущую */
+  --status-overdue: var(--danger);
+  --status-overdue-soft: var(--danger-soft);
+  --status-overdue-text: var(--danger-text);
+  --status-soon: var(--warning);
+  --status-soon-soft: var(--warning-soft);
+  --status-soon-text: var(--warning-text);
+  --status-ok: var(--success);
+  --status-ok-soft: var(--success-soft);
+  --status-ok-text: var(--success-text);
+  --status-inactive-soft: var(--surface-2);
+  --status-inactive-text: var(--text-2);
+  --chart-bar: var(--accent);
+
+  /* Отступы, радиусы, тени, касание, движение — от темы не зависят */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-full: 999px;
+
+  --shadow-sm: 0 1px 3px var(--shadow);
+  --shadow-md: 0 6px 20px var(--shadow);
+  --shadow-lg: 0 16px 48px var(--shadow);
+
+  --tap-min: 44px;
+  --tap-lg: 52px;
+  --control-h: 52px;
+
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+}
+
+:root.dark {
+  color-scheme: dark;
+
+  --bg: #0f0f0e;
+  --surface: #1a1a18;
+  --surface-2: #252522;
+  --surface-3: #302f2c;
+  --border: #2e2d2a;
+  --border-strong: #4a4843;
+  --text: #f3f2ee;
+  --text-2: #adaaa2;
+  --text-3: #85827a;
+  --inverse: #f3f2ee;
+  --on-inverse: #1c1b19;
+  --inverse-accent: #2440bd;
+  --inverse-success: #0b6e44;
+
+  --accent: #7b8cff;
+  --accent-pressed: #97a4ff;
+  --accent-soft: #23284a;
+  --accent-text: #9aa7ff;
+  --on-accent: #0f1020;
+  --focus-ring: #7b8cff59;
+
+  --danger: #ff6b5e;
+  --danger-pressed: #ff8a80;
+  --danger-soft: #3a1c19;
+  --danger-text: #ff8a80;
+  --on-danger: #1a0705;
+  --warning: #f5b841;
+  --warning-soft: #3a2c10;
+  --warning-text: #f7c55e;
+  --success: #3dd08c;
+  --success-soft: #123326;
+  --success-text: #5fdda2;
+  --info: #6ea2ff;
+  --info-soft: #172840;
+  --info-text: #8db6ff;
+
+  --status-inactive: #6e6b65;
+
+  --type-service: #a497ff;
+  --type-service-soft: #27223f;
+  --type-repair: #ff8597;
+  --type-repair-soft: #3b1c22;
+  --type-replace: #ff9f57;
+  --type-replace-soft: #3a2414;
+  --type-purchase: #45cfcf;
+  --type-purchase-soft: #12302f;
+  --type-other: #a8a59d;
+  --type-other-soft: #2a2926;
+
+  --chart-bar-muted: #2e3456;
+  --scrim: #000000a6;
+  --shadow: #00000080;
+}

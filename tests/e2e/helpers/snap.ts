@@ -6,9 +6,10 @@ export const SCREENS_DIR = path.resolve('test-results/screens')
 
 type Theme = 'light' | 'dark'
 
-// Тёмная тема появится в задаче темы (#32): тогда добавить 'dark' — переключение ниже уже готово
-const THEMES: Theme[] = ['light']
+const THEMES: Theme[] = ['light', 'dark']
 
+// Системная тема через colorScheme, и класс — явно: если тест выбрал тему вручную,
+// useTheme за colorScheme не следует
 async function applyTheme(page: Page, theme: Theme) {
   await page.emulateMedia({ colorScheme: theme })
   await page.evaluate((isDark) => {

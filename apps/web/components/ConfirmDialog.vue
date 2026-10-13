@@ -23,7 +23,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
     >
       <div
         v-if="dialog.open"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-scrim p-4"
         @click.self="respond(false)"
       >
         <Transition
@@ -36,22 +36,22 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
         >
           <div
             v-if="dialog.open"
-            class="card w-full max-w-sm p-5 shadow-xl"
+            class="card w-full max-w-sm p-5 shadow-lg"
             role="alertdialog"
             aria-modal="true"
           >
-            <h2 class="font-semibold text-slate-800">{{ dialog.title }}</h2>
-            <p class="text-sm text-slate-600 mt-1.5">{{ dialog.message }}</p>
+            <h2 class="font-semibold text-text">{{ dialog.title }}</h2>
+            <p class="text-sm text-text-2 mt-1.5">{{ dialog.message }}</p>
             <div class="flex justify-end gap-2 mt-5">
               <button class="btn-secondary px-3 py-1.5 text-sm" @click="respond(false)">
                 {{ dialog.cancelText }}
               </button>
               <button
-                class="inline-flex items-center justify-center gap-1.5 rounded-lg font-medium px-3 py-1.5 text-sm transition-colors"
+                class="inline-flex items-center justify-center gap-1.5 rounded-md font-medium px-3 py-1.5 text-sm transition-colors"
                 :class="
                   dialog.danger
-                    ? 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800'
-                    : 'bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800'
+                    ? 'bg-danger text-on-danger hover:bg-danger-pressed active:bg-danger-pressed'
+                    : 'bg-accent text-on-accent hover:bg-accent-pressed active:bg-accent-pressed'
                 "
                 @click="respond(true)"
               >

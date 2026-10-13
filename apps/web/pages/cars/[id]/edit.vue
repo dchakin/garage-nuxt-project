@@ -62,13 +62,11 @@ async function onInvite() {
 
 <template>
   <div>
-    <NuxtLink
-      :to="`/cars/${carId}`"
-      class="text-sm text-slate-500 hover:text-slate-800 transition-colors"
+    <NuxtLink :to="`/cars/${carId}`" class="text-sm text-text-2 hover:text-text transition-colors"
       >← {{ car.brand }} {{ car.model }}</NuxtLink
     >
 
-    <h1 class="text-lg font-semibold text-slate-800 mt-2 mb-4">Редактирование автомобиля</h1>
+    <h1 class="text-lg font-semibold text-text mt-2 mb-4">Редактирование автомобиля</h1>
 
     <div class="card p-4 mb-4">
       <p v-if="error" class="alert-error mb-2">{{ error }}</p>
@@ -81,8 +79,8 @@ async function onInvite() {
     </div>
 
     <div v-if="car.role === 'owner'" class="card p-4 mb-4">
-      <h2 class="font-medium text-slate-800 mb-2">Участники</h2>
-      <ul class="text-sm text-slate-600 mb-3 space-y-1">
+      <h2 class="font-medium text-text mb-2">Участники</h2>
+      <ul class="text-sm text-text-2 mb-3 space-y-1">
         <li>Владелец: вы</li>
         <li v-for="m in car.members" :key="m.id">{{ m.user.name }} ({{ m.user.email }})</li>
       </ul>
@@ -103,7 +101,7 @@ async function onInvite() {
       <p v-if="inviteSuccess" class="alert-success mt-2">{{ inviteSuccess }}</p>
     </div>
 
-    <div v-if="car.role === 'owner'" class="pt-4 border-t border-slate-200">
+    <div v-if="car.role === 'owner'" class="pt-4 border-t border-border">
       <button
         :disabled="deletingId === carId"
         class="btn-danger px-3 py-1.5 text-sm"

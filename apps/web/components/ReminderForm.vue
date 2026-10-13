@@ -68,7 +68,7 @@ function onSubmit() {
         <option :value="null">Не привязывать</option>
         <option v-for="e in entries" :key="e.id" :value="e.id">{{ entryLabel(e) }}</option>
       </select>
-      <p class="text-xs text-slate-400 mt-1">
+      <p class="text-xs text-text-3 mt-1">
         Если выбрать запись и указать интервал, следующая дата/пробег посчитаются автоматически.
       </p>
     </div>
@@ -106,8 +106,12 @@ function onSubmit() {
       </div>
     </div>
 
-    <label class="flex items-center gap-2 text-sm text-slate-600">
-      <input v-model="form.isActive" type="checkbox" class="h-4 w-4 rounded border-slate-300" />
+    <label class="flex items-center gap-2 text-sm text-text-2">
+      <input
+        v-model="form.isActive"
+        type="checkbox"
+        class="h-4 w-4 rounded-xs border-border-strong"
+      />
       Активно
     </label>
 

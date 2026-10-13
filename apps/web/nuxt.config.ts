@@ -1,3 +1,11 @@
+import { readFileSync } from 'node:fs'
+import { buildThemeInitScript, readThemeBackgrounds } from './theme/initScript'
+
+// Фон светлой/тёмной темы — из токенов: для theme-color, inline-скрипта темы и манифеста
+const themeBackgrounds = readThemeBackgrounds(
+  readFileSync(new URL('./assets/css/tokens.css', import.meta.url), 'utf8'),
+)
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
@@ -53,7 +61,6 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'theme-color', content: '#4f46e5' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-title', content: 'Гараж' },
       ],
@@ -62,6 +69,9 @@ export default defineNuxtConfig({
         { rel: 'icon', href: '/logo.svg', type: 'image/svg+xml' },
         { rel: 'apple-touch-icon', href: '/apple-touch-icon-180x180.png' },
       ],
+      // Синхронно в <head>, до CSS и бандла: класс темы ставится до первой отрисовки.
+      // <meta name="theme-color"> создаёт сам скрипт — статическая встала бы после него дублем
+      script: [{ innerHTML: buildThemeInitScript(themeBackgrounds), tagPosition: 'head' }],
     },
   },
 
@@ -76,8 +86,8 @@ export default defineNuxtConfig({
       name: 'Гараж — учёт авто',
       short_name: 'Гараж',
       description: 'Учёт обслуживания, ремонтов и расходов на автомобиль',
-      theme_color: '#4f46e5',
-      background_color: '#ffffff',
+      theme_color: themeBackgrounds.light,
+      background_color: themeBackgrounds.light,
       display: 'standalone',
       start_url: '/',
       lang: 'ru',

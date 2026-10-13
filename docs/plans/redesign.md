@@ -29,13 +29,13 @@
   - Контракт: сид пишет напрямую в тестовую SQLite (через API нельзя задать произвольные `nextDueDate`/`nextDueMileage` и прошлые даты записей). Состав — ровно «Эталонные данные»: пользователи Дмитрий/Анна/Сергей (пароль общий, в `reference.ts`), Camry с 8 записями 2026 г. и 5 напоминаниями (одно выключено), Kia Rio, Lada Largus (Дмитрий — участник). Фикстура отдаёт `{ carId, users }` и залогиненную страницу.
   - Готово: тест на фикстуре проверяет, что `GET /api/cars/:id/entries` отдаёт 8 записей на 88 500 ₽; описание в разделе «E2E» `conventions.md`.
 
-- [ ] **Цветовые токены и Tailwind** [decision, frontend] #31
+- [x] **Цветовые токены и Tailwind** [decision, frontend] #31
   - Макет: `01 · Цвет`, `03 · Пространство и движение` (`design/export/01.png`, `03.png`); значения — через Pencil MCP `GetVariables()` (ось `mode: light | dark`).
   - Файлы: `apps/web/assets/css/tokens.css` (CSS-переменные для `:root` и `.dark`), `apps/web/tailwind.config.ts` (цвета, радиусы `r-*`, отступы `sp-*`, тени, длительности `dur-*`/`ease-*` через `var(--…)`, `darkMode: 'class'`), `assets/css/main.css`, все текущие `components/*.vue` и `pages/**/*.vue` (замена `slate-*`/`indigo-*`/hex на токены).
   - Контракт: имена Tailwind-классов = имена токенов макета (`bg-surface`, `text-text`, `text-danger`, `bg-status-overdue`…). Цвет вне `tokens.css` — запрещён.
   - Готово: `grep` по `apps/web` не находит `slate-|indigo-|#[0-9a-f]{3,6}` вне `tokens.css`; e2e-скриншот списка машин; таблица токенов в `conventions.md`.
 
-- [ ] **Тема «Как в системе / Светлая / Тёмная» без вспышки** [decision, frontend] #32
+- [x] **Тема «Как в системе / Светлая / Тёмная» без вспышки** [decision, frontend] #32
   - Файлы: `apps/web/composables/useTheme.ts`, inline-скрипт в `app.head.script` (`nuxt.config.ts`), `apps/web/tests/useTheme.test.ts`, `tests/e2e/theme.spec.ts`.
   - Контракт: `useTheme()` → `{ mode: Ref<'system'|'light'|'dark'>, resolved: Ref<'light'|'dark'>, setMode }`; хранение — `localStorage['garage:theme']`; класс `dark` на `<html>` ставит inline-скрипт до монтирования; `<meta name="theme-color">` = токен фона текущей темы; при `system` следит за `prefers-color-scheme`.
   - Готово: unit-тест на выбор/хранение; e2e: выбор «Тёмная» переживает перезагрузку, `theme-color` меняется; `snap()` умеет обе темы.

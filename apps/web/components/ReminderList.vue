@@ -11,10 +11,10 @@ const { confirm } = useConfirmDialog()
 await fetchReminders()
 
 const statusStyles: Record<string, string> = {
-  overdue: 'bg-red-100 text-red-700',
-  soon: 'bg-amber-100 text-amber-700',
-  ok: 'bg-emerald-100 text-emerald-700',
-  inactive: 'bg-slate-100 text-slate-500',
+  overdue: 'bg-status-overdue-soft text-status-overdue-text',
+  soon: 'bg-status-soon-soft text-status-soon-text',
+  ok: 'bg-status-ok-soft text-status-ok-text',
+  inactive: 'bg-status-inactive-soft text-status-inactive-text',
 }
 
 function status(reminder: Reminder) {
@@ -49,18 +49,18 @@ function dueText(reminder: Reminder) {
 <template>
   <div>
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold text-slate-800">Напоминания</h2>
+      <h2 class="text-lg font-semibold text-text">Напоминания</h2>
       <NuxtLink :to="`/cars/${carId}/reminders/new`" class="btn-primary px-3 py-1.5 text-sm">
         + Добавить напоминание
       </NuxtLink>
     </div>
 
-    <div v-if="loading" class="flex items-center justify-center py-8 text-slate-500">
+    <div v-if="loading" class="flex items-center justify-center py-8 text-text-2">
       <Spinner size="md" />
     </div>
     <div v-else-if="!reminders.length" class="card p-8 text-center">
       <div class="text-3xl mb-2">⏰</div>
-      <p class="text-slate-500 text-sm">Напоминаний пока нет.</p>
+      <p class="text-text-2 text-sm">Напоминаний пока нет.</p>
     </div>
 
     <div v-else class="space-y-2">
@@ -68,7 +68,7 @@ function dueText(reminder: Reminder) {
         <div class="flex items-start gap-2.5">
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
-              <p class="font-medium text-slate-800 leading-snug flex-1 min-w-[140px]">
+              <p class="font-medium text-text leading-snug flex-1 min-w-[140px]">
                 {{ reminder.title }}
                 <span
                   class="ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
@@ -80,7 +80,7 @@ function dueText(reminder: Reminder) {
               <div class="flex items-center gap-1 shrink-0 ml-auto">
                 <NuxtLink
                   :to="`/cars/${carId}/reminders/${reminder.id}`"
-                  class="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors"
+                  class="flex h-7 w-7 items-center justify-center rounded-md bg-surface-2 text-text-2 hover:bg-surface-3 hover:text-text transition-colors"
                   :class="{ 'pointer-events-none opacity-50': deletingId === reminder.id }"
                   title="Изменить"
                   aria-label="Изменить"
@@ -99,7 +99,7 @@ function dueText(reminder: Reminder) {
                 </NuxtLink>
                 <button
                   :disabled="deletingId === reminder.id"
-                  class="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 disabled:opacity-50 transition-colors"
+                  class="flex h-7 w-7 items-center justify-center rounded-md bg-danger-soft text-danger hover:bg-danger-soft hover:text-danger-text disabled:opacity-50 transition-colors"
                   title="Удалить"
                   aria-label="Удалить"
                   @click="onDelete(reminder)"
@@ -122,10 +122,10 @@ function dueText(reminder: Reminder) {
                 </button>
               </div>
             </div>
-            <p v-if="reminder.category" class="text-sm text-slate-400 mt-0.5">
+            <p v-if="reminder.category" class="text-sm text-text-3 mt-0.5">
               {{ reminder.category.name }}
             </p>
-            <p class="text-sm text-slate-500 mt-0.5">
+            <p class="text-sm text-text-2 mt-0.5">
               {{ reminderTriggerTypeLabels[reminder.triggerType] }} · {{ dueText(reminder) }}
             </p>
           </div>

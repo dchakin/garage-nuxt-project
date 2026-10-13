@@ -28,8 +28,8 @@ async function onEnable() {
     <div class="card p-4 mb-4">
       <div class="flex items-center justify-between gap-3">
         <div>
-          <p class="font-medium text-slate-800">🔔 Push-уведомления</p>
-          <p class="text-sm text-slate-500">
+          <p class="font-medium text-text">🔔 Push-уведомления</p>
+          <p class="text-sm text-text-2">
             <template v-if="needsInstall"
               >На iPhone сначала добавьте приложение на экран «Домой» (Поделиться → На экран
               «Домой»)</template

@@ -72,7 +72,7 @@ const entryTypeIcons: Record<string, string> = {
 <template>
   <div>
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold text-slate-800">Журнал</h2>
+      <h2 class="text-lg font-semibold text-text">Журнал</h2>
       <NuxtLink :to="`/cars/${carId}/entries/new`" class="btn-primary px-3 py-1.5 text-sm">
         + Добавить запись
       </NuxtLink>
@@ -81,7 +81,7 @@ const entryTypeIcons: Record<string, string> = {
     <div class="mb-4">
       <div class="relative mb-2">
         <svg
-          class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+          class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-3"
           viewBox="0 0 20 20"
           fill="none"
           stroke="currentColor"
@@ -100,7 +100,7 @@ const entryTypeIcons: Record<string, string> = {
         />
         <button
           v-if="searchInput"
-          class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors"
+          class="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-3 hover:text-text transition-colors"
           @click="clearSearch"
         >
           <svg
@@ -118,8 +118,8 @@ const entryTypeIcons: Record<string, string> = {
 
       <div class="flex flex-wrap items-center gap-1 text-sm">
         <button
-          class="inline-flex h-10 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-slate-600 hover:text-slate-800 hover:border-slate-300 transition-colors"
-          :class="{ 'border-slate-400 text-slate-800': showFilters || activeFilterCount }"
+          class="inline-flex h-10 items-center gap-1.5 rounded-md border border-border bg-surface px-3 text-text-2 hover:text-text hover:border-border-strong transition-colors"
+          :class="{ 'border-border-strong text-text': showFilters || activeFilterCount }"
           @click="showFilters = !showFilters"
         >
           <svg
@@ -135,7 +135,7 @@ const entryTypeIcons: Record<string, string> = {
           Фильтры
           <span
             v-if="activeFilterCount"
-            class="ml-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-800 px-1 text-xs font-medium text-white"
+            class="ml-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-inverse px-1 text-xs font-medium text-on-inverse"
             >{{ activeFilterCount }}</span
           >
           <svg
@@ -154,7 +154,7 @@ const entryTypeIcons: Record<string, string> = {
 
         <button
           v-if="activeFilterCount"
-          class="flex h-8 w-8 items-center justify-center rounded-lg text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"
+          class="flex h-8 w-8 items-center justify-center rounded-md text-danger hover:bg-danger-soft hover:text-danger-text transition-colors"
           title="Сбросить фильтры"
           aria-label="Сбросить фильтры"
           @click="clearFilters"
@@ -179,36 +179,36 @@ const entryTypeIcons: Record<string, string> = {
 
       <div v-if="showFilters" class="card p-3 mt-2 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
         <label class="flex flex-col gap-1">
-          <span class="text-xs text-slate-500">Тип</span>
+          <span class="text-xs text-text-2">Тип</span>
           <select v-model="filters.type" class="select w-full">
             <option :value="undefined">Все типы</option>
             <option v-for="t in entryTypes" :key="t" :value="t">{{ entryTypeLabels[t] }}</option>
           </select>
         </label>
         <label class="flex flex-col gap-1">
-          <span class="text-xs text-slate-500">Категория</span>
+          <span class="text-xs text-text-2">Категория</span>
           <select v-model.number="filters.categoryId" class="select w-full">
             <option :value="undefined">Все категории</option>
             <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
           </select>
         </label>
         <label class="flex flex-col gap-1">
-          <span class="text-xs text-slate-500">Дата с</span>
+          <span class="text-xs text-text-2">Дата с</span>
           <input v-model="filters.dateFrom" type="date" class="input w-full" />
         </label>
         <label class="flex flex-col gap-1">
-          <span class="text-xs text-slate-500">Дата по</span>
+          <span class="text-xs text-text-2">Дата по</span>
           <input v-model="filters.dateTo" type="date" class="input w-full" />
         </label>
       </div>
     </div>
 
-    <div v-if="loading" class="flex items-center justify-center py-8 text-slate-500">
+    <div v-if="loading" class="flex items-center justify-center py-8 text-text-2">
       <Spinner size="md" />
     </div>
     <div v-else-if="!entries.length" class="card p-8 text-center">
       <div class="text-3xl mb-2">📋</div>
-      <p class="text-slate-500 text-sm">Записей пока нет.</p>
+      <p class="text-text-2 text-sm">Записей пока нет.</p>
     </div>
 
     <div v-else class="space-y-2">
@@ -219,13 +219,13 @@ const entryTypeIcons: Record<string, string> = {
           }}</span>
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
-              <p class="font-medium text-slate-800 leading-snug flex-1 min-w-[140px]">
+              <p class="font-medium text-text leading-snug flex-1 min-w-[140px]">
                 {{ entryTypeLabels[entry.type] }}
               </p>
               <div class="flex items-center gap-1 shrink-0 ml-auto">
                 <NuxtLink
                   :to="`/cars/${carId}/entries/${entry.id}`"
-                  class="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors"
+                  class="flex h-7 w-7 items-center justify-center rounded-md bg-surface-2 text-text-2 hover:bg-surface-3 hover:text-text transition-colors"
                   :class="{ 'pointer-events-none opacity-50': deletingId === entry.id }"
                   title="Изменить"
                   aria-label="Изменить"
@@ -244,7 +244,7 @@ const entryTypeIcons: Record<string, string> = {
                 </NuxtLink>
                 <button
                   :disabled="deletingId === entry.id"
-                  class="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 disabled:opacity-50 transition-colors"
+                  class="flex h-7 w-7 items-center justify-center rounded-md bg-danger-soft text-danger hover:bg-danger-soft hover:text-danger-text disabled:opacity-50 transition-colors"
                   title="Удалить"
                   aria-label="Удалить"
                   @click="onDelete(entry)"
@@ -267,20 +267,20 @@ const entryTypeIcons: Record<string, string> = {
                 </button>
               </div>
             </div>
-            <p v-if="entry.category" class="text-sm text-slate-400 mt-0.5">
+            <p v-if="entry.category" class="text-sm text-text-3 mt-0.5">
               {{ entry.category.name }}
             </p>
-            <p class="text-sm text-slate-500 mt-0.5">
+            <p class="text-sm text-text-2 mt-0.5">
               {{ entry.date }}
               <span v-if="entry.mileage != null"
                 >· {{ entry.mileage.toLocaleString('ru-RU') }} км</span
               >
             </p>
-            <p v-if="entry.description" class="text-sm text-slate-700 mt-2">
+            <p v-if="entry.description" class="text-sm text-text mt-2">
               {{ entry.description }}
             </p>
-            <p v-if="entry.place" class="text-sm text-slate-400 mt-1">{{ entry.place }}</p>
-            <p v-if="entry.cost != null" class="font-medium text-slate-800 text-sm text-right mt-2">
+            <p v-if="entry.place" class="text-sm text-text-3 mt-1">{{ entry.place }}</p>
+            <p v-if="entry.cost != null" class="font-medium text-text text-sm text-right mt-2">
               {{ formatCost(entry) }}
             </p>
           </div>

@@ -24,7 +24,7 @@ const visible = ref(false)
     <button
       type="button"
       tabindex="-1"
-      class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+      class="absolute right-3 top-1/2 -translate-y-1/2 text-text-3 hover:text-text-2 transition-colors"
       :aria-label="visible ? 'Скрыть пароль' : 'Показать пароль'"
       @click="visible = !visible"
     >
