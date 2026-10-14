@@ -1,9 +1,9 @@
 <script setup lang="ts">
-// Журнал встроен в страницу авто — старый URL редиректит туда
+// Старый URL журнала — редирект на вкладку «Журнал»
 definePageMeta({ middleware: 'auth' })
 
 const route = useRoute()
-await navigateTo(`/cars/${route.params.id}`, { redirectCode: 301 })
+await navigateTo(`/cars/${route.params.id}/journal`, { redirectCode: 301 })
 </script>
 
 <template>

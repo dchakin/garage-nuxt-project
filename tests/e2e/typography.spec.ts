@@ -20,7 +20,7 @@ const isFontLoaded = (page: Page, font: string) =>
 test('шрифты Onest и JetBrains Mono грузятся из бандла', async ({ page, seededCar, baseURL }) => {
   const fontUrls = collectFontRequests(page)
   await page.goto(`/cars/${seededCar.carId}`)
-  await expect(page.getByRole('heading', { name: 'Toyota Camry' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Сменить машину: Toyota Camry' })).toBeVisible()
 
   expect(await isFontLoaded(page, '16px "Onest Variable"')).toBe(true)
   expect(await isFontLoaded(page, '600 16px "JetBrains Mono"')).toBe(true)
@@ -28,7 +28,10 @@ test('шрифты Onest и JetBrains Mono грузятся из бандла', 
   const body = page.locator('body')
   await expect(body).toHaveCSS('font-family', /^"Onest Variable"/)
   await expect(body).toHaveCSS('font-variant-numeric', 'tabular-nums')
-  await expect(page.getByText('А123ВС 77')).toHaveCSS('font-family', /^"JetBrains Mono"/)
+  await expect(page.getByRole('img', { name: /^Госномер/ }).first()).toHaveCSS(
+    'font-family',
+    /^"JetBrains Mono"/,
+  )
 
   expect(fontUrls.length).toBeGreaterThan(0)
   const origin = new URL(baseURL!).origin
@@ -43,16 +46,16 @@ test('иконки Lucide вместо эмодзи на основных экр
   ).toBeVisible()
   await snap(page, 'icons-cars')
 
-  await page.goto(`/cars/${seededCar.carId}`)
+  await page.goto(`/cars/${seededCar.carId}/journal`)
   await expect(page.getByRole('heading', { name: 'Журнал' })).toBeVisible()
   await expect(
-    page.getByRole('link', { name: 'Все автомобили' }).locator('svg.lucide-arrow-left'),
+    page.getByRole('link', { name: 'Журнал' }).locator('svg.lucide-notebook-text'),
   ).toBeVisible()
   // Плитка типа записи: «Плановое ТО» — calendar-check
   await expect(page.locator('svg.lucide-calendar-check').first()).toBeVisible()
   await snap(page, 'icons-journal')
 
-  await page.getByRole('button', { name: 'Напоминания' }).click()
+  await page.getByRole('link', { name: /^Напоминания/ }).click()
   await expect(page.getByRole('heading', { name: 'Напоминания' })).toBeVisible()
   await snap(page, 'icons-reminders')
 })

@@ -17,7 +17,7 @@ async function onSubmit(input: EntryInput) {
   error.value = ''
   try {
     await updateEntry(entryId, input)
-    await navigateTo(`/cars/${carId}`)
+    await navigateTo(`/cars/${carId}/journal`)
   } catch (e: any) {
     error.value = e?.data?.statusMessage || 'Не удалось сохранить запись'
   }
@@ -26,7 +26,7 @@ async function onSubmit(input: EntryInput) {
 
 <template>
   <div>
-    <BackLink :to="`/cars/${carId}`">К автомобилю</BackLink>
+    <BackLink :to="`/cars/${carId}/journal`">Назад</BackLink>
 
     <h1 class="text-h1 text-text mt-2 mb-4">Редактирование записи</h1>
 
@@ -36,7 +36,7 @@ async function onSubmit(input: EntryInput) {
         :initial="entry"
         :saving="saving"
         @submit="onSubmit"
-        @cancel="navigateTo(`/cars/${carId}`)"
+        @cancel="navigateTo(`/cars/${carId}/journal`)"
       />
     </div>
   </div>

@@ -164,7 +164,7 @@
 **Цель:** новая структура приложения: нижняя панель, переключатель машин, «Обзор» (Б1–Б4) и «Профиль» (З1 без блока «Аккаунт»).
 **Когда готов:** e2e навигации и «Обзора» проходят со скриншотами в обеих темах.
 
-- [ ] **Маршруты, AppBar, TabBar и запоминание последней машины** [decision, frontend] #51
+- [x] **Маршруты, AppBar, TabBar и запоминание последней машины** [decision, frontend] #51
   - Макет: `Б1 · Обзор`, `Б4 · Переключатель машин` (`design/export/Б1.png`, `Б4.png`).
   - Файлы: `apps/web/layouts/car.vue` (AppBar/Car + TabBar + слот, «＋» эмитит открытие шторки записи — до этапа 7 заглушка), страницы `pages/cars/[id]/index.vue` (Обзор), `journal.vue`, `reminders.vue`, `expenses.vue`, `settings.vue`, `categories.vue`, `pages/profile.vue` — все с `definePageMeta({ middleware: 'auth', layout: … })`; `components/car/CarSwitcherSheet.vue`; `composables/useLastCar.ts` (`localStorage['garage:lastCarId']`); `pages/index.vue` → редирект на «Обзор» последней машины или `/cars`; `packages/shared/utils/reminderBadge.ts` (`countAttentionReminders(reminders, currentMileage, today)` — просроченные + скорые среди `isActive`) + тест.
   - Готово: e2e — переходы по вкладкам, Б4 переключает машину, после перезагрузки открывается последняя машина, бейдж = 3 на фикстуре и скрыт при 0; скриншоты Б4; маршруты и layout в `conventions.md`.

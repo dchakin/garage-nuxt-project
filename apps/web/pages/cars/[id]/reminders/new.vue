@@ -13,7 +13,7 @@ async function onSubmit(input: ReminderInput) {
   error.value = ''
   try {
     await createReminder(input)
-    await navigateTo(`/cars/${carId}?tab=reminders`)
+    await navigateTo(`/cars/${carId}/reminders`)
   } catch (e: any) {
     error.value = e?.data?.statusMessage || 'Не удалось сохранить напоминание'
   }
@@ -22,7 +22,7 @@ async function onSubmit(input: ReminderInput) {
 
 <template>
   <div>
-    <BackLink :to="`/cars/${carId}?tab=reminders`">К автомобилю</BackLink>
+    <BackLink :to="`/cars/${carId}/reminders`">Назад</BackLink>
 
     <h1 class="text-h1 text-text mt-2 mb-4">Новое напоминание</h1>
 
@@ -32,7 +32,7 @@ async function onSubmit(input: ReminderInput) {
         :car-id="carId"
         :saving="saving"
         @submit="onSubmit"
-        @cancel="navigateTo(`/cars/${carId}?tab=reminders`)"
+        @cancel="navigateTo(`/cars/${carId}/reminders`)"
       />
     </div>
   </div>
