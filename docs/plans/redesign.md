@@ -80,7 +80,7 @@
   - Готово: тесты — Sheet открывается/закрывается и возвращает фокус; Toast с действием вызывает `onClick` и исчезает по таймеру (fake timers); TabBar при `badge = 0` бейдж не рендерит; контракты в `conventions.md`.
   - Делается тремя частями, каждая — отдельная сессия и коммит, своя группа витрины `/dev/ui` + `snap()` + строки в `conventions.md`:
     - [x] Часть 1 «Оверлеи» (`?group=overlays`): `Sheet`, `Dialog`, `<Transition>`-имена и `prefers-reduced-motion` из `09`, замена `ConfirmDialog.vue`/`useConfirmDialog.ts`.
-    - [ ] Часть 2 «Обратная связь» (`?group=feedback`): `Toast` + `useToast`, `Alert`, `EmptyState`, `ReminderBridge`, `Disclosure`.
+    - [x] Часть 2 «Обратная связь» (`?group=feedback`): `Toast` + `useToast`, `Alert`, `EmptyState`, `ReminderBridge`, `Disclosure`.
     - [ ] Часть 3 «Навигация» (`?group=nav`): `AppBar`, `TabBar`; закрыть #38 и отметить задачу `[x]`.
 
 ### Этап 3: API — записи, напоминания, пробег

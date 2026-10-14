@@ -5,4 +5,6 @@
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+  <!-- Единственный вывод useToast().show() -->
+  <UiToast />
 </template>

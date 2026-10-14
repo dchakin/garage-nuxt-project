@@ -61,8 +61,63 @@
   transform: scale(0.96);
 }
 
+/* Toast: появление translateY 16 → 0 за dur-base, скрытие translateY 0 → 8 за 140,
+   вытесненный новым — за 84 */
+.toast-enter-active {
+  transition:
+    opacity var(--dur-base) var(--ease-enter),
+    transform var(--dur-base) var(--ease-enter);
+}
+.toast-leave-active {
+  transition:
+    opacity calc(var(--dur-base) * 0.7) var(--ease-exit),
+    transform calc(var(--dur-base) * 0.7) var(--ease-exit);
+}
+.toast-leave-active.toast-replaced {
+  transition-duration: calc(var(--dur-fast) * 0.7);
+}
+.toast-enter-from {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* Раскрытие секции / офлайн-плашка: высота 0 → auto и обратно (хуки utils/collapseTransition.ts),
+   содержимое проявляется за dur-fast; скрытие — 140 exit */
+.collapse-enter-active {
+  transition:
+    height var(--dur-base) var(--ease-standard),
+    opacity var(--dur-fast) var(--ease-enter) 80ms;
+}
+.collapse-leave-active {
+  transition:
+    height calc(var(--dur-base) * 0.7) var(--ease-exit),
+    opacity calc(var(--dur-base) * 0.7) var(--ease-exit);
+}
+.collapse-enter-from,
+.collapse-leave-to {
+  opacity: 0;
+}
+
 /* Уменьшенное движение: сдвиги и масштаб → fade dur-fast (принцип 08 фрейма «09») */
 @media (prefers-reduced-motion: reduce) {
+  .toast-enter-active,
+  .toast-leave-active {
+    transition: opacity var(--dur-fast) linear;
+  }
+  .toast-enter-from,
+  .toast-leave-to {
+    transform: none;
+  }
+  /* Раскрытие — сразу, без анимации высоты */
+  .collapse-enter-active,
+  .collapse-leave-active {
+    transition: none;
+  }
+
   .sheet-enter-active,
   .sheet-leave-active,
   .dialog-enter-active,
