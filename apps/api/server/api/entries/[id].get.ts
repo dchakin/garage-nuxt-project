@@ -1,14 +1,10 @@
-import { eq } from 'drizzle-orm'
-import { db, schema } from '../../database'
+import { findEntryWithRelations } from '../../utils/entryRelations'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireAuth(event)
   const entryId = Number(getRouterParam(event, 'id'))
 
-  const entry = await db.query.entries.findFirst({
-    where: eq(schema.entries.id, entryId),
-    with: { category: true },
-  })
+  const entry = await findEntryWithRelations(entryId)
   if (!entry) {
     throw createError({ statusCode: 404, statusMessage: 'Запись не найдена' })
   }

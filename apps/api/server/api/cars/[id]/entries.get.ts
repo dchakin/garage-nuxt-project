@@ -1,6 +1,7 @@
 import { and, eq, gte, lte, asc, desc } from 'drizzle-orm'
 import { db, schema } from '../../../database'
 import { entryFilterSchema } from '@garage/shared/schemas/entry'
+import { entryRelations } from '../../../utils/entryRelations'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireAuth(event)
@@ -21,7 +22,7 @@ export default defineEventHandler(async (event) => {
   let list = await db.query.entries.findMany({
     where: and(...conditions),
     orderBy: orderFn(sortColumn),
-    with: { category: true },
+    with: entryRelations,
   })
 
   // SQLite's LIKE is only case-insensitive for ASCII, so Cyrillic search
