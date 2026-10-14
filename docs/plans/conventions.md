@@ -47,6 +47,8 @@
 
 - (#45) Участники: `DELETE /api/cars/[id]/members/[userId]` (только владелец; владельца удалить → 400; нет такого участника → 404) и `DELETE /api/cars/[id]/members/me` (выход; владелец → 400) → `{ ok: true }`. `POST /api/cars/[id]/invite` отдаёт коды в `statusMessage`: 404 `user_not_found`, 409 `already_member` — тексты на клиенте. `GET /api/cars/[id]` дополнительно: `ownerName`, `entriesCount`, `remindersCount` (`CarDetail`).
 
+- (#48) Аккаунт: `PATCH /api/auth/me { name }` → `AuthUser` (`profileSchema`; кука-сессия обновляется, клиент берёт новую куку из ответа). `POST /api/auth/password { currentPassword, newPassword, refreshToken? }` (`changePasswordSchema`) → `{ ok }`; неверный текущий → 400; отзываются все refresh-токены пользователя, кроме переданного `refreshToken` (токен текущего устройства). `DELETE /api/auth/account` → `{ ok }`: удаляет пользователя каскадом по FK (машины-владения, членства, push, токены, его записи в чужих машинах — ссылки `reminders.lastEntryId` на них обнуляются) и чистит сессию.
+
 ## UI
 
 - (#33) Шрифты — из бандла (`@fontsource-variable/onest` `wght.css`, `@fontsource/jetbrains-mono` `600.css`, импорт в `assets/css/main.css`), CDN запрещены (e2e `typography.spec.ts` проверяет origin запросов шрифтов). `font-sans` = Onest Variable (по умолчанию на `body`, `tabular-nums` глобально), `font-mono` = JetBrains Mono 600 — только госномер и VIN.
