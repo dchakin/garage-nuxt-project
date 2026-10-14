@@ -30,7 +30,11 @@ describe('access-токен', () => {
     const token = await signAccessToken(user, SECRET)
     expect(await verifyAccessToken(token, 'b'.repeat(32))).toBeNull()
     expect(await verifyAccessToken('garbage', SECRET)).toBeNull()
-    expect(await verifyAccessToken(token.slice(0, -2) + 'xx', SECRET)).toBeNull()
+    // меняем первый символ подписи: у последнего символа часть битов не значима, подмена бывает «нулевой»
+    const [header, payload, signature] = token.split('.')
+    const tamperedFirst = signature[0] === 'A' ? 'B' : 'A'
+    const tampered = `${header}.${payload}.${tamperedFirst}${signature.slice(1)}`
+    expect(await verifyAccessToken(tampered, SECRET)).toBeNull()
   })
 
   it('просроченный токен отклоняется', async () => {
