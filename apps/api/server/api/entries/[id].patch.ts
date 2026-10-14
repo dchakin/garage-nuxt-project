@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { db, schema } from '../../database'
 import { entrySchema } from '@garage/shared/schemas/entry'
+import { findEntryWithRelations } from '../../utils/entryRelations'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireAuth(event)
@@ -14,7 +15,7 @@ export default defineEventHandler(async (event) => {
 
   const body = await readValidatedBody(event, entrySchema.partial().parse)
 
-  const [updated] = await db
+  await db
     .update(schema.entries)
     .set({
       ...(body.date !== undefined && { date: body.date }),
@@ -27,7 +28,6 @@ export default defineEventHandler(async (event) => {
       ...(body.place !== undefined && { place: body.place }),
     })
     .where(eq(schema.entries.id, entryId))
-    .returning()
 
-  return updated ?? entry
+  return (await findEntryWithRelations(entryId)) ?? entry
 })

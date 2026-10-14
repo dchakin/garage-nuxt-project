@@ -37,6 +37,7 @@ export interface Entry {
   id: number
   carId: number
   authorId: number
+  author: { id: number; name: string }
   date: string
   type: EntryType
   categoryId: number | null

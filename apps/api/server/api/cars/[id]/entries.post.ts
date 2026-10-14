@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { db, schema } from '../../../database'
 import { entrySchema } from '@garage/shared/schemas/entry'
+import { findEntryWithRelations } from '../../../utils/entryRelations'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireAuth(event)
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
       currency: body.currency,
       place: body.place ?? null,
     })
-    .returning()
+    .returning({ id: schema.entries.id })
 
   // Обновляем текущий пробег авто, если запись новее
   if (body.mileage != null) {
@@ -39,5 +40,5 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  return entry
+  return findEntryWithRelations(entry.id)
 })
