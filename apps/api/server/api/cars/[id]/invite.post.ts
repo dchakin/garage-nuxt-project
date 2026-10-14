@@ -19,17 +19,14 @@ export default defineEventHandler(async (event) => {
     where: eq(schema.users.email, body.email),
   })
   if (!invitedUser) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Пользователь с таким email не зарегистрирован',
-    })
+    throw createError({ statusCode: 404, statusMessage: 'user_not_found' })
   }
 
   const existing = await db.query.carMembers.findFirst({
     where: and(eq(schema.carMembers.carId, carId), eq(schema.carMembers.userId, invitedUser.id)),
   })
   if (existing) {
-    throw createError({ statusCode: 409, statusMessage: 'Пользователь уже приглашён' })
+    throw createError({ statusCode: 409, statusMessage: 'already_member' })
   }
 
   const [member] = await db

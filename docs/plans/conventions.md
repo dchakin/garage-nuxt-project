@@ -45,6 +45,8 @@
 
 - (#44) `GET /api/cars/[id]/analytics?period=month|year|all&date=YYYY-MM|YYYY` → `CarAnalytics` (`@garage/shared/types`, `analyticsQuerySchema`); расчёт — чистая `computeCarAnalytics(rows, { period, date?, today })` в `server/utils/analytics.ts`. Считаются записи с `cost > 0`. `avgPerMonth` округлён до 100 ₽, `avgEntry` до 10 ₽ (как в макете), `costPerKm` — до 0,1 (макс. − мин. пробег записей периода, < 2 записей → 0). `avgPerMonth` — от первого месяца с тратой до конца периода, но не дальше текущего месяца. `byMonth` — 12 месяцев года периода (month/year) или непрерывный ряд (all). `byCategory` по убыванию суммы, «Прочее» и «Без категории» — в конце. `prev/nextPeriodWithExpenses` — `YYYY-MM` / `YYYY`, для `all` — null.
 
+- (#45) Участники: `DELETE /api/cars/[id]/members/[userId]` (только владелец; владельца удалить → 400; нет такого участника → 404) и `DELETE /api/cars/[id]/members/me` (выход; владелец → 400) → `{ ok: true }`. `POST /api/cars/[id]/invite` отдаёт коды в `statusMessage`: 404 `user_not_found`, 409 `already_member` — тексты на клиенте. `GET /api/cars/[id]` дополнительно: `ownerName`, `entriesCount`, `remindersCount` (`CarDetail`).
+
 ## UI
 
 - (#33) Шрифты — из бандла (`@fontsource-variable/onest` `wght.css`, `@fontsource/jetbrains-mono` `600.css`, импорт в `assets/css/main.css`), CDN запрещены (e2e `typography.spec.ts` проверяет origin запросов шрифтов). `font-sans` = Onest Variable (по умолчанию на `body`, `tabular-nums` глобально), `font-mono` = JetBrains Mono 600 — только госномер и VIN.
