@@ -41,6 +41,7 @@
 
 - (#41) Тип срабатывания напоминания клиент не передаёт: `deriveTriggerType({ intervalKm, intervalMonths, nextDueDate?, nextDueMileage? })` (`@garage/shared/utils/reminderTrigger`) выводит `date|mileage|both` из заданных условий, роуты POST/PATCH кладут его в колонку `trigger_type`. Хотя бы одно условие обязательно (схема). При PATCH, чтобы убрать условие, клиент обнуляет и интервал, и `nextDue*`. `notifyDueReminders` берёт только `isActive = true`.
 - (#42) `POST /api/cars/[id]/reminders/bulk` `{ reminders: [{ title, intervalKm?, intervalMonths?, categoryId?, last?: { date?, mileage? }, nextDueDate? }] }` → `Reminder[]` (`reminderBulkSchema`, до 50, одна транзакция). Срок: `nextDueDate` как есть (интервал по месяцам тогда не считается), иначе от `last`, иначе от сегодня и `cars.currentMileage`; недостающая половина `last` добирается так же.
+- (#43) `PATCH /api/cars/[id]/mileage` `{ mileage, confirmDecrease? }` (`carMileageSchema`) — любой участник; меньше текущего без `confirmDecrease: true` → 400 `statusMessage: 'mileage_decrease_unconfirmed'`; ответ — `Car`. `PATCH /api/cars/[id]` пробег не принимает (`carUpdateSchema`, поле молча отбрасывается). `cars.mileageUpdatedAt` (`Car.mileageUpdatedAt: string | null`) ставят этот роут и `entries.post.ts` при росте пробега.
 
 ## UI
 

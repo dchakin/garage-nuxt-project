@@ -29,6 +29,13 @@
       "when": 1791998213354,
       "tag": "0003_car_categories",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1792002206940,
+      "tag": "0004_cold_juggernaut",
+      "breakpoints": true
     }
   ]
 }

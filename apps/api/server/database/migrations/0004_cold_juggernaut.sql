@@ -1,0 +1,1 @@
+ALTER TABLE `cars` ADD `mileage_updated_at` integer;

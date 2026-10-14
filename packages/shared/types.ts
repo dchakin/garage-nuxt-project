@@ -10,6 +10,7 @@ export interface Car {
   plateNumber: string | null
   vin: string | null
   currentMileage: number
+  mileageUpdatedAt: string | null
   photoUrl: string | null
   createdAt: string
 }

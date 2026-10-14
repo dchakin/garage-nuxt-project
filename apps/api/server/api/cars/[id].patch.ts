@@ -1,11 +1,11 @@
 import { eq } from 'drizzle-orm'
 import { db, schema } from '../../database'
-import { carSchema } from '@garage/shared/schemas/car'
+import { carUpdateSchema } from '@garage/shared/schemas/car'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireAuth(event)
   const carId = Number(getRouterParam(event, 'id'))
-  const body = await readValidatedBody(event, carSchema.partial().parse)
+  const body = await readValidatedBody(event, carUpdateSchema.parse)
 
   const { car, role } = await requireCarAccess(carId, user.id)
   if (role !== 'owner') {
@@ -23,7 +23,6 @@ export default defineEventHandler(async (event) => {
       ...(body.year !== undefined && { year: body.year }),
       ...(body.plateNumber !== undefined && { plateNumber: body.plateNumber }),
       ...(body.vin !== undefined && { vin: body.vin }),
-      ...(body.currentMileage !== undefined && { currentMileage: body.currentMileage }),
       ...(body.photoUrl !== undefined && { photoUrl: body.photoUrl || null }),
     })
     .where(eq(schema.cars.id, carId))

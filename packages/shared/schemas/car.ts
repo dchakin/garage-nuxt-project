@@ -11,6 +11,17 @@ export const carSchema = z.object({
 })
 export type CarInput = z.infer<typeof carSchema>
 
+export const carUpdateSchema = carSchema.omit({ currentMileage: true }).partial()
+export type CarUpdateInput = z.infer<typeof carUpdateSchema>
+
+export const MAX_MILEAGE_KM = 9_999_999
+
+export const carMileageSchema = z.object({
+  mileage: z.number().int().min(0).max(MAX_MILEAGE_KM),
+  confirmDecrease: z.boolean().optional(),
+})
+export type CarMileageInput = z.infer<typeof carMileageSchema>
+
 export const inviteSchema = z.object({
   email: z.string().email('Некорректный email'),
 })
