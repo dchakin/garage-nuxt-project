@@ -18,7 +18,8 @@ const props = defineProps<{ carId: number }>()
 
 const { entries, loading, deletingId, fetchEntries, deleteEntry } = useEntries(props.carId)
 const { categories, fetchCategories } = useCategories()
-const { confirm } = useConfirmDialog()
+const entryToDelete = ref<Entry | null>(null)
+const deleteDialogOpen = ref(false)
 
 const filters = reactive<Partial<EntryFilterInput>>({ sortBy: 'date', sortDir: 'desc' })
 const searchInput = ref('')
@@ -55,15 +56,15 @@ watch(searchInput, (value) => {
   }, 300)
 })
 
-async function onDelete(entry: Entry) {
-  const ok = await confirm({
-    title: 'Удалить запись?',
-    message: `«${entryTypeLabels[entry.type]}» от ${formatDate(entry.date)} будет удалена безвозвратно.`,
-    confirmText: 'Удалить',
-    danger: true,
-  })
-  if (!ok) return
-  await deleteEntry(entry.id)
+function askDelete(entry: Entry) {
+  entryToDelete.value = entry
+  deleteDialogOpen.value = true
+}
+
+async function onDelete() {
+  if (!entryToDelete.value) return
+  await deleteEntry(entryToDelete.value.id)
+  deleteDialogOpen.value = false
 }
 </script>
 
@@ -197,7 +198,7 @@ async function onDelete(entry: Entry) {
                   class="flex h-7 w-7 items-center justify-center rounded-md bg-danger-soft text-danger hover:bg-danger-soft hover:text-danger-text disabled:opacity-50 transition-colors"
                   title="Удалить"
                   aria-label="Удалить"
-                  @click="onDelete(entry)"
+                  @click="askDelete(entry)"
                 >
                   <UiSpinner v-if="deletingId === entry.id" />
                   <Trash2 v-else class="h-4 w-4" aria-hidden="true" />
@@ -222,5 +223,18 @@ async function onDelete(entry: Entry) {
         </div>
       </div>
     </div>
+    <UiDialog
+      v-model:open="deleteDialogOpen"
+      title="Удалить запись?"
+      :message="
+        entryToDelete
+          ? `«${entryTypeLabels[entryToDelete.type]}» от ${formatDate(entryToDelete.date)} будет удалена безвозвратно.`
+          : ''
+      "
+      confirm-text="Удалить"
+      :icon="Trash2"
+      :loading="deletingId !== null"
+      @confirm="onDelete"
+    />
   </div>
 </template>

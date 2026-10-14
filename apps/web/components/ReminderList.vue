@@ -8,7 +8,8 @@ import { BellOff, Pencil, Plus, Trash2 } from 'lucide-vue-next'
 const props = defineProps<{ carId: number; currentMileage: number }>()
 
 const { reminders, loading, deletingId, fetchReminders, deleteReminder } = useReminders(props.carId)
-const { confirm } = useConfirmDialog()
+const reminderToDelete = ref<Reminder | null>(null)
+const deleteDialogOpen = ref(false)
 
 await fetchReminders()
 
@@ -28,15 +29,15 @@ const sortedReminders = computed(() => {
   return [...reminders.value].sort((a, b) => order[status(a)] - order[status(b)])
 })
 
-async function onDelete(reminder: Reminder) {
-  const ok = await confirm({
-    title: 'Удалить напоминание?',
-    message: `«${reminder.title}» будет удалено безвозвратно.`,
-    confirmText: 'Удалить',
-    danger: true,
-  })
-  if (!ok) return
-  await deleteReminder(reminder.id)
+function askDelete(reminder: Reminder) {
+  reminderToDelete.value = reminder
+  deleteDialogOpen.value = true
+}
+
+async function onDelete() {
+  if (!reminderToDelete.value) return
+  await deleteReminder(reminderToDelete.value.id)
+  deleteDialogOpen.value = false
 }
 
 function dueText(reminder: Reminder) {
@@ -93,7 +94,7 @@ function dueText(reminder: Reminder) {
                   class="flex h-7 w-7 items-center justify-center rounded-md bg-danger-soft text-danger hover:bg-danger-soft hover:text-danger-text disabled:opacity-50 transition-colors"
                   title="Удалить"
                   aria-label="Удалить"
-                  @click="onDelete(reminder)"
+                  @click="askDelete(reminder)"
                 >
                   <UiSpinner v-if="deletingId === reminder.id" />
                   <Trash2 v-else class="h-4 w-4" aria-hidden="true" />
@@ -110,5 +111,14 @@ function dueText(reminder: Reminder) {
         </div>
       </div>
     </div>
+    <UiDialog
+      v-model:open="deleteDialogOpen"
+      title="Удалить напоминание?"
+      :message="reminderToDelete ? `«${reminderToDelete.title}» будет удалено безвозвратно.` : ''"
+      confirm-text="Удалить"
+      :icon="Trash2"
+      :loading="deletingId !== null"
+      @confirm="onDelete"
+    />
   </div>
 </template>

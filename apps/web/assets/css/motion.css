@@ -1,0 +1,87 @@
+/*
+ * Именованные переходы для <Transition name="…"> — фрейм «09 · Анимации» в design/garage.pen.
+ * Появление — ease-enter, скрытие — ease-exit и в 0,7× быстрее (320 → 224, 200 → 140, 120 → 84).
+ * Оверлей из нескольких слоёв (затемнение + панель): <Transition> вешается на корень, а анимируются
+ * дети `.overlay-scrim` / `.overlay-panel`. Корню задаётся длительность самого долгого слоя —
+ * Vue берёт её из computed-стиля корня, чтобы понять, когда убрать элемент.
+ */
+
+/* Шторка: затемнение fade dur-base, панель translateY 100% → 0 за dur-slow */
+.sheet-enter-active {
+  transition: opacity var(--dur-slow);
+}
+.sheet-leave-active {
+  transition: opacity calc(var(--dur-slow) * 0.7);
+}
+.sheet-enter-active .overlay-scrim {
+  transition: opacity var(--dur-base) var(--ease-enter);
+}
+.sheet-enter-active .overlay-panel {
+  transition: transform var(--dur-slow) var(--ease-enter);
+}
+.sheet-leave-active .overlay-scrim,
+.sheet-leave-active .overlay-panel {
+  transition:
+    opacity calc(var(--dur-slow) * 0.7) var(--ease-exit),
+    transform calc(var(--dur-slow) * 0.7) var(--ease-exit);
+}
+.sheet-enter-from .overlay-scrim,
+.sheet-leave-to .overlay-scrim {
+  opacity: 0;
+}
+.sheet-enter-from .overlay-panel,
+.sheet-leave-to .overlay-panel {
+  transform: translateY(100%);
+}
+
+/* Диалог: затемнение и диалог (scale 0,96 → 1 + opacity) за dur-base, закрытие — fade 140 */
+.dialog-enter-active {
+  transition: opacity var(--dur-base);
+}
+.dialog-leave-active {
+  transition: opacity calc(var(--dur-base) * 0.7);
+}
+.dialog-enter-active .overlay-scrim,
+.dialog-enter-active .overlay-panel {
+  transition:
+    opacity var(--dur-base) var(--ease-enter),
+    transform var(--dur-base) var(--ease-enter);
+}
+.dialog-leave-active .overlay-scrim,
+.dialog-leave-active .overlay-panel {
+  transition: opacity calc(var(--dur-base) * 0.7) var(--ease-exit);
+}
+.dialog-enter-from .overlay-scrim,
+.dialog-leave-to .overlay-scrim,
+.dialog-leave-to .overlay-panel {
+  opacity: 0;
+}
+.dialog-enter-from .overlay-panel {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+/* Уменьшенное движение: сдвиги и масштаб → fade dur-fast (принцип 08 фрейма «09») */
+@media (prefers-reduced-motion: reduce) {
+  .sheet-enter-active,
+  .sheet-leave-active,
+  .dialog-enter-active,
+  .dialog-leave-active,
+  .sheet-enter-active .overlay-scrim,
+  .sheet-enter-active .overlay-panel,
+  .sheet-leave-active .overlay-scrim,
+  .sheet-leave-active .overlay-panel,
+  .dialog-enter-active .overlay-scrim,
+  .dialog-enter-active .overlay-panel,
+  .dialog-leave-active .overlay-scrim,
+  .dialog-leave-active .overlay-panel {
+    transition: opacity var(--dur-fast) linear;
+  }
+  .sheet-enter-from .overlay-panel,
+  .sheet-leave-to .overlay-panel,
+  .dialog-enter-from .overlay-panel,
+  .dialog-leave-to .overlay-panel {
+    opacity: 0;
+    transform: none;
+  }
+}

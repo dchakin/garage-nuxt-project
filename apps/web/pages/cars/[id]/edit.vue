@@ -6,7 +6,7 @@ definePageMeta({ middleware: 'auth' })
 const route = useRoute()
 const carId = Number(route.params.id)
 const { fetchCar, updateCar, deleteCar, saving, deletingId } = useCars()
-const { confirm } = useConfirmDialog()
+const deleteDialogOpen = ref(false)
 
 const car = reactive(await fetchCar(carId))
 const error = ref('')
@@ -31,14 +31,8 @@ async function refresh() {
 }
 
 async function onDelete() {
-  const ok = await confirm({
-    title: 'Удалить автомобиль?',
-    message: `Автомобиль «${car.brand} ${car.model}» и все записи по нему будут удалены безвозвратно.`,
-    confirmText: 'Удалить',
-    danger: true,
-  })
-  if (!ok) return
   await deleteCar(carId)
+  deleteDialogOpen.value = false
   await navigateTo('/cars')
 }
 
@@ -105,10 +99,20 @@ async function onInvite() {
         variant="danger-text"
         :icon="Trash2"
         :loading="deletingId === carId"
-        @click="onDelete"
+        @click="deleteDialogOpen = true"
       >
-        {{ deletingId === carId ? 'Удаляем…' : 'Удалить автомобиль' }}
+        Удалить автомобиль
       </UiButton>
     </div>
+
+    <UiDialog
+      v-model:open="deleteDialogOpen"
+      :title="`Удалить ${car.brand} ${car.model}?`"
+      message="Вместе с машиной удалятся все её записи и напоминания. Это нельзя отменить."
+      confirm-text="Удалить"
+      :icon="Trash2"
+      :loading="deletingId === carId"
+      @confirm="onDelete"
+    />
   </div>
 </template>

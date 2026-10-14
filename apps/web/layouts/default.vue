@@ -2,20 +2,14 @@
 import { CarFront, LogOut } from 'lucide-vue-next'
 const { user, loggedIn, logout: logoutSession } = useAuth()
 const router = useRouter()
-const { confirm } = useConfirmDialog()
+const logoutDialogOpen = ref(false)
 const loggingOut = ref(false)
 
 async function logout() {
-  const ok = await confirm({
-    title: 'Выйти из аккаунта?',
-    message: 'Вам нужно будет снова войти, чтобы продолжить пользоваться приложением.',
-    confirmText: 'Выйти',
-  })
-  if (!ok) return
-
   loggingOut.value = true
   try {
     await logoutSession()
+    logoutDialogOpen.value = false
     router.push('/login')
   } finally {
     loggingOut.value = false
@@ -43,7 +37,7 @@ async function logout() {
           <button
             :disabled="loggingOut"
             class="inline-flex items-center gap-1.5 text-text-2 hover:text-text disabled:opacity-50 transition-colors"
-            @click="logout"
+            @click="logoutDialogOpen = true"
           >
             <UiSpinner v-if="loggingOut" />
             <LogOut v-else class="h-4 w-4" aria-hidden="true" />
@@ -56,6 +50,14 @@ async function logout() {
       <slot />
     </main>
 
-    <ConfirmDialog />
+    <UiDialog
+      v-model:open="logoutDialogOpen"
+      title="Выйти из аккаунта?"
+      message="Вам нужно будет снова войти, чтобы продолжить пользоваться приложением."
+      confirm-text="Выйти"
+      variant="primary"
+      :loading="loggingOut"
+      @confirm="logout"
+    />
   </div>
 </template>

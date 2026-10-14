@@ -1,6 +1,7 @@
 @import '@fontsource-variable/onest/wght.css';
 @import '@fontsource/jetbrains-mono/600.css';
 @import './tokens.css';
+@import './motion.css';
 
 @tailwind base;
 @tailwind components;
