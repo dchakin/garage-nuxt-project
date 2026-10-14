@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { db, schema } from '../../../database'
 import { reminderSchema } from '@garage/shared/schemas/reminder'
+import { deriveTriggerType } from '@garage/shared/utils/reminderTrigger'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireAuth(event)
@@ -23,8 +24,9 @@ export default defineEventHandler(async (event) => {
     lastEntry = { date: entry.date, mileage: entry.mileage }
   }
 
+  const triggerType = deriveTriggerType(body)
   const { nextDueDate, nextDueMileage } = computeNextDue({
-    triggerType: body.triggerType,
+    triggerType,
     intervalMonths: body.intervalMonths,
     intervalKm: body.intervalKm,
     lastEntry,
@@ -38,7 +40,7 @@ export default defineEventHandler(async (event) => {
       carId,
       title: body.title,
       categoryId: body.categoryId ?? null,
-      triggerType: body.triggerType,
+      triggerType,
       intervalMonths: body.intervalMonths ?? null,
       intervalKm: body.intervalKm ?? null,
       lastEntryId: body.lastEntryId ?? null,

@@ -14,7 +14,6 @@ export const reminderTriggerTypeLabels: Record<ReminderTriggerType, string> = {
 export const reminderBaseSchema = z.object({
   title: z.string().min(1, 'Укажите название'),
   categoryId: z.number().int().nullish(),
-  triggerType: z.enum(reminderTriggerTypes),
   intervalMonths: z.number().int().min(1).nullish(),
   intervalKm: z.number().int().min(1).nullish(),
   lastEntryId: z.number().int().nullish(),
@@ -24,21 +23,17 @@ export const reminderBaseSchema = z.object({
 })
 
 function validateTrigger(data: z.infer<typeof reminderBaseSchema>, ctx: z.RefinementCtx) {
-  const needsDate = data.triggerType === 'date' || data.triggerType === 'both'
-  const needsMileage = data.triggerType === 'mileage' || data.triggerType === 'both'
+  const hasCondition =
+    Boolean(data.intervalMonths) ||
+    Boolean(data.nextDueDate) ||
+    Boolean(data.intervalKm) ||
+    data.nextDueMileage != null
 
-  if (needsDate && !data.intervalMonths && !data.nextDueDate) {
+  if (!hasCondition) {
     ctx.addIssue({
       code: 'custom',
-      message: 'Укажите интервал в месяцах или дату',
+      message: 'Укажите интервал или срок по дате либо пробегу',
       path: ['intervalMonths'],
-    })
-  }
-  if (needsMileage && !data.intervalKm && data.nextDueMileage == null) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Укажите интервал в км или пробег',
-      path: ['intervalKm'],
     })
   }
 }

@@ -41,7 +41,6 @@ async function createOverdueReminder(cookie: string, carId: number) {
     headers: { cookie },
     body: {
       title: 'Замена масла',
-      triggerType: 'mileage',
       intervalKm: 10000,
       nextDueMileage: 95000,
     },

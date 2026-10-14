@@ -39,6 +39,8 @@
 - (#39) Все ответы с записью (`GET/POST /api/cars/[id]/entries`, `GET/PATCH /api/entries/[id]`) содержат `category` и `author: { id, name }` (email не отдаётся) — связи собирает `server/utils/entryRelations.ts` (`entryRelations`, `findEntryWithRelations(id)`); новые роуты с записями брать оттуда.
 - (#40) `POST /api/cars/[id]/entries` принимает `reminderId` (напоминание этой же машины, иначе 400): `server/utils/closeReminder.ts` `closeReminderWithEntry(reminder, entry)` ставит `lastEntryId`, пересчитывает срок через `computeNextDue`, удаляет `reminder_notifications` напоминания; ответ — запись + `reminder` (обновлённое). Закрытие идёт до `notifyDueReminders`.
 
+- (#41) Тип срабатывания напоминания клиент не передаёт: `deriveTriggerType({ intervalKm, intervalMonths, nextDueDate?, nextDueMileage? })` (`@garage/shared/utils/reminderTrigger`) выводит `date|mileage|both` из заданных условий, роуты POST/PATCH кладут его в колонку `trigger_type`. Хотя бы одно условие обязательно (схема). При PATCH, чтобы убрать условие, клиент обнуляет и интервал, и `nextDue*`. `notifyDueReminders` берёт только `isActive = true`.
+
 ## UI
 
 - (#33) Шрифты — из бандла (`@fontsource-variable/onest` `wght.css`, `@fontsource/jetbrains-mono` `600.css`, импорт в `assets/css/main.css`), CDN запрещены (e2e `typography.spec.ts` проверяет origin запросов шрифтов). `font-sans` = Onest Variable (по умолчанию на `body`, `tabular-nums` глобально), `font-mono` = JetBrains Mono 600 — только госномер и VIN.
