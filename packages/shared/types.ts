@@ -24,6 +24,9 @@ export interface CarMember {
 export interface CarDetail extends Car {
   role: 'owner' | 'member'
   members: CarMember[]
+  ownerName: string
+  entriesCount: number
+  remindersCount: number
 }
 
 export interface Category {
