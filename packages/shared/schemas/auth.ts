@@ -37,6 +37,18 @@ export const changePasswordSchema = z.object({
 })
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>
 
+export const passwordResetRequestSchema = z.object({
+  email: z.string().email('Некорректный email'),
+})
+export type PasswordResetRequestInput = z.infer<typeof passwordResetRequestSchema>
+
+export const passwordResetConfirmSchema = z.object({
+  token: z.string().min(1),
+  password: z.string().min(6, 'Минимум 6 символов'),
+  authMode: authModeSchema,
+})
+export type PasswordResetConfirmInput = z.input<typeof passwordResetConfirmSchema>
+
 export const refreshSchema = z.object({
   refreshToken: z.string().min(1),
 })

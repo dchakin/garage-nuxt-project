@@ -51,6 +51,8 @@
 
 - (#49) Почта: `server/utils/mail.ts` — `sendMail(message, config)` (`MailConfig { smtpUrl, from, outboxDir }`, outbox приоритетнее SMTP, без обоих бросает), `getMailConfig()` (из `runtimeConfig`: `NUXT_SMTP_URL`, `NUXT_MAIL_FROM`, `NUXT_MAIL_OUTBOX_DIR`), `isMailEnabled(config)`, `buildAppLink(appUrl, path)` (`NUXT_APP_URL` = `useRuntimeConfig().appUrl`). Outbox: файл `<ts>-<uuid>.json` с `{ from, to, subject, text, html? }`. `GET /api/auth/config` → `{ passwordReset: boolean }` (= почта включена).
 
+- (#50) Сброс пароля: `POST /api/auth/password-reset { email }` → всегда 204 (письмо раз в 60 с на пользователя, ссылка `${NUXT_APP_URL}/reset-password?token=…`, токен 1 час, в `password_reset_tokens` — SHA-256, `usedAt`); `POST /api/auth/password-reset/confirm { token, password, authMode }` (`passwordResetConfirmSchema`) → как `login` (сразу вход), неверный/просроченный/использованный токен → 400. Оба роута при выключенной почте — 404 (клиент смотрит `GET /api/auth/config`). `users.sessionVersion` растёт при сбросе; cookie-сессия хранит версию на момент входа, `getAuthUser` сверяет её с БД (нет версии в старой куке = 0) — старые куки дают 401. Все refresh-токены пользователя отзываются.
+
 ## UI
 
 - (#33) Шрифты — из бандла (`@fontsource-variable/onest` `wght.css`, `@fontsource/jetbrains-mono` `600.css`, импорт в `assets/css/main.css`), CDN запрещены (e2e `typography.spec.ts` проверяет origin запросов шрифтов). `font-sans` = Onest Variable (по умолчанию на `body`, `tabular-nums` глобально), `font-mono` = JetBrains Mono 600 — только госномер и VIN.
