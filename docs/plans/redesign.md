@@ -88,27 +88,27 @@
 **Цель:** серверная логика для «Сделал», мастера первого запуска, обновления пробега и подписи автора.
 **Когда готов:** `npm test` зелёный; роуты в `CLAUDE.md` (Architecture) и `conventions.md`.
 
-- [ ] **Записи отдаются с автором** [backend] #39
+- [x] **Записи отдаются с автором** [backend] #39
   - Файлы: `apps/api/server/api/cars/[id]/entries.get.ts`, `entries/[id].get.ts`, `entries.post.ts`, `entries/[id].patch.ts`; `packages/shared/types.ts` (`Entry.author: { id: number; name: string }`); `apps/api/tests/integration/entries.test.ts`.
   - Контракт: каждая запись в ответе содержит `author: { id, name }` (из `entries.authorId` → `users`). Email автора не отдаётся.
   - Готово: интеграционный тест — запись участника в списке владельца отдаётся с именем участника.
 
-- [ ] **Закрытие напоминания записью (`reminderId`)** [backend] #40
+- [x] **Закрытие напоминания записью (`reminderId`)** [backend] #40
   - Файлы: `packages/shared/schemas/entry.ts` (`reminderId?: number`), `apps/api/server/api/cars/[id]/entries.post.ts`, `server/utils/reminderDue.ts`, `server/utils/push.ts`; тесты `apps/api/tests/integration/entries-reminder.test.ts`.
   - Контракт: `POST /api/cars/[id]/entries` с `reminderId` (напоминание той же машины, иначе 400) ставит `reminders.lastEntryId` = новая запись, пересчитывает `nextDueDate`/`nextDueMileage` через `computeNextDue` и удаляет строки `reminder_notifications` этого напоминания. Ответ — запись + `reminder` (обновлённое).
   - Готово: тесты — просроченное после закрытия не `overdue`; push по новому сроку уходит снова (дедупликация сброшена); чужой `reminderId` → 400; посторонний → 403.
 
-- [ ] **Тип срабатывания вычисляется сервером; выключенные не шлют push** [backend] #41
+- [x] **Тип срабатывания вычисляется сервером; выключенные не шлют push** [backend] #41
   - Файлы: `packages/shared/schemas/reminder.ts` (убрать `triggerType` из входа, вывести из `intervalKm`/`intervalMonths`), `apps/api/server/api/cars/[id]/reminders.post.ts`, `reminders/[id].patch.ts`, `server/utils/push.ts` (`notifyDueReminders` фильтрует `isActive = true`); тесты.
   - Контракт: `deriveTriggerType({ intervalKm, intervalMonths })` в `packages/shared/utils/reminderTrigger.ts`; колонка `trigger_type` остаётся и заполняется сервером.
   - Готово: unit на `deriveTriggerType`; интеграционный — выключенное напоминание не получает push.
 
-- [ ] **Массовое создание напоминаний** [backend] #42
+- [x] **Массовое создание напоминаний** [backend] #42
   - Файлы: `packages/shared/schemas/reminder.ts` (`reminderBulkSchema`), `apps/api/server/api/cars/[id]/reminders/bulk.post.ts`, тест `apps/api/tests/integration/reminders-bulk.test.ts`.
   - Контракт: `POST /api/cars/[id]/reminders/bulk` `{ reminders: Array<{ title, intervalKm?, intervalMonths?, categoryId?, last?: { date?: string; mileage?: number }, nextDueDate?: string }> }` → `Reminder[]`. Срок: `nextDueDate`, если передан (ОСАГО «Полис действует до»); иначе от `last`; иначе от сегодня и `cars.currentMileage`. Всё в одной транзакции.
   - Готово: тесты — с `last`, с `nextDueDate`, без них; посторонний → 403; невалидный элемент → 400 и ничего не создано.
 
-- [ ] **Отдельный роут обновления пробега** [backend] #43
+- [x] **Отдельный роут обновления пробега** [backend] #43
   - Файлы: миграция `cars.mileage_updated_at` (через `schema.ts` → `npm run db:generate`), `packages/shared/schemas/car.ts` (`carMileageSchema`, убрать `currentMileage` из схемы `PATCH`), `packages/shared/types.ts` (`Car.mileageUpdatedAt`), `apps/api/server/api/cars/[id]/mileage.patch.ts`, `cars/[id].patch.ts`, `entries.post.ts` (обновляет `mileageUpdatedAt` при росте пробега); тест `apps/api/tests/integration/mileage.test.ts`.
   - Контракт: `PATCH /api/cars/[id]/mileage` `{ mileage: number, confirmDecrease?: boolean }` — любой участник; меньше текущего без `confirmDecrease: true` → 400 `{ statusMessage: 'mileage_decrease_unconfirmed' }`; после сохранения — `notifyDueReminders({ carId })` fire-and-forget; ответ — `Car`. `PATCH /api/cars/[id]` больше не принимает `currentMileage`.
   - Готово: тесты — 400 без флага, 200 с флагом, участник может обновить, посторонний 403, `mileageUpdatedAt` меняется.
