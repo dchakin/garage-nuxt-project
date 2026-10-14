@@ -62,7 +62,7 @@
 ## Сборка и запуск как в проде
 
 ```bash
-npm run build   # apps/api → .output (Nitro), apps/web → .output/public (nuxt generate)
+npm run build   # параллельно: apps/api → .output (Nitro), apps/web → .output/public (nuxt generate)
 NUXT_WEB_DIST_DIR=apps/web/.output/public node apps/api/.output/server/index.mjs
 ```
 

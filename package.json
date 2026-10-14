@@ -14,7 +14,7 @@
     "dev": "concurrently -k -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
     "dev:api": "npm run dev -w @garage/api",
     "dev:web": "npm run dev -w @garage/web",
-    "build": "npm run build -w @garage/api -w @garage/web",
+    "build": "concurrently -g --kill-others-on-fail -n api,web \"npm:build:api\" \"npm:build:web\"",
     "build:api": "npm run build -w @garage/api",
     "build:web": "npm run build -w @garage/web",
     "typecheck": "npm run typecheck --workspaces --if-present && tsc -p tests/e2e",

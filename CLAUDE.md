@@ -31,7 +31,7 @@ npm install                # install deps for all workspaces (postinstall runs `
 npm run dev                # api (http://localhost:3001) + web (http://localhost:3000, proxies /api to the api)
 npm run dev:api            # only the API
 npm run dev:web            # only the client
-npm run build              # build both: apps/api/.output (Nitro) and apps/web/.output/public (nuxt generate)
+npm run build              # build both in parallel (concurrently): apps/api/.output (Nitro) and apps/web/.output/public (nuxt generate)
 npm run typecheck          # every workspace: tsc (api, shared) and nuxt typecheck (web) — web has typeCheck: false in nuxt.config.ts, so run manually
 npm run db:generate        # drizzle-kit generate — create a migration from schema.ts changes (runs in apps/api)
 npm run db:migrate         # apply migrations (tsx server/database/migrate.ts)

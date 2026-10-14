@@ -23,8 +23,9 @@ has_script() { node -e "process.exit(require('./package.json').scripts?.['$1'] ?
 
 export CI=true # vitest, playwright — без watch-режима и интерактива
 run npm test --silent
-run npm run typecheck --silent
-run npm run build --silent
+# Typecheck и сборка друг от друга не зависят — параллельно (~70 с вместо ~125 с).
+# -g печатает вывод каждой команды целиком, а не вперемешку
+run npx concurrently -g --kill-others-on-fail -n typecheck,build "npm run typecheck --silent" "npm run build --silent"
 
 # E2E на собранном приложении (Playwright, tests/e2e). Скриншоты — в test-results/screens/ для ревью.
 rm -rf test-results/screens
