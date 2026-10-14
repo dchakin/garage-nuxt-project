@@ -85,6 +85,22 @@ export interface AuthTokens {
   expiresIn: number
 }
 
+/** Аналитика расходов машины за период (`GET /api/cars/[id]/analytics`). */
+export interface CarAnalytics {
+  total: number
+  avgPerMonth: number
+  costPerKm: number
+  avgEntry: number
+  topMonth: { month: string; total: number } | null
+  /** 12 месяцев года периода (month/year) или от первого до последнего месяца с тратой (all) */
+  byMonth: Array<{ month: string; total: number }>
+  byCategory: Array<{ categoryId: number | null; name: string; total: number; share: number }>
+  hasAnyExpenses: boolean
+  /** `YYYY-MM` для month, `YYYY` для year; для all — null */
+  prevPeriodWithExpenses: string | null
+  nextPeriodWithExpenses: string | null
+}
+
 /** Ответ login/register: пользователь; `tokens` есть только при `authMode: 'token'`. */
 export interface AuthResponse extends AuthUser {
   tokens?: AuthTokens
