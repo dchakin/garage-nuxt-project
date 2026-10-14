@@ -18,6 +18,7 @@ fi
 MAX_ISSUES="${1:-1}"
 MAX_ATTEMPTS="${RALPH_MAX_ATTEMPTS:-3}"
 MODEL="${RALPH_MODEL:-sonnet}"
+EFFORT="${RALPH_EFFORT:-high}"              # low | medium | high | xhigh | max
 IMPL_BUDGET="${RALPH_IMPL_BUDGET:-3}"       # USD на одну попытку реализации
 REVIEW_BUDGET="${RALPH_REVIEW_BUDGET:-1}"   # USD на одно ревью
 TOTAL_BUDGET="${RALPH_TOTAL_BUDGET:-15}"    # USD на весь запуск — новые шаги не начинаются
@@ -56,7 +57,7 @@ strip_ansi() { sed -E 's/\x1b\[[0-9;?]*[A-Za-z]//g'; }
 
 # Экономия токенов: только нужные встроенные инструменты (--tools), без MCP и скиллов,
 # без сохранения сессий. Всё, что не разрешено явно, — запрещено (dontAsk).
-COMMON=(--model "$MODEL" --strict-mcp-config --disable-slash-commands --no-session-persistence --permission-mode dontAsk)
+COMMON=(--model "$MODEL" --effort "$EFFORT" --strict-mcp-config --disable-slash-commands --no-session-persistence --permission-mode dontAsk)
 DENY=(Agent WebSearch WebFetch "Edit(ralph/**)" "Write(ralph/**)"
   "Bash(git push:*)" "Bash(git checkout:*)" "Bash(git switch:*)" "Bash(git reset:*)"
   "Bash(git rebase:*)" "Bash(git merge:*)" "Bash(gh:*)" "Bash(rm -rf:*)"
