@@ -1,12 +1,11 @@
 import { spawn, spawnSync } from 'node:child_process'
-import { createRequire } from 'node:module'
 import net from 'node:net'
-import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ofetch } from 'ofetch'
+import { inject } from 'vitest'
 
 const apiRoot = fileURLToPath(new URL('../..', import.meta.url))
-const SERVER_START_TIMEOUT_MS = 120_000
+const SERVER_START_TIMEOUT_MS = 30_000
 const POLL_INTERVAL_MS = 300
 
 export interface ApiServer {
@@ -43,7 +42,7 @@ async function waitForHealth(baseUrl: string, getExitInfo: () => string | null) 
 
 function killTree(pid: number) {
   if (process.platform === 'win32') {
-    // dev-режим Nitro порождает дочерний воркер — без /T он остаётся жить и держит порт и БД
+    // /T — вместе с возможными дочерними процессами, иначе они держат порт и файл БД
     spawnSync('taskkill', ['/pid', String(pid), '/T', '/F'])
   } else {
     try {
@@ -55,41 +54,36 @@ function killTree(pid: number) {
 }
 
 /**
- * Поднимает реальный dev-сервер apps/api (`nitropack dev`) на свободном порту с заданным окружением.
- * Роуты нельзя импортировать напрямую: они опираются на авто-импорты Nitro и runtime config,
- * поэтому интеграционные тесты ходят в них по HTTP.
+ * Поднимает реальный сервер apps/api на свободном порту с заданным окружением — сборку, которую
+ * один раз делает `tests/setup/buildApi.ts` (globalSetup). Роуты нельзя импортировать напрямую:
+ * они опираются на авто-импорты Nitro и runtime config, поэтому интеграционные тесты ходят в них
+ * по HTTP. Runtime config (`NUXT_*`) собранный сервер читает из env при старте.
  */
 export async function startApiServer(env: Record<string, string>): Promise<ApiServer> {
   const port = await findFreePort()
   const baseUrl = `http://127.0.0.1:${port}`
-  const nitropackCli = path.join(
-    path.dirname(createRequire(import.meta.url).resolve('nitropack/package.json')),
-    'dist/cli/index.mjs',
-  )
 
-  // Под vitest в окружении есть NODE_ENV=test и VITEST*: с ними `nitropack dev` молча не слушает порт
+  // Окружение теста (NODE_ENV=test, VITEST*) серверу не нужно
   const inheritedEnv = Object.fromEntries(
     Object.entries(process.env).filter(
       ([name]) => name !== 'NODE_ENV' && !name.startsWith('VITEST'),
     ),
   )
 
-  const child = spawn(
-    process.execPath,
-    [nitropackCli, 'dev', '--host', '127.0.0.1', '--port', String(port)],
-    {
-      cwd: apiRoot,
-      env: {
-        ...inheritedEnv,
-        // сабпроцесс не наследует env теста; про TZ см. комментарий в vitest.config.ts
-        TZ: 'UTC',
-        // отдельный dev-сервер на своём порту и БД не конфликтует с локальным `npm run dev:api`
-        ...env,
-      },
-      stdio: process.env.API_SERVER_DEBUG ? 'inherit' : 'ignore',
-      detached: process.platform !== 'win32',
+  const child = spawn(process.execPath, [inject('apiServerEntry')], {
+    cwd: apiRoot,
+    env: {
+      ...inheritedEnv,
+      NITRO_HOST: '127.0.0.1',
+      NITRO_PORT: String(port),
+      // сабпроцесс не наследует env теста; про TZ см. комментарий в vitest.config.ts
+      TZ: 'UTC',
+      // свой порт и БД — не конфликтует с локальным `npm run dev:api` и другими тест-файлами
+      ...env,
     },
-  )
+    stdio: process.env.API_SERVER_DEBUG ? 'inherit' : 'ignore',
+    detached: process.platform !== 'win32',
+  })
 
   let exitInfo: string | null = null
   child.once('exit', (code, signal) => {

@@ -10,10 +10,9 @@ export default defineConfig({
     // дат зависят от часового пояса машины, на которой они запущены.
     env: { TZ: 'UTC' },
     setupFiles: ['./tests/setup/node-globals.ts'],
-    // Интеграционные тесты поднимают по dev-серверу Nitro; параллельные серверы дерутся за общий
-    // каталог .nitro и часть из них не стартует — файлы идут по очереди
-    fileParallelism: false,
+    // Один раз собирает API; интеграционные тесты запускают готовую сборку (tests/helpers/apiServer.ts)
+    globalSetup: ['./tests/setup/buildApi.ts'],
     testTimeout: 30000,
-    hookTimeout: 180000,
+    hookTimeout: 60000,
   },
 })
