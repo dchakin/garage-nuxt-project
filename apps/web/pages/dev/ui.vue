@@ -7,17 +7,19 @@ import DevShowcaseData from '~/components/dev/ShowcaseData.vue'
 import DevShowcaseCharts from '~/components/dev/ShowcaseCharts.vue'
 import DevShowcaseOverlays from '~/components/dev/ShowcaseOverlays.vue'
 import DevShowcaseFeedback from '~/components/dev/ShowcaseFeedback.vue'
+import DevShowcaseNav from '~/components/dev/ShowcaseNav.vue'
 
 definePageMeta({ layout: false })
 useHead({ title: 'UI-кит', meta: [{ name: 'robots', content: 'noindex' }] })
 
-/** Группа витрины = фрейм макета; новые группы (данные, навигация) добавляются сюда */
+/** Группа витрины = фрейм макета; новые группы добавляются сюда */
 const GROUPS: { id: string; title: string; component: Component }[] = [
   { id: 'actions', title: 'Действия и ввод', component: DevShowcaseActions },
   { id: 'data', title: 'Данные и статусы', component: DevShowcaseData },
   { id: 'charts', title: 'Графики и загрузка', component: DevShowcaseCharts },
   { id: 'overlays', title: 'Оверлеи', component: DevShowcaseOverlays },
   { id: 'feedback', title: 'Обратная связь', component: DevShowcaseFeedback },
+  { id: 'nav', title: 'Навигация', component: DevShowcaseNav },
 ]
 
 const route = useRoute()
