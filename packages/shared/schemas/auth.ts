@@ -24,6 +24,19 @@ export const loginSchema = z.object({
 })
 export type LoginInput = z.input<typeof loginSchema>
 
+export const profileSchema = z.object({
+  name: z.string().trim().min(1, 'Укажите имя').max(100, 'Максимум 100 символов'),
+})
+export type ProfileInput = z.infer<typeof profileSchema>
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Введите текущий пароль'),
+  newPassword: z.string().min(6, 'Минимум 6 символов'),
+  /** Refresh-токен текущего устройства (мобильный клиент): он остаётся действующим. */
+  refreshToken: z.string().min(1).optional(),
+})
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>
+
 export const refreshSchema = z.object({
   refreshToken: z.string().min(1),
 })

@@ -1,4 +1,4 @@
-import { and, eq, gt } from 'drizzle-orm'
+import { and, eq, gt, ne } from 'drizzle-orm'
 import { createError, getRequestHeader, useSession } from 'h3'
 import type { H3Event, SessionConfig } from 'h3'
 import type { AuthMode } from '@garage/shared/schemas/auth'
@@ -112,6 +112,25 @@ export async function startAuthSession(
   const session = await useSession<SessionData>(event, sessionConfig())
   await session.update({ user: authUser })
   return authUser
+}
+
+/** Обновляет данные пользователя в куке, если запрос пришёл с cookie-сессией (не с Bearer). */
+export async function refreshCookieSession(event: H3Event, user: AuthUser): Promise<void> {
+  if (extractBearerToken(getRequestHeader(event, 'authorization'))) return
+  const session = await useSession<SessionData>(event, sessionConfig())
+  if (session.data.user) await session.update({ user: toAuthUser(user) })
+}
+
+/** Отзывает все refresh-токены пользователя, кроме `exceptToken` (токен текущего устройства). */
+export async function revokeUserRefreshTokens(userId: number, exceptToken?: string): Promise<void> {
+  const ofUser = eq(schema.refreshTokens.userId, userId)
+  await db
+    .delete(schema.refreshTokens)
+    .where(
+      exceptToken
+        ? and(ofUser, ne(schema.refreshTokens.tokenHash, hashRefreshToken(exceptToken)))
+        : ofUser,
+    )
 }
 
 export async function clearCookieSession(event: H3Event): Promise<void> {
