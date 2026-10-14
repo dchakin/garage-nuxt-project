@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
     if (car && body.mileage > car.currentMileage) {
       await db
         .update(schema.cars)
-        .set({ currentMileage: body.mileage })
+        .set({ currentMileage: body.mileage, mileageUpdatedAt: new Date() })
         .where(eq(schema.cars.id, carId))
       // Пробег вырос — напоминания по км могли стать «скоро»/«просрочено».
       // Не ждём отправку, чтобы не задерживать ответ.

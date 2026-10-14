@@ -22,6 +22,7 @@ export const cars = sqliteTable('cars', {
   plateNumber: text('plate_number'),
   vin: text('vin'),
   currentMileage: integer('current_mileage').notNull().default(0),
+  mileageUpdatedAt: integer('mileage_updated_at', { mode: 'timestamp' }),
   photoUrl: text('photo_url'),
   createdAt: integer('created_at', { mode: 'timestamp' })
     .notNull()
