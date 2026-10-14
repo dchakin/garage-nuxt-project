@@ -40,6 +40,7 @@
 - (#40) `POST /api/cars/[id]/entries` принимает `reminderId` (напоминание этой же машины, иначе 400): `server/utils/closeReminder.ts` `closeReminderWithEntry(reminder, entry)` ставит `lastEntryId`, пересчитывает срок через `computeNextDue`, удаляет `reminder_notifications` напоминания; ответ — запись + `reminder` (обновлённое). Закрытие идёт до `notifyDueReminders`.
 
 - (#41) Тип срабатывания напоминания клиент не передаёт: `deriveTriggerType({ intervalKm, intervalMonths, nextDueDate?, nextDueMileage? })` (`@garage/shared/utils/reminderTrigger`) выводит `date|mileage|both` из заданных условий, роуты POST/PATCH кладут его в колонку `trigger_type`. Хотя бы одно условие обязательно (схема). При PATCH, чтобы убрать условие, клиент обнуляет и интервал, и `nextDue*`. `notifyDueReminders` берёт только `isActive = true`.
+- (#42) `POST /api/cars/[id]/reminders/bulk` `{ reminders: [{ title, intervalKm?, intervalMonths?, categoryId?, last?: { date?, mileage? }, nextDueDate? }] }` → `Reminder[]` (`reminderBulkSchema`, до 50, одна транзакция). Срок: `nextDueDate` как есть (интервал по месяцам тогда не считается), иначе от `last`, иначе от сегодня и `cars.currentMileage`; недостающая половина `last` добирается так же.
 
 ## UI
 
