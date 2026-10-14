@@ -65,7 +65,8 @@ IMPL_TOOLS=(Read Edit Write Glob Grep LSP
   "Bash(npm test:*)" "Bash(npm run:*)" "Bash(npm install:*)" "Bash(npm i:*)"
   "Bash(npx vitest:*)" "Bash(npx playwright:*)" "Bash(npx nuxi:*)" "Bash(npx drizzle-kit:*)" "Bash(npx tsx:*)"
   "Bash(git status:*)" "Bash(git diff:*)" "Bash(git log:*)" "Bash(git show:*)"
-  "Bash(git add:*)" "Bash(git commit:*)" "Bash(ls:*)" "Bash(mkdir:*)")
+  "Bash(git add:*)" "Bash(git commit:*)" "Bash(ls:*)" "Bash(mkdir:*)"
+  "Bash(cat:*)" "Bash(head:*)" "Bash(tail:*)" "Bash(grep:*)" "Bash(wc:*)" "Bash(cd:*)")
 REVIEW_TOOLS=(Read Glob Grep "Bash(git diff:*)" "Bash(git log:*)" "Bash(git show:*)")
 
 # ---------- предусловия ----------
@@ -230,12 +231,14 @@ for ((done_count = 1; done_count <= MAX_ISSUES; done_count++)); do
     log "#$N попытка $ATTEMPT/$MAX_ATTEMPTS: реализация"
     implement || { STATUS="abort"; break; }
 
-    if [ -z "$TIMED_OUT" ] && grep -qiE 'BLOCKED:' <<<"$IMPL_TEXT"; then
-      STATUS="blocked"; block_issue "$(grep -iE 'BLOCKED:' <<<"$IMPL_TEXT" | tail -n 1)"; break
-    fi
-
+    # Незакоммиченное — в ветку задачи до проверки BLOCKED: иначе checkout следующей задачи
+    # унесёт эти изменения в её ветку.
     if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
       git add -A && git commit -q -m "chore(ralph): commit leftover changes (#$N)"
+    fi
+
+    if [ -z "$TIMED_OUT" ] && grep -qiE 'BLOCKED:' <<<"$IMPL_TEXT"; then
+      STATUS="blocked"; block_issue "$(grep -iE 'BLOCKED:' <<<"$IMPL_TEXT" | tail -n 1)"; break
     fi
     if [ "$(git rev-parse HEAD)" = "$START_SHA" ]; then
       EMPTY_ATTEMPTS=$((EMPTY_ATTEMPTS + 1))

@@ -13,6 +13,7 @@
 ## Правила
 
 - Не переключай ветки, не пушь, не обращайся к GitHub — это делает скрипт.
+- Bash работает по белому списку (режим `dontAsk`): `npm test`, `npm run …`, `npx vitest|playwright|nuxi|drizzle-kit|tsx`, `git status|diff|log|show|add|commit`, `ls`, `mkdir`, `cat`, `head`, `tail`, `grep`, `wc`, `cd`. В цепочке (`&&`, `;`, `|`) проверяется каждая команда — одна неразрешённая (`python`, `sed`, `find`, `rm`…) отклоняет всю строку. Отказ относится только к этой строке, а не к Bash целиком: перепиши её разрешёнными командами или используй Read/Grep/Glob/Edit/Write. `npm test`, `npm run typecheck` и `git commit` разрешены всегда — отказ в другой команде не причина для `BLOCKED`.
 - Не отключай и не удаляй тесты, не ставь `skip`/`only`, не ослабляй типы (`any`, `@ts-ignore`, `@ts-expect-error`) ради зелёного результата.
 - Меняешь данные — синхронно обнови `apps/api/server/database/schema.ts`, миграцию (`npm run db:generate`), Zod-схему (`packages/shared/schemas`) и `packages/shared/types.ts`. Новый API-роут — обязательно через `requireCarAccess`.
 - Если в задаче не хватает решения — выбери самый простой вариант, согласованный с `TZ.md` и задачей, и запиши его в «Решения».
