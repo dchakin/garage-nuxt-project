@@ -44,11 +44,24 @@ export const carMembers = sqliteTable('car_members', {
     .default(sql`(unixepoch())`),
 })
 
-export const categories = sqliteTable('categories', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  name: text('name').notNull().unique(),
-  isDefault: integer('is_default', { mode: 'boolean' }).notNull().default(false),
-})
+// carId = null — стандартная категория (общая для всех машин), иначе — своя категория машины.
+// SQLite считает NULL разными значениями, поэтому имена стандартных уникальны отдельным
+// частичным индексом (на нём держится onConflictDoNothing в seed.ts).
+export const categories = sqliteTable(
+  'categories',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    carId: integer('car_id').references(() => cars.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    isDefault: integer('is_default', { mode: 'boolean' }).notNull().default(false),
+  },
+  (t) => [
+    uniqueIndex('categories_car_name_unique').on(t.carId, t.name),
+    uniqueIndex('categories_default_name_unique')
+      .on(t.name)
+      .where(sql`${t.carId} is null`),
+  ],
+)
 
 export const entries = sqliteTable('entries', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -157,6 +170,7 @@ export const carsRelations = relations(cars, ({ one, many }) => ({
   members: many(carMembers),
   entries: many(entries),
   reminders: many(reminders),
+  categories: many(categories),
 }))
 
 export const carMembersRelations = relations(carMembers, ({ one }) => ({
@@ -164,7 +178,8 @@ export const carMembersRelations = relations(carMembers, ({ one }) => ({
   user: one(users, { fields: [carMembers.userId], references: [users.id] }),
 }))
 
-export const categoriesRelations = relations(categories, ({ many }) => ({
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
+  car: one(cars, { fields: [categories.carId], references: [cars.id] }),
   entries: many(entries),
   reminders: many(reminders),
 }))

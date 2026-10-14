@@ -27,6 +27,8 @@ export interface CarDetail extends Car {
 
 export interface Category {
   id: number
+  /** null — стандартная категория, иначе — своя категория этой машины */
+  carId: number | null
   name: string
   isDefault: boolean
 }

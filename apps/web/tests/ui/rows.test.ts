@@ -54,7 +54,9 @@ describe('UiRowEntry', () => {
     expect(byType.text()).toBe(`Прочее—12${NBSP}сент`)
 
     const byCategory = mount(UiRowEntry, {
-      props: { entry: { ...bare, category: { id: 1, name: 'Шины', isDefault: true } } },
+      props: {
+        entry: { ...bare, category: { id: 1, carId: null, name: 'Шины', isDefault: true } },
+      },
     })
     expect(byCategory.text()).toContain('Шины')
   })
