@@ -29,6 +29,8 @@ export const entrySchema = z.object({
   cost: z.number().min(0).nullish(),
   currency: z.string().default('RUB'),
   place: z.string().nullish(),
+  /** Напоминание той же машины, которое закрывает запись. */
+  reminderId: z.number().int().positive().optional(),
 })
 export type EntryInput = z.infer<typeof entrySchema>
 
