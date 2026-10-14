@@ -16,6 +16,14 @@ export default defineNitroConfig({
       vapidPublicKey: '',
     },
 
+    // Почта: NUXT_SMTP_URL (smtp://user:pass@host:587), NUXT_MAIL_FROM, NUXT_APP_URL (база ссылок в письмах),
+    // NUXT_MAIL_OUTBOX_DIR — вместо SMTP писать письма JSON-файлами в каталог (тесты, e2e).
+    // Без SMTP и outbox почта выключена.
+    smtpUrl: '',
+    mailFrom: '',
+    appUrl: '',
+    mailOutboxDir: '',
+
     // Дополнительные origin'ы для CORS через запятую (NUXT_CORS_ORIGINS). Origin'ы Capacitor
     // (capacitor://localhost, https://localhost) разрешены всегда, см. server/middleware/cors.ts.
     corsOrigins: '',

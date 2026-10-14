@@ -49,6 +49,8 @@
 
 - (#48) Аккаунт: `PATCH /api/auth/me { name }` → `AuthUser` (`profileSchema`; кука-сессия обновляется, клиент берёт новую куку из ответа). `POST /api/auth/password { currentPassword, newPassword, refreshToken? }` (`changePasswordSchema`) → `{ ok }`; неверный текущий → 400; отзываются все refresh-токены пользователя, кроме переданного `refreshToken` (токен текущего устройства). `DELETE /api/auth/account` → `{ ok }`: удаляет пользователя каскадом по FK (машины-владения, членства, push, токены, его записи в чужих машинах — ссылки `reminders.lastEntryId` на них обнуляются) и чистит сессию.
 
+- (#49) Почта: `server/utils/mail.ts` — `sendMail(message, config)` (`MailConfig { smtpUrl, from, outboxDir }`, outbox приоритетнее SMTP, без обоих бросает), `getMailConfig()` (из `runtimeConfig`: `NUXT_SMTP_URL`, `NUXT_MAIL_FROM`, `NUXT_MAIL_OUTBOX_DIR`), `isMailEnabled(config)`, `buildAppLink(appUrl, path)` (`NUXT_APP_URL` = `useRuntimeConfig().appUrl`). Outbox: файл `<ts>-<uuid>.json` с `{ from, to, subject, text, html? }`. `GET /api/auth/config` → `{ passwordReset: boolean }` (= почта включена).
+
 ## UI
 
 - (#33) Шрифты — из бандла (`@fontsource-variable/onest` `wght.css`, `@fontsource/jetbrains-mono` `600.css`, импорт в `assets/css/main.css`), CDN запрещены (e2e `typography.spec.ts` проверяет origin запросов шрифтов). `font-sans` = Onest Variable (по умолчанию на `body`, `tabular-nums` глобально), `font-mono` = JetBrains Mono 600 — только госномер и VIN.
