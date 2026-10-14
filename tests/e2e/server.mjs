@@ -2,7 +2,7 @@
 // на отдельной временной SQLite — как прод (один origin), но без влияния на локальную БД.
 // Запускается Playwright'ом (webServer в playwright.config.ts), сам ничего не собирает.
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
+import { existsSync, mkdirSync, rmSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -22,19 +22,16 @@ for (const required of [apiEntry, path.join(webDistDir, '200.html')]) {
 
 const TMP_PREFIX = 'garage-e2e-'
 
-// На Windows Playwright гасит сервер принудительно, обработчик exit не срабатывает — подчищаем
-// каталоги прошлых прогонов при старте
-for (const entry of readdirSync(os.tmpdir())) {
-  if (entry.startsWith(TMP_PREFIX)) {
-    rmSync(path.join(os.tmpdir(), entry), { recursive: true, force: true })
-  }
-}
-
 // Путь задаёт playwright.config.ts (E2E_DB_FILE): фикстура seededCar пишет в ту же БД
 const dbFileName =
   process.env.E2E_DB_FILE ||
   path.join(os.tmpdir(), `${TMP_PREFIX}${process.env.E2E_PORT || '3100'}`, 'garage.db')
 const tmpDir = path.dirname(dbFileName)
+
+// На Windows Playwright гасит сервер принудительно, обработчик exit не срабатывает — подчищаем
+// каталог прошлого прогона на этом порту при старте. Чужие порты не трогаем: там может идти
+// параллельный прогон (Ralph в отдельном worktree с другим E2E_PORT).
+rmSync(tmpDir, { recursive: true, force: true })
 mkdirSync(tmpDir, { recursive: true })
 
 function runDbScript(script) {
