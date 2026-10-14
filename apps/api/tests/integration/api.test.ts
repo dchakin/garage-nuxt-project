@@ -174,12 +174,12 @@ describe('cars, entries, reminders', () => {
       headers: { cookie: aliceCookie },
       body: {
         title: 'Следующая замена масла',
-        triggerType: 'both',
         intervalMonths: 6,
         intervalKm: 10000,
         lastEntryId: entryId,
       },
     })
+    expect(reminder.triggerType).toBe('both')
     expect(reminder.nextDueDate).toBe('2026-09-01')
     expect(reminder.nextDueMileage).toBe(98500)
   })

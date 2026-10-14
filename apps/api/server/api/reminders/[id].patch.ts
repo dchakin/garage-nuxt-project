@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { db, schema } from '../../database'
 import { reminderBaseSchema } from '@garage/shared/schemas/reminder'
+import { deriveTriggerType } from '@garage/shared/utils/reminderTrigger'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireAuth(event)
@@ -19,7 +20,6 @@ export default defineEventHandler(async (event) => {
   const merged = {
     title: body.title ?? reminder.title,
     categoryId: body.categoryId !== undefined ? body.categoryId : reminder.categoryId,
-    triggerType: body.triggerType ?? reminder.triggerType,
     intervalMonths:
       body.intervalMonths !== undefined ? body.intervalMonths : reminder.intervalMonths,
     intervalKm: body.intervalKm !== undefined ? body.intervalKm : reminder.intervalKm,
@@ -44,8 +44,9 @@ export default defineEventHandler(async (event) => {
     lastEntry = { date: entry.date, mileage: entry.mileage }
   }
 
+  const triggerType = deriveTriggerType(merged)
   const { nextDueDate, nextDueMileage } = computeNextDue({
-    triggerType: merged.triggerType,
+    triggerType,
     intervalMonths: merged.intervalMonths,
     intervalKm: merged.intervalKm,
     lastEntry,
@@ -58,7 +59,7 @@ export default defineEventHandler(async (event) => {
     .set({
       title: merged.title,
       categoryId: merged.categoryId,
-      triggerType: merged.triggerType,
+      triggerType,
       intervalMonths: merged.intervalMonths,
       intervalKm: merged.intervalKm,
       lastEntryId: merged.lastEntryId,

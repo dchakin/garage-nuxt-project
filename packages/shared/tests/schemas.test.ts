@@ -71,33 +71,18 @@ describe('entrySchema', () => {
 })
 
 describe('reminderSchema', () => {
-  it('требует интервал в месяцах или дату для triggerType=date', () => {
-    expect(() => reminderSchema.parse({ title: 'Замена масла', triggerType: 'date' })).toThrow()
+  it('требует хотя бы одно условие: интервал или срок', () => {
+    expect(() => reminderSchema.parse({ title: 'Замена масла' })).toThrow()
   })
 
-  it('принимает triggerType=date с nextDueDate без интервала', () => {
-    const result = reminderSchema.parse({
-      title: 'Замена масла',
-      triggerType: 'date',
-      nextDueDate: '2026-06-01',
-    })
+  it('принимает nextDueDate без интервала', () => {
+    const result = reminderSchema.parse({ title: 'Замена масла', nextDueDate: '2026-06-01' })
     expect(result.nextDueDate).toBe('2026-06-01')
   })
 
-  it('требует интервал в км или пробег для triggerType=mileage', () => {
-    expect(() => reminderSchema.parse({ title: 'Замена масла', triggerType: 'mileage' })).toThrow()
-  })
-
-  it('both требует оба условия одновременно', () => {
-    expect(() =>
-      reminderSchema.parse({ title: 'ТО', triggerType: 'both', intervalMonths: 6 }),
-    ).toThrow()
-    const result = reminderSchema.parse({
-      title: 'ТО',
-      triggerType: 'both',
-      intervalMonths: 6,
-      intervalKm: 10000,
-    })
+  it('принимает только интервал в км и не пропускает triggerType во вход', () => {
+    const result = reminderSchema.parse({ title: 'Масло', intervalKm: 10000, triggerType: 'date' })
+    expect(result).not.toHaveProperty('triggerType')
     expect(result.isActive).toBe(true)
   })
 

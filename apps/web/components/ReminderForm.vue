@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { Reminder } from '@garage/shared/types'
 import type { ReminderInput } from '@garage/shared/schemas/reminder'
-import { reminderTriggerTypes, reminderTriggerTypeLabels } from '@garage/shared/schemas/reminder'
+import {
+  reminderTriggerTypes,
+  reminderTriggerTypeLabels,
+  type ReminderTriggerType,
+} from '@garage/shared/schemas/reminder'
 import { entryTypeLabels } from '@garage/shared/schemas/entry'
 import { formatDate, formatMileage } from '@garage/shared/utils/format'
 
@@ -15,7 +19,6 @@ await Promise.all([fetchCategories(), fetchEntries({ sortBy: 'date', sortDir: 'd
 const form = reactive<ReminderInput>({
   title: props.initial?.title ?? '',
   categoryId: props.initial?.categoryId ?? null,
-  triggerType: props.initial?.triggerType ?? 'date',
   intervalMonths: props.initial?.intervalMonths ?? null,
   intervalKm: props.initial?.intervalKm ?? null,
   lastEntryId: props.initial?.lastEntryId ?? null,
@@ -24,8 +27,11 @@ const form = reactive<ReminderInput>({
   isActive: props.initial?.isActive ?? true,
 })
 
-const showDate = computed(() => form.triggerType === 'date' || form.triggerType === 'both')
-const showMileage = computed(() => form.triggerType === 'mileage' || form.triggerType === 'both')
+// Тип срабатывания сервер выводит сам из заполненных условий; здесь он только переключает поля.
+const triggerType = ref<ReminderTriggerType>(props.initial?.triggerType ?? 'date')
+
+const showDate = computed(() => triggerType.value === 'date' || triggerType.value === 'both')
+const showMileage = computed(() => triggerType.value === 'mileage' || triggerType.value === 'both')
 
 function entryLabel(entry: (typeof entries.value)[number]) {
   const parts = [formatDate(entry.date), entryTypeLabels[entry.type]]
@@ -34,7 +40,11 @@ function entryLabel(entry: (typeof entries.value)[number]) {
 }
 
 function onSubmit() {
-  emit('submit', { ...form })
+  emit('submit', {
+    ...form,
+    ...(showDate.value ? {} : { intervalMonths: null, nextDueDate: null }),
+    ...(showMileage.value ? {} : { intervalKm: null, nextDueMileage: null }),
+  })
 }
 </script>
 
@@ -55,7 +65,7 @@ function onSubmit() {
       </div>
       <div>
         <label class="label">Условие срабатывания</label>
-        <select v-model="form.triggerType" class="select">
+        <select v-model="triggerType" class="select">
           <option v-for="t in reminderTriggerTypes" :key="t" :value="t">
             {{ reminderTriggerTypeLabels[t] }}
           </option>

@@ -76,4 +76,31 @@ describe('notifyDueReminders', () => {
     const logsAfterSecond = await db.select().from(schema.reminderNotifications)
     expect(logsAfterSecond).toHaveLength(1)
   })
+
+  it('не шлёт push по выключенному напоминанию', async () => {
+    const [otherCar] = await db
+      .select()
+      .from(schema.cars)
+      .limit(1)
+      .then(async ([first]) => {
+        const [created] = await db
+          .insert(schema.cars)
+          .values({ ownerId: first.ownerId, brand: 'Kia', model: 'Rio', currentMileage: 50000 })
+          .returning()
+        return [created]
+      })
+    await db.insert(schema.reminders).values({
+      carId: otherCar.id,
+      title: 'Выключено',
+      triggerType: 'mileage',
+      intervalKm: 10000,
+      nextDueMileage: 40000,
+      isActive: false,
+    })
+
+    const calls = sendNotification.mock.calls.length
+    const result = await notifyDueReminders({ carId: otherCar.id })
+    expect(result.sent).toBe(0)
+    expect(sendNotification).toHaveBeenCalledTimes(calls)
+  })
 })
