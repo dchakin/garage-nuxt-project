@@ -16,6 +16,8 @@ import {
 
 interface SessionData {
   user?: AuthUser
+  /** `users.sessionVersion` на момент входа; у старых кук нет — это 0. */
+  sessionVersion?: number
 }
 
 function sessionConfig(): SessionConfig {
@@ -48,7 +50,16 @@ export async function getAuthUser(event: H3Event): Promise<AuthUser | null> {
   if (bearer) return await verifyAccessToken(bearer, sessionConfig().password as string)
 
   const session = await useSession<SessionData>(event, sessionConfig())
-  return session.data.user ?? null
+  const sessionUser = session.data.user
+  if (!sessionUser) return null
+
+  // Сброс пароля увеличивает sessionVersion — старые куки перестают действовать.
+  const stored = await db.query.users.findFirst({
+    columns: { sessionVersion: true },
+    where: eq(schema.users.id, sessionUser.id),
+  })
+  if (!stored || stored.sessionVersion !== (session.data.sessionVersion ?? 0)) return null
+  return sessionUser
 }
 
 /** Общий вход для защищённых роутов: понимает и cookie-сессию (веб), и Bearer-токен (мобильный). */
@@ -109,8 +120,12 @@ export async function startAuthSession(
   if (mode === 'token') {
     return { ...authUser, tokens: await issueTokens(authUser) }
   }
+  const stored = await db.query.users.findFirst({
+    columns: { sessionVersion: true },
+    where: eq(schema.users.id, user.id),
+  })
   const session = await useSession<SessionData>(event, sessionConfig())
-  await session.update({ user: authUser })
+  await session.update({ user: authUser, sessionVersion: stored?.sessionVersion ?? 0 })
   return authUser
 }
 
