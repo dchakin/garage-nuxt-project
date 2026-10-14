@@ -6,10 +6,12 @@ cd "$(git rev-parse --show-toplevel)"
 
 run() {
   echo "::: $*"
+  local started=$SECONDS
   if ! "$@"; then
-    echo "::: FAILED: $*"
+    echo "::: FAILED: $* ($((SECONDS - started)) с)"
     exit 1
   fi
+  echo "::: OK: $* ($((SECONDS - started)) с)"
 }
 
 if ! node -e 'process.exit(require("./package.json").scripts?.test ? 0 : 1)'; then
