@@ -105,12 +105,13 @@ test('Журнал: по пробегу — без групп по месяца�
   await expect(rows.last()).toContainText('Замена масла 5W-30 и фильтра')
 })
 
-test('Журнал: тап по строке открывает запись', async ({ page, seededCar }) => {
+test('Журнал: тап по строке открывает шторку записи', async ({ page, seededCar }) => {
   await page.goto(`/cars/${seededCar.carId}/journal`)
 
   await groupedRows(page).first().getByRole('button').click()
 
-  await expect(page).toHaveURL(new RegExp(`/cars/${seededCar.carId}/entries/\\d+$`))
+  await expect(page.getByRole('dialog', { name: 'Запись', exact: true })).toBeVisible()
+  await expect(page).toHaveURL(new RegExp(`/cars/${seededCar.carId}/journal$`))
 })
 
 test('Журнал: старый адрес /entries ведёт на журнал', async ({ page, seededCar }) => {

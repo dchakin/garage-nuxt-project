@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { NotebookPen, SearchX, TriangleAlert } from 'lucide-vue-next'
 import type { EntryFilterInput, EntryType } from '@garage/shared/schemas/entry'
-import type { Entry } from '@garage/shared/types'
 import { todayIso } from '@garage/shared/utils/format'
 import { groupEntriesByMonth } from '@garage/shared/utils/groupEntries'
 
@@ -15,7 +14,13 @@ const SEARCH_DEBOUNCE_MS = 300
 
 const route = useRoute()
 const carId = computed(() => Number(route.params.id))
-const { entries, fetchEntries } = useEntries(carId)
+const { entries: loadedEntries, fetchEntries } = useEntries(carId)
+const { savedCount } = useEntrySheet()
+const { open: openEntryDetail, hiddenIds, changedCount } = useEntryDetailSheet()
+/** Запись, удаляемая с «Отменить», пропадает из списка сразу, до запроса на сервер */
+const entries = computed(() =>
+  loadedEntries.value.filter((entry) => !hiddenIds.value.includes(entry.id)),
+)
 
 const today = todayIso()
 const type = ref<EntryType | null>(null)
@@ -72,16 +77,13 @@ function resetFilters() {
   search.value = ''
 }
 
-function openEntry(entry: Entry) {
-  // Карточка записи в шторке (этап 7) заменит переход на страницу редактирования
-  return navigateTo(`/cars/${carId.value}/entries/${entry.id}`)
-}
-
 watch(searchInput, (value) => {
   clearTimeout(searchTimer)
   searchTimer = setTimeout(() => (search.value = value), SEARCH_DEBOUNCE_MS)
 })
 watch([carId, query], () => Number.isInteger(carId.value) && load(), { immediate: true })
+// Запись добавлена или изменена в шторке — перечитываем список с теми же фильтрами
+watch([savedCount, changedCount], load)
 onBeforeUnmount(() => {
   clearTimeout(skeletonTimer)
   clearTimeout(searchTimer)
@@ -138,11 +140,11 @@ onBeforeUnmount(() => {
         :key="group.month"
         :group="group"
         :today="today"
-        @open="openEntry"
+        @open="openEntryDetail"
       />
       <UiCard v-if="sortBy === 'mileage'" tag="ul">
         <li v-for="entry in entries" :key="entry.id">
-          <UiRowEntry :entry="entry" :today="today" @open="openEntry(entry)" />
+          <UiRowEntry :entry="entry" :today="today" @open="openEntryDetail(entry)" />
         </li>
       </UiCard>
     </template>
