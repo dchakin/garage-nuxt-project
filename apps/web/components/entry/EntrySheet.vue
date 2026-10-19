@@ -19,7 +19,7 @@ const FORM_ID = 'entry-sheet-form'
 const DONE_ENTRY_TYPE: EntryType = 'maintenance'
 
 const { isOpen, options, close, notifySaved } = useEntrySheet()
-const { categories, fetchCategories } = useCategories()
+const { categories, fetchCategories } = useCategories(() => options.value?.carId ?? 0)
 const { car, refreshCurrentCar } = useCurrentCar()
 const { createEntry, saving } = useEntries(() => options.value?.carId ?? 0)
 const toast = useToast()

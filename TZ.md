@@ -92,7 +92,7 @@
 - `GET/POST /api/cars/[id]/entries`, `GET/PATCH/DELETE /api/entries/[id]`.
 - `GET/POST /api/cars/[id]/reminders`, `GET/PATCH/DELETE /api/reminders/[id]`.
 - `GET /api/cars/[id]/analytics` — агрегированные данные для дашборда (параметры: период).
-- `GET/POST /api/categories`.
+- `GET/POST /api/cars/[id]/categories` — стандартные и свои категории машины; `PATCH/DELETE /api/categories/[id]` — только свои (стандартные — 403).
 
 Все роуты, кроме auth, проверяют, что пользователь — владелец или участник соответствующего автомобиля.
 
