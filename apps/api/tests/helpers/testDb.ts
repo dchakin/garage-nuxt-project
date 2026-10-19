@@ -21,7 +21,12 @@ export function createTestDbFile(): string {
   sqlite.pragma('foreign_keys = ON')
   const db = drizzle(sqlite, { schema })
   migrate(db, { migrationsFolder })
-  db.insert(schema.categories).values({ name: 'Тест-категория', isDefault: true }).run()
+  db.insert(schema.categories)
+    .values([
+      { name: 'Тест-категория', isDefault: true },
+      { name: 'Прочее', isDefault: true },
+    ])
+    .run()
   sqlite.close()
   return file
 }

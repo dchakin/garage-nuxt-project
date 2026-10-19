@@ -14,7 +14,7 @@ import { Trash2 } from 'lucide-vue-next'
 const FORM_ID = 'entry-detail-form'
 
 const { isOpen, entry, close, hide, restore, notifyChanged } = useEntryDetailSheet()
-const { categories, fetchCategories } = useCategories()
+const { categories, fetchCategories } = useCategories(() => entry.value?.carId ?? 0)
 const { car, refreshCurrentCar } = useCurrentCar()
 const { updateEntry, saving } = useEntries(() => entry.value?.carId ?? 0)
 const { scheduleDelete } = useDeferredDelete()
