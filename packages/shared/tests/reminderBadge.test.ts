@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { countAttentionReminders, countRemindersByStatus } from '../utils/reminderBadge'
+import {
+  ATTENTION_LIMIT,
+  countAttentionReminders,
+  countRemindersByStatus,
+  pickAttentionReminders,
+} from '../utils/reminderBadge'
 
 const TODAY = '2026-10-10'
 const MILEAGE = 87_450
@@ -54,5 +59,27 @@ describe('countAttentionReminders', () => {
   it('всё в порядке — 0', () => {
     const reminders = [reminder({ nextDueDate: '2027-01-01' })]
     expect(countAttentionReminders(reminders, MILEAGE, TODAY)).toBe(0)
+  })
+})
+
+describe('pickAttentionReminders', () => {
+  it('просроченные раньше скорых, выключенные и «в порядке» отброшены', () => {
+    const [overdueMileage, overdueDate, soon] = camryReminders
+    // «скоро» стоит первым в исходном списке — в результате всё равно последним
+    const picked = pickAttentionReminders([soon, ...camryReminders], MILEAGE, TODAY)
+    expect(picked).toEqual([overdueMileage, overdueDate, soon])
+  })
+
+  it('не больше лимита', () => {
+    const many = Array.from({ length: 5 }, () => reminder({ nextDueDate: '2026-09-01' }))
+    expect(pickAttentionReminders(many, MILEAGE, TODAY)).toHaveLength(ATTENTION_LIMIT)
+    expect(pickAttentionReminders(many, MILEAGE, TODAY, 2)).toHaveLength(2)
+  })
+
+  it('нечего показывать — пустой список', () => {
+    expect(pickAttentionReminders([], MILEAGE, TODAY)).toEqual([])
+    expect(
+      pickAttentionReminders([reminder({ nextDueDate: '2027-01-01' })], MILEAGE, TODAY),
+    ).toEqual([])
   })
 })
