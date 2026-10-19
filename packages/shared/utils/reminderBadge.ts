@@ -16,6 +16,28 @@ export function countRemindersByStatus(
   return counts
 }
 
+/** Порядок групп на экране «Напоминания»: сначала то, что требует внимания, выключенные — в конце. */
+export const REMINDER_GROUP_ORDER: ReminderStatus[] = ['overdue', 'soon', 'ok', 'inactive']
+
+/**
+ * Напоминания по группам статусов в порядке `REMINDER_GROUP_ORDER`; пустые группы опущены,
+ * внутри группы порядок исходного списка сохраняется.
+ */
+export function groupRemindersByStatus<T extends BadgeReminder>(
+  reminders: T[],
+  currentMileage: number,
+  today?: string,
+): { status: ReminderStatus; reminders: T[] }[] {
+  const byStatus: Record<ReminderStatus, T[]> = { overdue: [], soon: [], ok: [], inactive: [] }
+  for (const reminder of reminders) {
+    byStatus[getReminderStatus(reminder, currentMileage, today)].push(reminder)
+  }
+  return REMINDER_GROUP_ORDER.filter((status) => byStatus[status].length).map((status) => ({
+    status,
+    reminders: byStatus[status],
+  }))
+}
+
 /** Бейдж вкладки «Напоминания»: просроченные + скорые среди включённых. */
 export function countAttentionReminders(
   reminders: BadgeReminder[],
