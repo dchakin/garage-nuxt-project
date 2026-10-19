@@ -9,7 +9,7 @@ import UiSectionHeader from '~/components/ui/SectionHeader.vue'
 
 /**
  * «Последние записи» на Обзоре: три самые свежие и ссылка «Журнал». Нет записей — пустое
- * состояние. Тап по строке подключится в этапе 7 (карточка записи).
+ * состояние. Тап по строке эмитит `open` (страница открывает шторку записи).
  */
 const props = defineProps<{
   carId: number
@@ -17,6 +17,8 @@ const props = defineProps<{
   entries: Entry[]
   today?: string
 }>()
+
+defineEmits<{ open: [entry: Entry] }>()
 
 const RECENT_LIMIT = 3
 
@@ -32,7 +34,7 @@ const recent = computed(() => props.entries.slice(0, RECENT_LIMIT))
     />
     <UiCard v-if="recent.length" tag="ul" class="mt-sp-2">
       <li v-for="entry in recent" :key="entry.id">
-        <UiRowEntry :entry="entry" :today="today" />
+        <UiRowEntry :entry="entry" :today="today" @open="$emit('open', entry)" />
       </li>
     </UiCard>
     <UiCard v-else class="mt-sp-2">

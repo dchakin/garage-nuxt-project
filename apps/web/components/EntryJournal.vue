@@ -1,25 +1,12 @@
 <script setup lang="ts">
-import type { Entry } from '@garage/shared/types'
 import type { EntryFilterInput } from '@garage/shared/schemas/entry'
 import { entryTypes, entryTypeLabels } from '@garage/shared/schemas/entry'
-import { formatDate, formatMileage, formatMoney } from '@garage/shared/utils/format'
-import {
-  ChevronDown,
-  NotebookPen,
-  Pencil,
-  Plus,
-  Search,
-  SlidersHorizontal,
-  Trash2,
-  X,
-} from 'lucide-vue-next'
+import { ChevronDown, NotebookPen, Plus, Search, SlidersHorizontal, X } from 'lucide-vue-next'
 
 const props = defineProps<{ carId: number }>()
 
-const { entries, loading, deletingId, fetchEntries, deleteEntry } = useEntries(props.carId)
+const { entries, loading, fetchEntries } = useEntries(props.carId)
 const { categories, fetchCategories } = useCategories()
-const entryToDelete = ref<Entry | null>(null)
-const deleteDialogOpen = ref(false)
 
 const filters = reactive<Partial<EntryFilterInput>>({ sortBy: 'date', sortDir: 'desc' })
 const searchInput = ref('')
@@ -52,6 +39,13 @@ watch(filters, () => fetchEntries(filters), { deep: true })
 const { open: openEntrySheet, savedCount } = useEntrySheet()
 watch(savedCount, () => fetchEntries(filters))
 
+// Запись изменена или удалена в шторке Д4; удаляемая запись пропадает из списка сразу
+const { open: openEntryDetail, hiddenIds, changedCount } = useEntryDetailSheet()
+watch(changedCount, () => fetchEntries(filters))
+const visibleEntries = computed(() =>
+  entries.value.filter((entry) => !hiddenIds.value.includes(entry.id)),
+)
+
 let searchTimeout: ReturnType<typeof setTimeout> | undefined
 watch(searchInput, (value) => {
   clearTimeout(searchTimeout)
@@ -59,17 +53,6 @@ watch(searchInput, (value) => {
     filters.search = value.trim() || undefined
   }, 300)
 })
-
-function askDelete(entry: Entry) {
-  entryToDelete.value = entry
-  deleteDialogOpen.value = true
-}
-
-async function onDelete() {
-  if (!entryToDelete.value) return
-  await deleteEntry(entryToDelete.value.id)
-  deleteDialogOpen.value = false
-}
 </script>
 
 <template>
@@ -165,80 +148,21 @@ async function onDelete() {
       </div>
     </div>
 
-    <div v-if="loading" class="flex items-center justify-center py-8 text-text-2">
+    <div
+      v-if="loading && !entries.length"
+      class="flex items-center justify-center py-8 text-text-2"
+    >
       <UiSpinner size="md" />
     </div>
-    <div v-else-if="!entries.length" class="card p-8 text-center">
+    <div v-else-if="!visibleEntries.length" class="card p-8 text-center">
       <NotebookPen class="mx-auto mb-2 h-7 w-7 text-text-3" aria-hidden="true" />
       <p class="text-text-2 text-sm">Записей пока нет.</p>
     </div>
 
-    <div v-else class="space-y-2">
-      <div v-for="entry in entries" :key="entry.id" class="card p-4">
-        <div class="flex items-start gap-2.5">
-          <component
-            :is="entryTypeIcons[entry.type].icon"
-            class="h-5 w-5 shrink-0"
-            :class="entryTypeIcons[entry.type].colorClass"
-            aria-hidden="true"
-          />
-          <div class="min-w-0 flex-1">
-            <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
-              <p class="font-medium text-text leading-snug flex-1 min-w-[140px]">
-                {{ entryTypeLabels[entry.type] }}
-              </p>
-              <div class="flex items-center gap-1 shrink-0 ml-auto">
-                <NuxtLink
-                  :to="`/cars/${carId}/entries/${entry.id}`"
-                  class="flex h-7 w-7 items-center justify-center rounded-md bg-surface-2 text-text-2 hover:bg-surface-3 hover:text-text transition-colors"
-                  :class="{ 'pointer-events-none opacity-50': deletingId === entry.id }"
-                  title="Изменить"
-                  aria-label="Изменить"
-                >
-                  <Pencil class="h-4 w-4" aria-hidden="true" />
-                </NuxtLink>
-                <button
-                  :disabled="deletingId === entry.id"
-                  class="flex h-7 w-7 items-center justify-center rounded-md bg-danger-soft text-danger hover:bg-danger-soft hover:text-danger-text disabled:opacity-50 transition-colors"
-                  title="Удалить"
-                  aria-label="Удалить"
-                  @click="askDelete(entry)"
-                >
-                  <UiSpinner v-if="deletingId === entry.id" />
-                  <Trash2 v-else class="h-4 w-4" aria-hidden="true" />
-                </button>
-              </div>
-            </div>
-            <p v-if="entry.category" class="text-sm text-text-3 mt-0.5">
-              {{ entry.category.name }}
-            </p>
-            <p class="text-sm text-text-2 mt-0.5">
-              {{ formatDate(entry.date) }}
-              <span v-if="entry.mileage != null">· {{ formatMileage(entry.mileage) }}</span>
-            </p>
-            <p v-if="entry.description" class="text-sm text-text mt-2">
-              {{ entry.description }}
-            </p>
-            <p v-if="entry.place" class="text-sm text-text-3 mt-1">{{ entry.place }}</p>
-            <p v-if="entry.cost != null" class="font-medium text-text text-sm text-right mt-2">
-              {{ formatMoney(entry.cost) }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <UiDialog
-      v-model:open="deleteDialogOpen"
-      title="Удалить запись?"
-      :message="
-        entryToDelete
-          ? `«${entryTypeLabels[entryToDelete.type]}» от ${formatDate(entryToDelete.date)} будет удалена безвозвратно.`
-          : ''
-      "
-      confirm-text="Удалить"
-      :icon="Trash2"
-      :loading="deletingId !== null"
-      @confirm="onDelete"
-    />
+    <UiCard v-else tag="ul">
+      <li v-for="entry in visibleEntries" :key="entry.id">
+        <UiRowEntry :entry="entry" @open="openEntryDetail(entry)" />
+      </li>
+    </UiCard>
   </div>
 </template>
