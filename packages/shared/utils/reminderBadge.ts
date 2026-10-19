@@ -25,3 +25,25 @@ export function countAttentionReminders(
   const counts = countRemindersByStatus(reminders, currentMileage, today)
   return counts.overdue + counts.soon
 }
+
+/** Сколько напоминаний показывает блок «Требует внимания» на Обзоре. */
+export const ATTENTION_LIMIT = 3
+
+/**
+ * Напоминания для «Требует внимания»: просроченные, затем скорые (внутри статуса порядок
+ * сохраняется), не больше `limit`. Выключенные и «в порядке» не попадают.
+ */
+export function pickAttentionReminders<T extends BadgeReminder>(
+  reminders: T[],
+  currentMileage: number,
+  today?: string,
+  limit: number = ATTENTION_LIMIT,
+): T[] {
+  const withStatus = reminders.map((reminder) => ({
+    reminder,
+    status: getReminderStatus(reminder, currentMileage, today),
+  }))
+  const overdue = withStatus.filter(({ status }) => status === 'overdue')
+  const soon = withStatus.filter(({ status }) => status === 'soon')
+  return [...overdue, ...soon].slice(0, limit).map(({ reminder }) => reminder)
+}

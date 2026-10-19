@@ -56,10 +56,7 @@ const TOAST_ABOVE_TAB_BAR = 'calc(84px + var(--sp-2))'
 onMounted(() => document.documentElement.style.setProperty('--toast-bottom', TOAST_ABOVE_TAB_BAR))
 onBeforeUnmount(() => document.documentElement.style.removeProperty('--toast-bottom'))
 
-// До шторки записи (этап 7) «＋» ведёт на форму новой записи
-function openEntrySheet() {
-  navigateTo(`/cars/${carId.value}/entries/new`)
-}
+const { open: openEntrySheet } = useEntrySheet()
 </script>
 
 <template>
@@ -73,6 +70,7 @@ function openEntrySheet() {
       @switch="switcherOpen = true"
     />
     <main class="mx-auto max-w-3xl px-sp-4 pb-sp-6">
+      <OfflineBanner />
       <slot />
     </main>
     <UiTabBar
@@ -80,8 +78,10 @@ function openEntrySheet() {
       :active="activeTab"
       :badge="attentionCount"
       class="fixed inset-x-0 bottom-0 z-20"
-      @add="openEntrySheet"
+      @add="openEntrySheet({ carId })"
     />
+    <EntrySheet />
+    <EntryDetailSheet />
     <CarSwitcherSheet
       v-if="car"
       v-model:open="switcherOpen"

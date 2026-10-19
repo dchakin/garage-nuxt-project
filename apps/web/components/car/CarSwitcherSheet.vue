@@ -5,9 +5,7 @@
  * Внизу — настройки текущей машины и «Добавить машину» (пока ведёт на список машин).
  */
 import { Plus, Settings } from 'lucide-vue-next'
-import type { Car, Reminder, ReminderStatus } from '@garage/shared/types'
-import { countRemindersByStatus } from '@garage/shared/utils/reminderBadge'
-import { todayIso } from '@garage/shared/utils/format'
+import type { Car } from '@garage/shared/types'
 
 const props = defineProps<{
   currentCar: Pick<Car, 'id' | 'brand' | 'model'>
@@ -16,22 +14,12 @@ const open = defineModel<boolean>('open', { required: true })
 const emit = defineEmits<{ select: [carId: number] }>()
 
 const { cars, fetchCars } = useCars()
-const statusCounts = ref<Record<number, Record<ReminderStatus, number>>>({})
-
-async function loadStatusCounts(car: Car) {
-  const reminders = await $fetch<Reminder[]>(`/api/cars/${car.id}/reminders`, {
-    query: { isActive: true },
-  })
-  statusCounts.value = {
-    ...statusCounts.value,
-    [car.id]: countRemindersByStatus(reminders, car.currentMileage, todayIso()),
-  }
-}
+const { statusCounts, loadAllStatusCounts } = useCarStatusCounts()
 
 watch(open, async (isOpen) => {
   if (!isOpen) return
   await fetchCars()
-  await Promise.all(cars.value.map(loadStatusCounts))
+  await loadAllStatusCounts(cars.value)
 })
 
 function onSelect(carId: number) {

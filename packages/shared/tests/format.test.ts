@@ -6,6 +6,7 @@ import {
   formatMileage,
   formatMoney,
   formatNumber,
+  formatTime,
   NBSP,
   pluralize,
   todayIso,
@@ -14,6 +15,14 @@ import {
 // В ожиданиях пробел обычный, `nb()` превращает его в неразрывный
 const nb = (text: string) => text.replaceAll(' ', NBSP)
 const TODAY = '2026-10-10'
+
+describe('formatTime', () => {
+  it('часы без ведущего нуля, минуты с нулём', () => {
+    expect(formatTime(new Date(2026, 9, 10, 9, 12))).toBe('9:12')
+    expect(formatTime(new Date(2026, 9, 10, 14, 5))).toBe('14:05')
+    expect(formatTime(new Date(2026, 9, 10, 0, 0))).toBe('0:00')
+  })
+})
 
 describe('formatNumber', () => {
   it('группирует разряды неразрывным пробелом', () => {

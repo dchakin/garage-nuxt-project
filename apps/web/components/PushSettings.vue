@@ -1,76 +1,86 @@
 <script setup lang="ts">
-import { Bell } from 'lucide-vue-next'
-const { supported, permission, subscribed, busy, needsInstall, subscribe, unsubscribe, sendTest } =
-  usePush()
-const message = ref('')
+/**
+ * Блок «Уведомления» профиля (З1): переключатель push на этом устройстве и тестовое уведомление.
+ * Подзаголовок показывает, почему включить нельзя: iOS не в PWA, нет VAPID, браузер без push, запрет.
+ * Явные импорты — тест монтирует компонент без Nuxt (`tests/ui/pushSettings.test.ts`).
+ */
+import { computed, ref } from 'vue'
+import { Send } from 'lucide-vue-next'
+import UiAlert from '~/components/ui/Alert.vue'
+import UiCard from '~/components/ui/Card.vue'
+import UiRowSetting from '~/components/ui/RowSetting.vue'
+import UiRowToggle from '~/components/ui/RowToggle.vue'
+import { usePush } from '~/composables/usePush'
+import { useToast } from '~/composables/useToast'
+
+const {
+  supported,
+  vapidMissing,
+  permission,
+  subscribed,
+  busy,
+  needsInstall,
+  subscribe,
+  unsubscribe,
+  sendTest,
+} = usePush()
+const { show } = useToast()
 const error = ref('')
 
-async function run(action: () => Promise<unknown>, success = '') {
-  message.value = ''
+const canToggle = computed(
+  () => supported.value && !needsInstall.value && permission.value !== 'denied',
+)
+
+const subtitle = computed(() => {
+  if (needsInstall.value)
+    return 'На iPhone сначала добавьте приложение на экран «Домой» (Поделиться → На экран «Домой»)'
+  if (vapidMissing.value) return 'Уведомления не настроены на сервере'
+  if (!supported.value) return 'Браузер не поддерживает push-уведомления'
+  if (permission.value === 'denied') return 'Уведомления запрещены в настройках браузера'
+  if (subscribed.value) return 'Включены на этом устройстве'
+  return 'Напомним, когда подойдёт срок ТО или замены расходников'
+})
+
+async function run(action: () => Promise<unknown>, success: string) {
   error.value = ''
   try {
     await action()
-    message.value = success
+    show({ message: success })
   } catch (e: any) {
     error.value = e?.data?.statusMessage || e?.message || 'Что-то пошло не так'
   }
 }
 
-async function onEnable() {
+async function enable() {
   await run(async () => {
     const ok = await subscribe()
     if (!ok) throw new Error('Разрешение на уведомления не выдано')
   }, 'Уведомления включены')
 }
+
+function onToggle(enabled: boolean) {
+  if (busy.value) return
+  return enabled ? enable() : run(unsubscribe, 'Уведомления выключены')
+}
+
+function onSendTest() {
+  if (busy.value) return
+  return run(sendTest, 'Тестовое уведомление отправлено')
+}
 </script>
 
 <template>
-  <ClientOnly>
-    <div class="card p-4 mb-4">
-      <div class="flex items-center justify-between gap-3">
-        <div>
-          <p class="flex items-center gap-1.5 font-medium text-text">
-            <Bell class="h-5 w-5 text-text-2" aria-hidden="true" />
-            Push-уведомления
-          </p>
-          <p class="text-sm text-text-2">
-            <template v-if="needsInstall"
-              >На iPhone сначала добавьте приложение на экран «Домой» (Поделиться → На экран
-              «Домой»)</template
-            >
-            <template v-else-if="!supported">Браузер не поддерживает push-уведомления</template>
-            <template v-else-if="permission === 'denied'"
-              >Уведомления запрещены в настройках браузера</template
-            >
-            <template v-else-if="subscribed">Включены на этом устройстве</template>
-            <template v-else>Напомним, когда подойдёт срок ТО или замены расходников</template>
-          </p>
-        </div>
-        <template v-if="supported && !needsInstall && permission !== 'denied'">
-          <UiButton v-if="!subscribed" size="sm" :loading="busy" @click="onEnable">
-            Включить
-          </UiButton>
-          <UiButton
-            v-else
-            variant="secondary"
-            size="sm"
-            :disabled="busy"
-            @click="run(unsubscribe, 'Уведомления выключены')"
-          >
-            Выключить
-          </UiButton>
-        </template>
-      </div>
-      <button
-        v-if="subscribed"
-        :disabled="busy"
-        class="link text-sm mt-2"
-        @click="run(sendTest, 'Тестовое уведомление отправлено')"
-      >
-        Отправить тестовое уведомление
-      </button>
-      <p v-if="message" class="alert-success mt-2">{{ message }}</p>
-      <p v-if="error" class="alert-error mt-2">{{ error }}</p>
+  <UiCard>
+    <UiRowToggle
+      title="Push-уведомления"
+      :subtitle="subtitle"
+      :model-value="subscribed"
+      :disabled="!canToggle || busy"
+      @update:model-value="onToggle"
+    />
+    <UiRowSetting v-if="subscribed" :icon="Send" label="Отправить тестовое" @click="onSendTest" />
+    <div v-if="error" class="p-sp-3">
+      <UiAlert variant="error" title="Не получилось" :message="error" />
     </div>
-  </ClientOnly>
+  </UiCard>
 </template>

@@ -33,7 +33,11 @@ async function logout() {
           Гараж
         </NuxtLink>
         <div class="flex items-center gap-3 text-sm">
-          <span class="text-text-2 hidden sm:inline">{{ user?.name }}</span>
+          <NuxtLink to="/profile" class="flex items-center gap-2 text-text-2 hover:text-text">
+            <UiAvatar :name="user?.name ?? ''" />
+            <span class="hidden sm:inline">{{ user?.name }}</span>
+            <span class="sr-only">Профиль</span>
+          </NuxtLink>
           <button
             :disabled="loggingOut"
             class="inline-flex items-center gap-1.5 text-text-2 hover:text-text disabled:opacity-50 transition-colors"
