@@ -5,6 +5,7 @@ import {
   formatDays,
   formatMileage,
   formatMoney,
+  formatMonthYear,
   formatNumber,
   formatTime,
   NBSP,
@@ -15,6 +16,18 @@ import {
 // В ожиданиях пробел обычный, `nb()` превращает его в неразрывный
 const nb = (text: string) => text.replaceAll(' ', NBSP)
 const TODAY = '2026-10-10'
+
+describe('formatMonthYear', () => {
+  it('месяц и год с заглавной буквы', () => {
+    expect(formatMonthYear('2026-09')).toBe('Сентябрь 2026')
+    expect(formatMonthYear('2025-01')).toBe('Январь 2025')
+    expect(formatMonthYear('2026-12')).toBe('Декабрь 2026')
+  })
+
+  it('принимает полную дату', () => {
+    expect(formatMonthYear('2026-05-02')).toBe('Май 2026')
+  })
+})
 
 describe('formatTime', () => {
   it('часы без ведущего нуля, минуты с нулём', () => {

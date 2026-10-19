@@ -51,6 +51,27 @@ export function formatDate(date: string, today: string = todayIso()): string {
   return String(year) === today.slice(0, 4) ? label : `${label}${NBSP}${year}`
 }
 
+const MONTHS_FULL = [
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь',
+] as const
+
+/** `'2026-09'` (или полная дата) → `Сентябрь 2026` — заголовок месяца в журнале. */
+export function formatMonthYear(month: string): string {
+  const [year, monthNumber] = month.slice(0, 7).split('-').map(Number)
+  return `${MONTHS_FULL[monthNumber - 1]} ${year}`
+}
+
 /** Время в локальном поясе без ведущего нуля у часов: `9:12`, `14:05`. */
 export function formatTime(time: Date): string {
   return `${time.getHours()}:${String(time.getMinutes()).padStart(2, '0')}`
