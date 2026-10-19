@@ -8,8 +8,15 @@ import type { CarDetail, Entry } from '@garage/shared/types'
 import type { EntryType } from '@garage/shared/schemas/entry'
 import { checkEntryMileage } from '@garage/shared/utils/entryMileageCheck'
 import { todayIso } from '@garage/shared/utils/format'
+import {
+  describeNextDue,
+  formatReminderShifted,
+  previewNextDue,
+} from '@garage/shared/utils/reminderNextDue'
 
 const FORM_ID = 'entry-sheet-form'
+/** Тип записи, который «Сделал» подставляет сам: закрытое напоминание — это плановое ТО */
+const DONE_ENTRY_TYPE: EntryType = 'maintenance'
 
 const { isOpen, options, close, notifySaved } = useEntrySheet()
 const { categories, fetchCategories } = useCategories()
@@ -27,6 +34,8 @@ const form = reactive({
   place: '',
 })
 const moreOpen = ref(false)
+/** «Мостик» Д2: закрыть напоминание этой записью (выключен — обычная запись) */
+const closeReminder = ref(true)
 const submitted = ref(false)
 const serverError = ref('')
 const today = ref(todayIso())
@@ -58,20 +67,37 @@ const mileageWarning = computed(() =>
   mileageCheck.value.level === 'warning' ? mileageCheck.value.message : undefined,
 )
 
-/** Пустая форма: сегодня и текущий пробег (если машина уже загружена в layout) */
+const reminder = computed(() => options.value?.reminder ?? null)
+const sheetTitle = computed(() =>
+  reminder.value ? `Запись: ${reminder.value.title}` : 'Новая запись',
+)
+const bridgeSubtitle = computed(() => {
+  if (!reminder.value) return undefined
+  const target = describeNextDue(
+    previewNextDue(reminder.value, { date: form.date, mileage: form.mileage }),
+    today.value,
+  )
+  return target ? `Следующая — ${target}` : undefined
+})
+
+/**
+ * Пустая форма: сегодня и текущий пробег (если машина уже загружена в layout).
+ * С напоминанием («Сделал») — ещё тип «ТО», название и категория напоминания, «мостик» включён.
+ */
 function resetForm(carId: number) {
   const knownCar = car.value?.id === carId ? car.value : null
   today.value = todayIso()
   currentMileage.value = knownCar?.currentMileage ?? 0
   Object.assign(form, {
-    type: null,
-    description: '',
+    type: reminder.value ? DONE_ENTRY_TYPE : null,
+    description: reminder.value?.title ?? '',
     cost: null,
     mileage: knownCar?.currentMileage ?? null,
     date: today.value,
-    categoryId: null,
+    categoryId: reminder.value?.categoryId ?? null,
     place: '',
   })
+  closeReminder.value = true
   moreOpen.value = false
   submitted.value = false
   serverError.value = ''
@@ -109,8 +135,9 @@ async function submit() {
   submitted.value = true
   serverError.value = ''
   if (!form.type || !form.date || mileageCheck.value.level === 'error') return
+  let created
   try {
-    await createEntry({
+    created = await createEntry({
       type: form.type,
       date: form.date,
       description: form.description.trim(),
@@ -119,6 +146,7 @@ async function submit() {
       currency: 'RUB',
       categoryId: form.categoryId,
       place: form.place.trim() || null,
+      reminderId: reminder.value && closeReminder.value ? reminder.value.id : undefined,
     })
   } catch (error: any) {
     serverError.value = error?.data?.statusMessage || 'Не удалось сохранить запись'
@@ -126,7 +154,11 @@ async function submit() {
   }
   close()
   notifySaved()
-  toast.show({ message: 'Запись добавлена' })
+  toast.show({
+    message: created.reminder
+      ? formatReminderShifted(created.reminder, today.value)
+      : 'Запись добавлена',
+  })
   // Пробег мог вырасти, а напоминания — стать просроченными: пересчитать бейдж вкладки
   refreshCurrentCar().catch(() => {})
 }
@@ -135,13 +167,19 @@ onBeforeUnmount(close)
 </script>
 
 <template>
-  <UiSheet v-model:open="isOpen" title="Новая запись">
+  <UiSheet v-model:open="isOpen" :title="sheetTitle">
     <form :id="FORM_ID" class="flex flex-col gap-sp-4 pb-sp-2" novalidate @submit.prevent="submit">
       <UiAlert
         v-if="serverError"
         variant="error"
         title="Не удалось сохранить"
         :message="serverError"
+      />
+      <UiReminderBridge
+        v-if="reminder"
+        v-model="closeReminder"
+        :title="`Закрыть «${reminder.title}»`"
+        :subtitle="bridgeSubtitle"
       />
       <EntryTypePicker v-model="form.type" :error="typeError" />
       <EntryTitleField v-model="form.description" :entries="pastEntries" :type="form.type" />

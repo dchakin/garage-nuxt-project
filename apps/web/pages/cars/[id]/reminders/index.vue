@@ -73,9 +73,14 @@ watch([savedCount, changedCount], async () => {
 })
 onBeforeUnmount(() => clearTimeout(skeletonTimer))
 
-// Правка — прежняя страница напоминания до шторки Е4 (#63); «Сделал» подключит #61
+// Правка — прежняя страница напоминания до шторки Е4 (#63)
 function openReminder(reminder: Reminder) {
   navigateTo(`/cars/${carId.value}/reminders/${reminder.id}`)
+}
+
+const { open: openEntrySheet } = useEntrySheet()
+function markDone(reminder: Reminder) {
+  openEntrySheet({ carId: carId.value, reminder })
 }
 </script>
 
@@ -130,6 +135,7 @@ function openReminder(reminder: Reminder) {
           :avg-km-per-month="avgKmPerMonth"
           :today="today"
           @open="openReminder"
+          @done="markDone"
         />
       </template>
     </template>

@@ -1,4 +1,4 @@
-import type { Entry } from '@garage/shared/types'
+import type { CreatedEntry, Entry } from '@garage/shared/types'
 import type { EntryInput, EntryFilterInput } from '@garage/shared/schemas/entry'
 
 export function useEntries(carId: MaybeRefOrGetter<number>) {
@@ -21,12 +21,13 @@ export function useEntries(carId: MaybeRefOrGetter<number>) {
   async function createEntry(input: EntryInput) {
     saving.value = true
     try {
-      const entry = await $fetch<Entry>(`/api/cars/${toValue(carId)}/entries`, {
+      const created = await $fetch<CreatedEntry>(`/api/cars/${toValue(carId)}/entries`, {
         method: 'POST',
         body: input,
       })
+      const { reminder: _closedReminder, ...entry } = created
       entries.value = [entry, ...entries.value]
-      return entry
+      return created
     } finally {
       saving.value = false
     }

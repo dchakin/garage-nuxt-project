@@ -67,7 +67,7 @@ watch(carId, (id) => Number.isInteger(id) && load(), { immediate: true })
 
 // Запись добавлена из шторки — суммы, пробег и «Требует внимания» могли измениться;
 // перечитываем молча, без скелетона: прежние данные остаются на экране
-const { savedCount } = useEntrySheet()
+const { savedCount, open: openEntrySheet } = useEntrySheet()
 const { open: openEntryDetail, hiddenIds, changedCount } = useEntryDetailSheet()
 watch([savedCount, changedCount], async () => {
   try {
@@ -108,6 +108,7 @@ onBeforeUnmount(() => clearTimeout(skeletonTimer))
         :current-mileage="currentCar.currentMileage"
         :avg-km-per-month="avgKmPerMonth"
         :today="today"
+        @done="(reminder) => openEntrySheet({ carId, reminder })"
       />
       <OverviewMonthExpensesCard :analytics="shownAnalytics ?? analytics" :today="today" />
       <OverviewRecentEntries
