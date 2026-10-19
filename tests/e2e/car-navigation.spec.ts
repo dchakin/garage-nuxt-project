@@ -33,7 +33,8 @@ test('вкладки машины и бейдж напоминаний', async (
   await snap(page, 'car-overview')
 
   await tabs.getByRole('button', { name: 'Добавить запись' }).click()
-  await expect(page).toHaveURL(new RegExp(`/cars/${camry}/entries/new$`))
+  await expect(page.getByRole('dialog', { name: 'Новая запись' })).toBeVisible()
+  await expect(page).toHaveURL(new RegExp(`/cars/${camry}$`))
 })
 
 test('переключатель машин (Б4) и запоминание последней машины', async ({ page, seededCar }) => {

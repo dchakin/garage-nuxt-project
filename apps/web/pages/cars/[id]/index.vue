@@ -51,6 +51,17 @@ async function load() {
 }
 
 watch(carId, (id) => Number.isInteger(id) && load(), { immediate: true })
+
+// Запись добавлена из шторки — суммы, пробег и «Требует внимания» могли измениться;
+// перечитываем молча, без скелетона: прежние данные остаются на экране
+const { savedCount } = useEntrySheet()
+watch(savedCount, async () => {
+  try {
+    await Promise.all([fetchReminders({ isActive: true }), fetchEntries(), fetchAnalytics()])
+  } catch {
+    // Остаются прежние данные; сеть отсутствует — плашка в layout
+  }
+})
 onBeforeUnmount(() => clearTimeout(skeletonTimer))
 </script>
 
