@@ -3,6 +3,7 @@ import {
   ATTENTION_LIMIT,
   countAttentionReminders,
   countRemindersByStatus,
+  groupRemindersByStatus,
   pickAttentionReminders,
 } from '../utils/reminderBadge'
 
@@ -81,5 +82,25 @@ describe('pickAttentionReminders', () => {
     expect(
       pickAttentionReminders([reminder({ nextDueDate: '2027-01-01' })], MILEAGE, TODAY),
     ).toEqual([])
+  })
+})
+
+describe('groupRemindersByStatus', () => {
+  it('группы по порядку: просрочено, скоро, в порядке, выключено', () => {
+    const [overdueMileage, overdueDate, soon, ok, inactive] = camryReminders
+    const groups = groupRemindersByStatus(
+      [inactive, ok, soon, overdueMileage, overdueDate],
+      MILEAGE,
+      TODAY,
+    )
+    expect(groups.map(({ status }) => status)).toEqual(['overdue', 'soon', 'ok', 'inactive'])
+    expect(groups[0].reminders).toEqual([overdueMileage, overdueDate])
+    expect(groups[3].reminders).toEqual([inactive])
+  })
+
+  it('пустые группы опущены', () => {
+    const [, , , ok] = camryReminders
+    expect(groupRemindersByStatus([ok], MILEAGE, TODAY).map(({ status }) => status)).toEqual(['ok'])
+    expect(groupRemindersByStatus([], MILEAGE, TODAY)).toEqual([])
   })
 })
