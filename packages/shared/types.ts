@@ -54,6 +54,11 @@ export interface Entry {
   createdAt: string
 }
 
+/** Ответ `POST /api/cars/[id]/entries`: при `reminderId` — ещё и обновлённое (закрытое) напоминание */
+export interface CreatedEntry extends Entry {
+  reminder?: Pick<Reminder, 'id' | 'title' | 'nextDueDate' | 'nextDueMileage'>
+}
+
 export interface Reminder {
   id: number
   carId: number
