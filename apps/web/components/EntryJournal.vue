@@ -48,6 +48,10 @@ await Promise.all([fetchEntries(filters), fetchCategories()])
 
 watch(filters, () => fetchEntries(filters), { deep: true })
 
+// Запись добавлена из шторки — перечитать список с текущими фильтрами
+const { open: openEntrySheet, savedCount } = useEntrySheet()
+watch(savedCount, () => fetchEntries(filters))
+
 let searchTimeout: ReturnType<typeof setTimeout> | undefined
 watch(searchInput, (value) => {
   clearTimeout(searchTimeout)
@@ -72,7 +76,7 @@ async function onDelete() {
   <div>
     <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-4">
       <h2 class="text-h2 text-text">Журнал</h2>
-      <UiButton :to="`/cars/${carId}/entries/new`" size="sm" :icon="Plus">
+      <UiButton size="sm" :icon="Plus" @click="openEntrySheet({ carId })">
         Добавить запись
       </UiButton>
     </div>
