@@ -23,6 +23,19 @@ const skeletonVisible = ref(false)
 /** Машина, чьи данные уже загружены хотя бы раз: при сбое повторной загрузки их не стираем */
 const loadedCarId = ref<number | null>(null)
 const avgKmPerMonth = computed(() => averageKmPerMonth(entries.value))
+// Удаляемая запись (ждёт «Отменить») уже убрана из UI: список и сумма месяца пересчитаны сразу
+const visibleEntries = computed(() =>
+  entries.value.filter((entry) => !hiddenIds.value.includes(entry.id)),
+)
+const shownAnalytics = computed(() =>
+  analytics.value
+    ? analyticsWithoutEntries(
+        analytics.value,
+        entries.value.filter((entry) => hiddenIds.value.includes(entry.id)),
+        today.slice(0, 7),
+      )
+    : null,
+)
 const currentCar = computed(() => (car.value?.id === carId.value ? car.value : null))
 const ready = computed(() => !loading.value && !failed.value && currentCar.value && analytics.value)
 
@@ -55,7 +68,8 @@ watch(carId, (id) => Number.isInteger(id) && load(), { immediate: true })
 // Запись добавлена из шторки — суммы, пробег и «Требует внимания» могли измениться;
 // перечитываем молча, без скелетона: прежние данные остаются на экране
 const { savedCount } = useEntrySheet()
-watch(savedCount, async () => {
+const { open: openEntryDetail, hiddenIds, changedCount } = useEntryDetailSheet()
+watch([savedCount, changedCount], async () => {
   try {
     await Promise.all([fetchReminders({ isActive: true }), fetchEntries(), fetchAnalytics()])
   } catch {
@@ -95,8 +109,13 @@ onBeforeUnmount(() => clearTimeout(skeletonTimer))
         :avg-km-per-month="avgKmPerMonth"
         :today="today"
       />
-      <OverviewMonthExpensesCard :analytics="analytics" :today="today" />
-      <OverviewRecentEntries :car-id="carId" :entries="entries" :today="today" />
+      <OverviewMonthExpensesCard :analytics="shownAnalytics ?? analytics" :today="today" />
+      <OverviewRecentEntries
+        :car-id="carId"
+        :entries="visibleEntries"
+        :today="today"
+        @open="openEntryDetail"
+      />
     </template>
 
     <template v-else-if="skeletonVisible">
