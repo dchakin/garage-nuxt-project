@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { CarFront, ChevronRight, Plus } from 'lucide-vue-next'
+import { CarFront, Plus } from 'lucide-vue-next'
 import type { CarInput } from '@garage/shared/schemas/car'
-import { formatMileage } from '@garage/shared/utils/format'
 
 definePageMeta({ middleware: 'auth' })
 
 const { cars, loading, saving, fetchCars, createCar } = useCars()
+const { statusCounts, loadAllStatusCounts } = useCarStatusCounts()
 const showForm = ref(false)
 const error = ref('')
 
 await fetchCars()
+// Бейджи статусов подгружаются после списка и не задерживают экран
+loadAllStatusCounts(cars.value)
 
 async function onCreate(input: CarInput) {
   error.value = ''
@@ -37,10 +39,6 @@ async function onCreate(input: CarInput) {
       </UiButton>
     </div>
 
-    <PushSettings />
-    <!-- До экрана «Профиль» (#54) настройки живут здесь -->
-    <ProfileThemeSetting />
-
     <div v-if="showForm" class="card p-4 mb-4">
       <p v-if="error" class="alert-error mb-2">{{ error }}</p>
       <CarForm :saving="saving" @submit="onCreate" @cancel="showForm = false" />
@@ -57,27 +55,15 @@ async function onCreate(input: CarInput) {
       </p>
     </div>
 
-    <div v-else class="grid gap-3">
-      <NuxtLink
-        v-for="car in cars"
-        :key="car.id"
-        :to="`/cars/${car.id}`"
-        class="card p-4 flex items-center justify-between hover:border-accent hover:shadow-sm transition"
-      >
-        <div>
-          <p class="font-medium text-text">
-            {{ car.brand }} {{ car.model }} <span v-if="car.year">({{ car.year }})</span>
-          </p>
-          <p class="text-sm text-text-2">
-            <span :class="{ 'font-mono font-semibold': car.plateNumber }">{{
-              car.plateNumber || 'Без номера'
-            }}</span>
-            ·
-            {{ formatMileage(car.currentMileage) }}
-          </p>
-        </div>
-        <ChevronRight class="h-5 w-5 text-text-3 shrink-0" aria-hidden="true" />
-      </NuxtLink>
-    </div>
+    <ul v-else class="flex flex-col gap-sp-3" aria-label="Машины">
+      <li v-for="car in cars" :key="car.id">
+        <UiRowCar
+          :car="car"
+          :overdue-count="statusCounts[car.id]?.overdue"
+          :soon-count="statusCounts[car.id]?.soon"
+          @select="navigateTo(`/cars/${car.id}`)"
+        />
+      </li>
+    </ul>
   </div>
 </template>

@@ -12,7 +12,7 @@ const themeColor = (page: import('@playwright/test').Page) =>
 
 test('«Тёмная» переживает перезагрузку и меняет theme-color', async ({ page }) => {
   await registerViaApi(page, createTestUser())
-  await page.goto('/cars')
+  await page.goto('/profile')
 
   const themeGroup = page.getByRole('radiogroup', { name: 'Тема' })
   await expect(themeGroup.getByRole('radio', { name: 'Как в системе' })).toHaveAttribute(

@@ -14,6 +14,7 @@ export function usePush() {
   // Публичный VAPID-ключ отдаёт API (/api/push/config): статическая сборка клиента не знает серверных ключей
   const vapidPublicKey = ref('')
   const supported = ref(false)
+  const vapidMissing = ref(false)
   const permission = ref<NotificationPermission>('default')
   const subscribed = ref(false)
   const busy = ref(false)
@@ -37,6 +38,8 @@ export function usePush() {
       vapidPublicKey.value = config?.vapidPublicKey ?? ''
     }
     supported.value = browserSupported && !!vapidPublicKey.value
+    // Браузер умеет push, но сервер без VAPID-ключей — отдельное сообщение
+    vapidMissing.value = browserSupported && !vapidPublicKey.value
     if (!supported.value) return
 
     permission.value = Notification.permission
@@ -100,5 +103,15 @@ export function usePush() {
     refresh().catch((e) => console.error('[push]', e))
   })
 
-  return { supported, permission, subscribed, busy, needsInstall, subscribe, unsubscribe, sendTest }
+  return {
+    supported,
+    vapidMissing,
+    permission,
+    subscribed,
+    busy,
+    needsInstall,
+    subscribe,
+    unsubscribe,
+    sendTest,
+  }
 }

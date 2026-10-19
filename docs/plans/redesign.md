@@ -180,7 +180,7 @@
   - Файлы: `composables/useOnline.ts`, `components/OfflineBanner.vue` (в `layouts/car.vue`); composables данных не сбрасывают последние загруженные данные при сетевой ошибке.
   - Готово: e2e — `context.setOffline(true)` → плашка, данные «Обзора» остаются; скриншот Б3.
 
-- [ ] **«Профиль»: push, тема, машины, выход** [frontend] #54
+- [x] **«Профиль»: push, тема, машины, выход** [frontend] #54
   - Макет: `З1 · Профиль`, `Т8 · Профиль` (без блока «Аккаунт» — он в этапе 11).
   - Файлы: `pages/profile.vue`, `components/PushSettings.vue` (перенос с `/cars`, на `UiRowToggle`, все прежние состояния: нет VAPID, iOS не PWA, запрещено, включено), `components/profile/ThemeSetting.vue` (`useTheme`), `pages/cars/index.vue` (без push, на `UiRowCar`).
   - Готово: e2e — смена темы из профиля, переход к списку машин, выход; скриншоты З1.
