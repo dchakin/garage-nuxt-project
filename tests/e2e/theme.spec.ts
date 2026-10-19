@@ -15,7 +15,7 @@ test('«Тёмная» переживает перезагрузку и меня
   await page.goto('/profile')
 
   const themeGroup = page.getByRole('radiogroup', { name: 'Тема' })
-  await expect(themeGroup.getByRole('radio', { name: 'Как в системе' })).toHaveAttribute(
+  await expect(themeGroup.getByRole('radio', { name: 'Системная' })).toHaveAttribute(
     'aria-checked',
     'true',
   )

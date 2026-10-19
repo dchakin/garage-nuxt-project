@@ -22,7 +22,7 @@ test('профиль: тема, список машин, выход', async ({ p
   const themeGroup = page.getByRole('radiogroup', { name: 'Тема' })
   await themeGroup.getByRole('radio', { name: 'Тёмная' }).click()
   await expect(page.locator('html')).toHaveClass(/dark/)
-  await themeGroup.getByRole('radio', { name: 'Как в системе' }).click()
+  await themeGroup.getByRole('radio', { name: 'Системная' }).click()
 
   // Назад — к последней машине
   await expect(page.getByRole('link', { name: 'Назад' })).toHaveAttribute(

@@ -7,7 +7,7 @@ export type ThemeMode = (typeof THEME_MODES)[number]
 export type ResolvedTheme = Exclude<ThemeMode, 'system'>
 
 export const themeModeLabels: Record<ThemeMode, string> = {
-  system: 'Как в системе',
+  system: 'Системная',
   light: 'Светлая',
   dark: 'Тёмная',
 }
