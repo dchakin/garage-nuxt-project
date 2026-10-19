@@ -13,10 +13,18 @@ export function useAnalytics(carId: MaybeRefOrGetter<number>) {
   async function fetchAnalytics(query?: Partial<AnalyticsQuery>) {
     loading.value = true
     try {
-      query ??= { period: 'month', date: todayIso().slice(0, 7) }
-      analytics.value = await $fetch<CarAnalytics>(`/api/cars/${toValue(carId)}/analytics`, {
-        query,
-      })
+      const url = `/api/cars/${toValue(carId)}/analytics`
+      if (query) {
+        analytics.value = await $fetch<CarAnalytics>(url, { query })
+        return
+      }
+      const month = todayIso().slice(0, 7)
+      // «в среднем N в месяц» на Обзоре — за год (в месячной выборке это был бы сам месяц)
+      const [monthStats, yearStats] = await Promise.all([
+        $fetch<CarAnalytics>(url, { query: { period: 'month', date: month } }),
+        $fetch<CarAnalytics>(url, { query: { period: 'year', date: month.slice(0, 4) } }),
+      ])
+      analytics.value = { ...monthStats, avgPerMonth: yearStats.avgPerMonth }
     } finally {
       loading.value = false
     }
