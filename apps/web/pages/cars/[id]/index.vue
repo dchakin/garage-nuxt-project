@@ -20,6 +20,8 @@ const today = todayIso()
 const loading = ref(true)
 const failed = ref(false)
 const skeletonVisible = ref(false)
+/** Машина, чьи данные уже загружены хотя бы раз: при сбое повторной загрузки их не стираем */
+const loadedCarId = ref<number | null>(null)
 const avgKmPerMonth = computed(() => averageKmPerMonth(entries.value))
 const currentCar = computed(() => (car.value?.id === carId.value ? car.value : null))
 const ready = computed(() => !loading.value && !failed.value && currentCar.value && analytics.value)
@@ -36,8 +38,10 @@ async function load() {
   skeletonTimer = setTimeout(() => (skeletonVisible.value = true), SKELETON_DELAY_MS)
   try {
     await Promise.all([fetchReminders({ isActive: true }), fetchEntries(), fetchAnalytics()])
+    if (token === loadToken) loadedCarId.value = carId.value
   } catch {
-    if (token === loadToken) failed.value = true
+    // Уже показанные данные этой машины остаются (нет сети — плашка в layout), не экран ошибки
+    if (token === loadToken && loadedCarId.value !== carId.value) failed.value = true
   } finally {
     if (token === loadToken) {
       loading.value = false
