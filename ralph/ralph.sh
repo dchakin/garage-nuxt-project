@@ -66,7 +66,7 @@ IMPL_TOOLS=(Read Edit Write Glob Grep LSP
   "Bash(npm test:*)" "Bash(npm run:*)" "Bash(npm install:*)" "Bash(npm i:*)"
   "Bash(npx vitest:*)" "Bash(npx playwright:*)" "Bash(npx nuxi:*)" "Bash(npx drizzle-kit:*)" "Bash(npx tsx:*)"
   "Bash(git status:*)" "Bash(git diff:*)" "Bash(git log:*)" "Bash(git show:*)"
-  "Bash(git add:*)" "Bash(git commit:*)" "Bash(ls:*)" "Bash(mkdir:*)"
+  "Bash(git add:*)" "Bash(git commit:*)" "Bash(git rm:*)" "Bash(ls:*)" "Bash(mkdir:*)"
   "Bash(cat:*)" "Bash(head:*)" "Bash(tail:*)" "Bash(grep:*)" "Bash(wc:*)" "Bash(cd:*)")
 REVIEW_TOOLS=(Read Glob Grep "Bash(git diff:*)" "Bash(git log:*)" "Bash(git show:*)")
 
