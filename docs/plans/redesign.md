@@ -118,12 +118,12 @@
 **Цель:** данные для «Расходов» и «Обзора», управление участниками, категории машины, действия с аккаунтом.
 **Когда готов:** `npm test` зелёный; миграция категорий проверена на копии прод-БД; роуты в документации.
 
-- [ ] **Аналитика расходов** [backend] #44
+- [x] **Аналитика расходов** [backend] #44
   - Файлы: `packages/shared/schemas/analytics.ts` (`analyticsQuerySchema`), `packages/shared/types.ts` (`CarAnalytics`), `apps/api/server/utils/analytics.ts` (чистые функции, явные импорты), `apps/api/server/api/cars/[id]/analytics.get.ts`; тесты `apps/api/tests/server/analytics.test.ts` + интеграционный.
   - Контракт: `GET /api/cars/[id]/analytics?period=month|year|all&date=YYYY-MM|YYYY` → `{ total, avgPerMonth, costPerKm, avgEntry, topMonth: { month, total } | null, byMonth: Array<{ month: 'YYYY-MM', total }>, byCategory: Array<{ categoryId, name, total, share }>, hasAnyExpenses, prevPeriodWithExpenses: string | null, nextPeriodWithExpenses: string | null }`. `avgPerMonth` — с первого месяца с тратой в периоде; `share` — целые, сумма = 100 (метод наибольшего остатка).
   - Готово: на эталонных данных: год 2026 → 88 500, 9 800 в месяц, 8,6 ₽/км, 11 060, топ — май 48 600, доли 55/11/8/8/5/13; июль 2026 → `total 0`, prev `2026-06`, next `2026-08`; машина без трат → `hasAnyExpenses: false`.
 
-- [ ] **Участники: удаление, выход, тексты ошибок, данные машины** [backend] #45
+- [x] **Участники: удаление, выход, тексты ошибок, данные машины** [backend] #45
   - Файлы: `apps/api/server/api/cars/[id]/members/[userId].delete.ts`, `members/me.delete.ts`, `cars/[id]/invite.post.ts`, `cars/[id].get.ts`, `packages/shared/types.ts` (`CarDetail.ownerName`, `entriesCount`, `remindersCount`); тест `apps/api/tests/integration/members.test.ts`.
   - Контракт: удалить участника — только владелец, себя-владельца нельзя (400); выйти — только участник (владелец → 400). `invite.post.ts`: 404 `statusMessage: 'user_not_found'`, 409 `'already_member'` (тексты на клиенте — И8/И9).
   - Готово: тесты — удаление владельцем, 403 участнику на удаление другого, убранный и вышедший получают 403 на `GET /api/cars/[id]`, посторонний 403.
@@ -139,7 +139,7 @@
   - Контракт: `GET /api/cars/[id]/categories` → `Array<Category & { entriesCount: number }>` (стандартные + свои этой машины). `PATCH`/`DELETE` — только свои, любому участнику машины; стандартные → 403. Удаление: записи → «Прочее», `reminders.categoryId` → null.
   - Готово: тесты — изоляция между машинами, перенос в «Прочее», стандартные неизменны, посторонний 403.
 
-- [ ] **Аккаунт: имя, пароль, удаление** [backend] #48
+- [x] **Аккаунт: имя, пароль, удаление** [backend] #48
   - Файлы: `packages/shared/schemas/auth.ts` (`profileSchema`, `changePasswordSchema`), `apps/api/server/api/auth/me.patch.ts`, `auth/password.post.ts`, `auth/account.delete.ts`; тест `apps/api/tests/integration/account.test.ts`.
   - Контракт: `PATCH /api/auth/me { name }` → `AuthUser`; `POST /api/auth/password { currentPassword, newPassword }` — неверный текущий → 400, отзывает refresh-токены кроме текущего; `DELETE /api/auth/account` — машины-владения каскадом, членства, push-подписки, токены; чистит сессию.
   - Готово: тесты на каждый случай, включая вход старым паролем после смены → 401.
@@ -149,12 +149,12 @@
 **Цель:** восстановление доступа по email.
 **Когда готов:** `npm test` зелёный; `README.md`, `apps/api/.env.example`, `TZ.md` (исключение из «email вне рамок»), `CLAUDE.md` обновлены.
 
-- [ ] **Почтовый транспорт** [backend] #49
+- [x] **Почтовый транспорт** [backend] #49
   - Файлы: `apps/api/server/utils/mail.ts` (`sendMail({ to, subject, text, html })`, явные импорты, конфиг в аргументах), зависимость `nodemailer`, `nitro.config.ts` (`runtimeConfig`), `apps/api/.env.example`, `README.md`.
   - Контракт: env `NUXT_SMTP_URL`, `NUXT_MAIL_FROM`, `NUXT_APP_URL` (база ссылок в письмах); `NUXT_MAIL_OUTBOX_DIR` — вместо SMTP пишет письма JSON-файлами в каталог (тесты и e2e). Без SMTP и outbox почта выключена. `GET /api/auth/config` → `{ passwordReset: boolean }`.
   - Готово: unit-тест outbox-транспорта; тест `config` с env и без.
 
-- [ ] **Токены и роуты сброса пароля** [backend] #50
+- [x] **Токены и роуты сброса пароля** [backend] #50
   - Файлы: `schema.ts` (`password_reset_tokens`: `userId`, `tokenHash`, `expiresAt`, `usedAt`) + миграция, `packages/shared/schemas/auth.ts`, `apps/api/server/api/auth/password-reset.post.ts`, `password-reset/confirm.post.ts`; тест `apps/api/tests/integration/password-reset.test.ts`.
   - Контракт: `POST /api/auth/password-reset { email }` → всегда `204`, письмо не чаще раза в 60 с на email, ссылка `${NUXT_APP_URL}/reset-password?token=…`, токен 1 час, хранится SHA-256. `POST /api/auth/password-reset/confirm { token, password, authMode }` → как у `login` (сразу вход); отзывает все refresh-токены. Чтобы старые cookie-сессии стали недействительны — `users.sessionVersion` (миграция), сверяется в `requireAuth`. При выключенной почте — 404.
   - Готово: тесты — одинаковый ответ для существующего/несуществующего email, частота, одноразовость, истечение, старый пароль и старая кука → 401, выключенный режим.
