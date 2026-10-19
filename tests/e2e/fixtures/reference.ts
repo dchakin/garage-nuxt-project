@@ -56,6 +56,8 @@ export interface ReferenceCar {
   plateNumber: string
   vin: string | null
   currentMileage: number
+  /** Когда обновлялся пробег; без значения — «ни разу» (`null`) */
+  mileageUpdatedAt?: Date
   owner: ReferenceUserKey
   members: ReferenceUserKey[]
   entries: ReferenceEntry[]
@@ -72,6 +74,8 @@ export const referenceCars: Record<ReferenceCarKey, ReferenceCar> = {
     plateNumber: 'А123ВС 77',
     vin: 'JTNB11HK103012345',
     currentMileage: 87_450,
+    // «обновлён 3 дня назад» на Обзоре (макет Б1, «сегодня» — 10 окт)
+    mileageUpdatedAt: new Date('2026-10-07T09:00:00+03:00'),
     owner: 'dmitry',
     members: ['anna'],
     entries: camryEntries,

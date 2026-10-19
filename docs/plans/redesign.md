@@ -169,7 +169,7 @@
   - Файлы: `apps/web/layouts/car.vue` (AppBar/Car + TabBar + слот, «＋» эмитит открытие шторки записи — до этапа 7 заглушка), страницы `pages/cars/[id]/index.vue` (Обзор), `journal.vue`, `reminders.vue`, `expenses.vue`, `settings.vue`, `categories.vue`, `pages/profile.vue` — все с `definePageMeta({ middleware: 'auth', layout: … })`; `components/car/CarSwitcherSheet.vue`; `composables/useLastCar.ts` (`localStorage['garage:lastCarId']`); `pages/index.vue` → редирект на «Обзор» последней машины или `/cars`; `packages/shared/utils/reminderBadge.ts` (`countAttentionReminders(reminders, currentMileage, today)` — просроченные + скорые среди `isActive`) + тест.
   - Готово: e2e — переходы по вкладкам, Б4 переключает машину, после перезагрузки открывается последняя машина, бейдж = 3 на фикстуре и скрыт при 0; скриншоты Б4; маршруты и layout в `conventions.md`.
 
-- [ ] **Экран «Обзор»** [frontend] #52
+- [x] **Экран «Обзор»** [frontend] #52
   - Макет: `Б1 · Обзор`, `Б2 · Обзор — загрузка`, `Т1 · Обзор` (`design/export/Б1.png`, `Б2.png`, `Т1.png`).
   - Файлы: `pages/cars/[id]/index.vue` (≤ 250 строк), `components/overview/MileageCard.vue`, `AttentionList.vue`, `MonthExpensesCard.vue`, `RecentEntries.vue`; `composables/useAnalytics.ts` (`GET /api/cars/[id]/analytics?period=month`). Старый `pages/cars/[id]/index.vue` декомпозировать, не дописывать.
   - Контракт: пробег + «обновлён N дней назад» (`mileageUpdatedAt`); «Требует внимания» — до 3 напоминаний через `UiReminderCard`, ссылка «Все сроки» → `/cars/[id]/reminders`; расходы месяца — из аналитики; последние записи — `UiRowEntry`. Кнопка «Обновить» пробег и тап по записи пока не рендерятся/не активны (появятся в этапах 7–8). Состояния: скелетон, пусто (`UiEmptyState`), ошибка с «Повторить».
