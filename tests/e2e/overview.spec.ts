@@ -81,6 +81,31 @@ test('Обзор: ошибка загрузки и «Повторить»', asyn
   await expect(page.getByRole('heading', { name: 'Не удалось загрузить обзор' })).toHaveCount(0)
 })
 
+test('Обзор (Б3): нет сети — плашка, данные остаются', async ({ page, seededCar }) => {
+  await page.goto(`/cars/${seededCar.carId}`)
+  const mileage = page.getByTestId('overview-mileage')
+  await expect(mileage).toHaveText(/87\s450\s+км/)
+  await expect(page.getByTestId('offline-banner')).toHaveCount(0)
+
+  await page.context().setOffline(true)
+
+  const banner = page.getByTestId('offline-banner')
+  await expect(banner).toBeVisible()
+  await expect(banner.getByText('Нет соединения')).toBeVisible()
+  // Часы зафиксированы: данные актуальны на момент потери сети
+  await expect(banner.getByText(/Показываем данные на 9:41\./)).toBeVisible()
+  // Данные Обзора на месте, экрана ошибки нет
+  await expect(mileage).toHaveText(/87\s450\s+км/)
+  await expect(page.getByRole('heading', { name: 'Требует внимания' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Расходы в октябре' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Не удалось загрузить обзор' })).toHaveCount(0)
+  await snap(page, 'overview-offline')
+
+  await page.context().setOffline(false)
+  await expect(banner).toHaveCount(0)
+  await expect(mileage).toHaveText(/87\s450\s+км/)
+})
+
 test('Обзор: машина без записей и напоминаний — пусто', async ({ page, seededCar }) => {
   await page.goto(`/cars/${seededCar.carIds.rio}`)
 

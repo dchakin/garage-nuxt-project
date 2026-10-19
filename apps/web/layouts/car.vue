@@ -73,6 +73,7 @@ function openEntrySheet() {
       @switch="switcherOpen = true"
     />
     <main class="mx-auto max-w-3xl px-sp-4 pb-sp-6">
+      <OfflineBanner />
       <slot />
     </main>
     <UiTabBar

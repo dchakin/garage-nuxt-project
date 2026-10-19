@@ -51,6 +51,11 @@ export function formatDate(date: string, today: string = todayIso()): string {
   return String(year) === today.slice(0, 4) ? label : `${label}${NBSP}${year}`
 }
 
+/** Время в локальном поясе без ведущего нуля у часов: `9:12`, `14:05`. */
+export function formatTime(time: Date): string {
+  return `${time.getHours()}:${String(time.getMinutes()).padStart(2, '0')}`
+}
+
 /** Выбор формы по числу: `pluralize(39, ['день', 'дня', 'дней'])` → `дней`. */
 export function pluralize(count: number, forms: readonly [string, string, string]): string {
   const n = Math.abs(count) % 100
