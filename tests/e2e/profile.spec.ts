@@ -46,7 +46,10 @@ test('профиль: тема, список машин, выход', async ({ p
   // Выход
   await page.getByRole('link', { name: 'Профиль' }).click()
   await page.getByRole('button', { name: 'Выйти' }).click()
-  await page.getByRole('dialog').getByRole('button', { name: 'Выйти' }).click()
+  await page
+    .getByRole('alertdialog', { name: 'Выйти из аккаунта?' })
+    .getByRole('button', { name: 'Выйти' })
+    .click()
   await expect(page).toHaveURL(/\/login$/)
 
   await page.goto('/profile')
