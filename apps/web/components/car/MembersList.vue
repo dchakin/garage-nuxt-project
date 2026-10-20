@@ -2,9 +2,10 @@
 /**
  * Участники машины (З2): владелец и приглашённые с ролями. Владелец в `carMembers` не хранится —
  * его строка строится из `ownerName` (для текущего пользователя — «вы» и его email).
- * Ниже — форма добавления по email: коды ошибок API (`user_not_found`, `already_member`)
- * переводятся здесь, запрос выполняет родитель.
+ * Владелец (`canManage`) видит кнопку «Пригласить участника» (шторка И1 — у родителя, событие
+ * `add`) и кнопку удаления у каждого участника (диалог подтверждения — у родителя, `remove`).
  */
+import { Plus, X } from 'lucide-vue-next'
 import type { CarMember } from '@garage/shared/types'
 
 const props = defineProps<{
@@ -13,28 +14,14 @@ const props = defineProps<{
   ownerEmail?: string
   isOwnerYou: boolean
   members: CarMember[]
-  /** Можно ли добавлять участников (только владелец) */
-  canInvite?: boolean
-  inviting?: boolean
-  inviteError?: string
+  /** Можно ли добавлять и удалять участников (только владелец) */
+  canManage?: boolean
+  /** Участник, чей запрос на удаление сейчас выполняется */
+  removingUserId?: number | null
 }>()
-const emit = defineEmits<{ invite: [email: string] }>()
-
-const email = ref('')
+const emit = defineEmits<{ add: []; remove: [member: CarMember] }>()
 
 const ownerLabel = computed(() => (props.isOwnerYou ? `${props.ownerName} (вы)` : props.ownerName))
-
-function onSubmit() {
-  const value = email.value.trim()
-  if (value) emit('invite', value)
-}
-
-/** Очистить поле после успешного приглашения */
-function reset() {
-  email.value = ''
-}
-
-defineExpose({ reset })
 </script>
 
 <template>
@@ -51,7 +38,8 @@ defineExpose({ reset })
       <li
         v-for="member in members"
         :key="member.id"
-        class="flex min-h-14 items-center gap-sp-3 bg-surface px-sp-4 py-sp-2"
+        class="flex min-h-14 items-center gap-sp-3 bg-surface py-sp-2 pl-sp-4"
+        :class="canManage ? 'pr-sp-1' : 'pr-sp-4'"
       >
         <UiAvatar :name="member.user.name" />
         <div class="min-w-0 flex-1">
@@ -59,21 +47,18 @@ defineExpose({ reset })
           <p class="truncate text-sm text-text-2">{{ member.user.email }}</p>
         </div>
         <span class="shrink-0 text-sm text-text-2">Участник</span>
+        <UiIconButton
+          v-if="canManage"
+          :icon="X"
+          :label="`Убрать участника ${member.user.name}`"
+          :disabled="removingUserId === member.user.id"
+          @click="emit('remove', member)"
+        />
       </li>
     </UiCard>
 
-    <form v-if="canInvite" class="flex flex-col gap-sp-3" @submit.prevent="onSubmit">
-      <UiField
-        v-model="email"
-        type="email"
-        label="Email участника"
-        placeholder="sergey@mail.ru"
-        autocomplete="off"
-        :error="inviteError"
-      />
-      <UiButton type="submit" variant="tonal" :loading="inviting" :disabled="!email.trim()">
-        {{ inviting ? 'Добавляем…' : 'Добавить участника' }}
-      </UiButton>
-    </form>
+    <UiButton v-if="canManage" variant="tonal" :icon="Plus" @click="emit('add')">
+      Пригласить участника
+    </UiButton>
   </div>
 </template>

@@ -115,6 +115,10 @@ describe('участники машины', () => {
     const dup = await invite('invite-member@test.local')
     expect(dup.status).toBe(409)
     expect((await dup.json()).statusMessage).toBe('already_member')
+
+    const self = await invite('invite-owner@test.local')
+    expect(self.status).toBe(409)
+    expect((await self.json()).statusMessage).toBe('already_member')
   })
 
   it('GET /api/cars/[id] отдаёт ownerName и счётчики', async () => {

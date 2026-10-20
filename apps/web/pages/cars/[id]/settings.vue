@@ -4,8 +4,9 @@
  * машину (И2). Участнику показывается только пробег и категории — полный вид З4 делает #69.
  * Пробег меняется только через шторку Б5 (`CarMileageSheet`), поэтому она стоит и здесь.
  */
-import { Gauge, Tags, Trash2, TriangleAlert } from 'lucide-vue-next'
+import { Gauge, Tags, Trash2, TriangleAlert, UserMinus } from 'lucide-vue-next'
 import type { CarUpdateInput } from '@garage/shared/schemas/car'
+import type { CarMember } from '@garage/shared/types'
 import { formatMileage } from '@garage/shared/utils/format'
 
 definePageMeta({ middleware: 'auth', layout: 'plain' })
@@ -26,9 +27,10 @@ const toast = useToast()
 const loadFailed = ref(false)
 const saveError = ref('')
 const deleteDialogOpen = ref(false)
-const inviting = ref(false)
-const inviteError = ref('')
-const membersList = ref<{ reset: () => void } | null>(null)
+const addMemberOpen = ref(false)
+const memberToRemove = ref<CarMember | null>(null)
+const removeDialogOpen = ref(false)
+const removingUserId = ref<number | null>(null)
 
 const isReady = computed(() => car.value?.id === carId)
 const isOwner = computed(() => car.value?.role === 'owner')
@@ -71,25 +73,32 @@ async function onSave(input: CarUpdateInput) {
   }
 }
 
-const INVITE_ERRORS: Record<string, string> = {
-  user_not_found: 'Пользователь с таким email не найден',
-  already_member: 'Этот пользователь уже участник машины',
+async function onMemberAdded() {
+  toast.show({ message: 'Участник добавлен' })
+  await loadCurrentCar(carId).catch(() => {})
 }
 
-async function onInvite(email: string) {
-  inviteError.value = ''
-  inviting.value = true
+function askRemoveMember(member: CarMember) {
+  memberToRemove.value = member
+  removeDialogOpen.value = true
+}
+
+async function onRemoveMember() {
+  const member = memberToRemove.value
+  if (!member) return
+  removingUserId.value = member.user.id
   try {
-    await $fetch(`/api/cars/${carId}/invite`, { method: 'POST', body: { email } })
-    membersList.value?.reset()
-    await loadCurrentCar(carId)
-    toast.show({ message: 'Участник добавлен' })
-  } catch (error: any) {
-    const code = error?.data?.statusMessage
-    inviteError.value = INVITE_ERRORS[code] ?? 'Не удалось добавить участника'
+    await $fetch(`/api/cars/${carId}/members/${member.user.id}`, { method: 'DELETE' })
+  } catch {
+    removeDialogOpen.value = false
+    toast.show({ message: 'Не удалось убрать участника', icon: null })
+    return
   } finally {
-    inviting.value = false
+    removingUserId.value = null
   }
+  removeDialogOpen.value = false
+  toast.show({ message: `${member.user.name} больше не участник` })
+  await loadCurrentCar(carId).catch(() => {})
 }
 
 async function onDelete() {
@@ -171,15 +180,14 @@ async function onDelete() {
           Участники
         </h2>
         <CarMembersList
-          ref="membersList"
           :owner-name="car.ownerName"
           :owner-email="user?.email"
           is-owner-you
           :members="car.members"
-          can-invite
-          :inviting="inviting"
-          :invite-error="inviteError"
-          @invite="onInvite"
+          can-manage
+          :removing-user-id="removingUserId"
+          @add="addMemberOpen = true"
+          @remove="askRemoveMember"
         />
       </section>
 
@@ -200,6 +208,24 @@ async function onDelete() {
     </div>
 
     <CarMileageSheet />
+    <CarAddMemberSheet
+      v-if="car && isReady && isOwner"
+      v-model:open="addMemberOpen"
+      :car-id="carId"
+      :owner-name="car.ownerName"
+      :owner-email="user?.email"
+      :members="car.members"
+      @added="onMemberAdded"
+    />
+    <UiDialog
+      v-model:open="removeDialogOpen"
+      :title="`Убрать ${memberToRemove?.user.name ?? 'участника'}?`"
+      message="Участник потеряет доступ к машине, записи и напоминания останутся."
+      confirm-text="Убрать"
+      :icon="UserMinus"
+      :loading="removingUserId !== null"
+      @confirm="onRemoveMember"
+    />
     <CarDeleteCarDialog
       v-if="car && isReady"
       v-model:open="deleteDialogOpen"

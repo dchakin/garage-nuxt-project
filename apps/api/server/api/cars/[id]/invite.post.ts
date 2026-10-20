@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   const carId = Number(getRouterParam(event, 'id'))
   const body = await readValidatedBody(event, inviteSchema.parse)
 
-  const { role } = await requireCarAccess(carId, user.id)
+  const { car, role } = await requireCarAccess(carId, user.id)
   if (role !== 'owner') {
     throw createError({
       statusCode: 403,
@@ -20,6 +20,11 @@ export default defineEventHandler(async (event) => {
   })
   if (!invitedUser) {
     throw createError({ statusCode: 404, statusMessage: 'user_not_found' })
+  }
+
+  // Владелец в car_members не хранится, но участником машины уже является
+  if (invitedUser.id === car.ownerId) {
+    throw createError({ statusCode: 409, statusMessage: 'already_member' })
   }
 
   const existing = await db.query.carMembers.findFirst({
