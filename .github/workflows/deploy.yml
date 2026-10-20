@@ -12,24 +12,12 @@ env:
   IMAGE: ghcr.io/dchakin/garage-nuxt-project
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - run: npm ci
-
-      - run: npm run typecheck
-
-      - run: npm test
+  # Те же проверки, что и в CI для PR: format, typecheck, unit/integration, build + e2e
+  ci:
+    uses: ./.github/workflows/ci.yml
 
   build:
-    needs: test
+    needs: ci
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -60,6 +48,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      # Ключ на сервере ограничен command="/opt/garage/deploy.sh": любая команда запускает deploy.sh.
+      # Скрипт сам делает бэкап БД и smoke-check, при ошибке job падает
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.0.3
         with:

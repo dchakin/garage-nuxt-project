@@ -1,6 +1,7 @@
 services:
   garage:
-    image: ghcr.io/dchakin/garage-nuxt-project:latest
+    # Откат: GARAGE_TAG=<sha коммита> docker compose up -d (см. docs/deploy.md)
+    image: ghcr.io/dchakin/garage-nuxt-project:${GARAGE_TAG:-latest}
     container_name: garage
     restart: unless-stopped
     environment:

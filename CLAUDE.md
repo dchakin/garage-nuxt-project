@@ -16,7 +16,7 @@ Root `package.json` only holds workspace config, shared dev tooling (vitest, pre
 
 ## Branching & deploy
 
-`master` is production; day-to-day work happens on `dev`, merged into `master` when ready to ship. Pushing to `master` deploys: GitHub Actions builds one Docker image (API + generated web client, one origin, port 3000) → GHCR → the server only pulls and restarts it. Read `docs/deploy.md` before touching `Dockerfile`, `docker-compose.yml`, `deploy.sh` or `.github/workflows/deploy.yml`.
+`master` is production; day-to-day work happens on `dev`, merged into `master` when ready to ship. CI (`.github/workflows/ci.yml`: format:check, typecheck, `npm test`, build + `test:e2e`) runs on `dev` pushes and PRs and is reused by the deploy. Pushing to `master` deploys: CI → GitHub Actions builds one Docker image (API + generated web client, one origin, port 3000) → GHCR → `deploy.sh` on the server backs up the DB, pulls, restarts and health-checks it. Read `docs/deploy.md` before touching `Dockerfile`, `docker-compose.yml`, `deploy.sh` or `.github/workflows/deploy.yml`.
 
 ## Plans & autonomous work
 
