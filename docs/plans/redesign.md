@@ -133,7 +133,7 @@
   - Контракт: `carId = null` — стандартная. Перенос: своя категория используется одной машиной → привязать; несколькими → копия на каждую машину с переназначением записей и напоминаний; не используется → удалить.
   - Готово: тест миграции на БД с тремя случаями; прогон на копии прод-БД (вручную, результат в PR). `decision` — потому что трогает прод-данные.
 
-- [ ] **Категории машины: роуты** [backend] #47
+- [x] **Категории машины: роуты** [backend] #47
   - Зависит от задачи «Категории машины: схема и миграция» (`decision`): если в `schema.ts` ещё нет `categories.carId`, ответить `BLOCKED: нужна миграция категорий`.
   - Файлы: `apps/api/server/api/cars/[id]/categories.get.ts`, `categories.post.ts`, `apps/api/server/api/categories/[id].patch.ts`, `categories/[id].delete.ts`; удалить `api/categories/index.get.ts`/`index.post.ts`; тест `apps/api/tests/integration/categories.test.ts`.
   - Контракт: `GET /api/cars/[id]/categories` → `Array<Category & { entriesCount: number }>` (стандартные + свои этой машины). `PATCH`/`DELETE` — только свои, любому участнику машины; стандартные → 403. Удаление: записи → «Прочее», `reminders.categoryId` → null.

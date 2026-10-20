@@ -120,7 +120,7 @@ describe('createApiClient', () => {
       onUnauthorized: vi.fn(),
     })
 
-    await Promise.all([api('/api/cars'), api('/api/categories'), api('/api/cars/1')])
+    await Promise.all([api('/api/cars'), api('/api/cars/2'), api('/api/cars/1')])
 
     const refreshCalls = fetchMock.mock.calls.filter(([url]) =>
       String(url).endsWith('/api/auth/refresh'),

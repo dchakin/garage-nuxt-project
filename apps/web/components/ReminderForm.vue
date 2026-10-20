@@ -12,7 +12,7 @@ import { formatDate, formatMileage } from '@garage/shared/utils/format'
 const props = defineProps<{ carId: number; initial?: Reminder | null; saving?: boolean }>()
 const emit = defineEmits<{ submit: [ReminderInput]; cancel: [] }>()
 
-const { categories, fetchCategories } = useCategories()
+const { categories, fetchCategories } = useCategories(props.carId)
 const { entries, fetchEntries } = useEntries(props.carId)
 await Promise.all([fetchCategories(), fetchEntries({ sortBy: 'date', sortDir: 'desc' })])
 
