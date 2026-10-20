@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
  * «Настройки машины» (З2, #66). Владелец правит данные, видит участников и может удалить
- * машину (И2). Участнику показывается только пробег и категории — полный вид З4 делает #69.
- * Пробег меняется только через шторку Б5 (`CarMileageSheet`), поэтому она стоит и здесь.
+ * машину (И2). Участнику — вид З4 (`CarMemberCarView`): данные для чтения, пробег, категории и
+ * «Покинуть машину…». Пробег меняется только через шторку Б5 (`CarMileageSheet`), поэтому она стоит и здесь.
  */
 import { Gauge, Tags, Trash2, TriangleAlert, UserMinus } from 'lucide-vue-next'
 import type { CarUpdateInput } from '@garage/shared/schemas/car'
@@ -18,7 +18,7 @@ const route = useRoute()
 const carId = Number(route.params.id)
 const { user } = useAuth()
 const { car, loadCurrentCar } = useCurrentCar()
-const { updateCar, deleteCar, saving, deletingId } = useCars()
+const { updateCar, deleteCar, leaveCar, saving, deletingId, leavingId } = useCars()
 const { categories, fetchCategories } = useCategories(carId)
 const { getLastCarId, forgetLastCar } = useLastCar()
 const { open: openMileageSheet, savedCount } = useMileageSheet()
@@ -27,6 +27,7 @@ const toast = useToast()
 const loadFailed = ref(false)
 const saveError = ref('')
 const deleteDialogOpen = ref(false)
+const leaveDialogOpen = ref(false)
 const addMemberOpen = ref(false)
 const memberToRemove = ref<CarMember | null>(null)
 const removeDialogOpen = ref(false)
@@ -101,6 +102,21 @@ async function onRemoveMember() {
   await loadCurrentCar(carId).catch(() => {})
 }
 
+async function onLeave() {
+  const carName = car.value ? `${car.value.brand} ${car.value.model}` : 'машину'
+  try {
+    await leaveCar(carId)
+  } catch {
+    leaveDialogOpen.value = false
+    toast.show({ message: 'Не удалось покинуть машину', icon: null })
+    return
+  }
+  leaveDialogOpen.value = false
+  if (getLastCarId() === carId) forgetLastCar()
+  toast.show({ message: `Вы покинули ${carName}` })
+  await navigateTo('/cars')
+}
+
 async function onDelete() {
   try {
     await deleteCar(carId)
@@ -147,10 +163,14 @@ async function onDelete() {
     </div>
 
     <div v-else-if="car && isReady" class="flex flex-col gap-sp-5 px-sp-4 pb-sp-6">
-      <UiAlert
+      <CarMemberCarView
         v-if="!isOwner"
-        variant="info"
-        :title="`Данные машины меняет владелец — ${car.ownerName}`"
+        v-model:leave-open="leaveDialogOpen"
+        :car="car"
+        :categories-count="categories.length"
+        :leaving="leavingId === carId"
+        @update-mileage="openMileageSheet()"
+        @confirm="onLeave"
       />
       <CarSettingsForm
         v-if="isOwner"
@@ -160,7 +180,7 @@ async function onDelete() {
         @submit="onSave"
       />
 
-      <UiCard>
+      <UiCard v-if="isOwner">
         <UiRowSetting
           :icon="Gauge"
           label="Пробег"
