@@ -8,7 +8,15 @@ import type { ReminderPreview } from '@garage/shared/utils/reminderPreview'
 import { describeNextDue } from '@garage/shared/utils/reminderNextDue'
 import UiAlert from '~/components/ui/Alert.vue'
 
-const props = defineProps<{ preview: ReminderPreview | null; today?: string }>()
+const props = withDefaults(
+  defineProps<{
+    preview: ReminderPreview | null
+    today?: string
+    /** Подпись над сроком: у выключенного напоминания (Е4) — «Если включить» */
+    label?: string
+  }>(),
+  { today: undefined, label: 'Следующий раз' },
+)
 
 const dueText = computed(() => (props.preview ? describeNextDue(props.preview, props.today) : null))
 </script>
@@ -16,7 +24,7 @@ const dueText = computed(() => (props.preview ? describeNextDue(props.preview, p
 <template>
   <div class="flex flex-col gap-sp-3" data-testid="reminder-preview">
     <div class="rounded-md bg-surface-2 px-sp-4 py-sp-3">
-      <p class="text-sm text-text-2">Следующий раз</p>
+      <p class="text-sm text-text-2">{{ label }}</p>
       <p class="mt-0.5 text-h3 text-text">
         {{ dueText ?? 'Укажите интервал — покажем срок' }}
       </p>

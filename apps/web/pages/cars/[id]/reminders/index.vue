@@ -15,8 +15,17 @@ const SKELETON_DELAY_MS = 300
 const route = useRoute()
 const carId = computed(() => Number(route.params.id))
 const { car } = useCurrentCar()
-const { reminders, fetchReminders } = useReminders(carId)
+const { reminders: loadedReminders, fetchReminders } = useReminders(carId)
 const { entries, fetchEntries } = useEntries(carId)
+const {
+  open: openReminderEdit,
+  hiddenIds,
+  changedCount: reminderChangedCount,
+} = useReminderEditSheet()
+// Удаляемое (ждёт «Отменить») напоминание пропадает сразу, до DELETE
+const reminders = computed(() =>
+  loadedReminders.value.filter((reminder) => !hiddenIds.value.includes(reminder.id)),
+)
 
 const today = todayIso()
 const loading = ref(true)
@@ -65,7 +74,7 @@ watch(carId, (id) => Number.isInteger(id) && load(), { immediate: true })
 const { savedCount } = useEntrySheet()
 const { changedCount } = useEntryDetailSheet()
 const { savedCount: reminderSavedCount, open: openReminderSheet } = useReminderSheet()
-watch([savedCount, changedCount, reminderSavedCount], async () => {
+watch([savedCount, changedCount, reminderSavedCount, reminderChangedCount], async () => {
   try {
     await Promise.all([fetchReminders(), fetchEntries()])
   } catch {
@@ -74,7 +83,6 @@ watch([savedCount, changedCount, reminderSavedCount], async () => {
 })
 onBeforeUnmount(() => clearTimeout(skeletonTimer))
 
-// Тап по карточке (`open`) подключит шторка правки Е4 (#63): страницы правки больше нет.
 const { open: openEntrySheet } = useEntrySheet()
 function markDone(reminder: Reminder) {
   openEntrySheet({ carId: carId.value, reminder })
@@ -131,6 +139,7 @@ function markDone(reminder: Reminder) {
           :current-mileage="currentCar.currentMileage"
           :avg-km-per-month="avgKmPerMonth"
           :today="today"
+          @open="openReminderEdit"
           @done="markDone"
         />
       </template>

@@ -8,7 +8,7 @@ import UiSectionHeader from '~/components/ui/SectionHeader.vue'
 /**
  * «Требует внимания» на Обзоре: до 3 просроченных/скорых напоминаний и ссылка «Все сроки».
  * Если внимания ничего не требует — блок не рендерится. «Сделал» поднимается событием `done`
- * (страница открывает шторку записи); открытие карточки подключится в этапе 8.
+ * (страница открывает шторку записи); тап по карточке — `open` (шторка правки Е4).
  */
 const props = defineProps<{
   carId: number
@@ -18,7 +18,7 @@ const props = defineProps<{
   today?: string
 }>()
 
-defineEmits<{ done: [reminder: Reminder] }>()
+defineEmits<{ open: [reminder: Reminder]; done: [reminder: Reminder] }>()
 
 const attention = computed(() =>
   pickAttentionReminders(props.reminders, props.currentMileage, props.today),
@@ -39,6 +39,7 @@ const attention = computed(() =>
           :current-mileage="currentMileage"
           :avg-km-per-month="avgKmPerMonth"
           :today="today"
+          @open="$emit('open', reminder)"
           @done="$emit('done', reminder)"
         />
       </li>
