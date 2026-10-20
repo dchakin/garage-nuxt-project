@@ -6,6 +6,7 @@ export function useCars() {
   const loading = ref(false)
   const saving = ref(false)
   const deletingId = ref<number | null>(null)
+  const leavingId = ref<number | null>(null)
 
   async function fetchCars() {
     loading.value = true
@@ -60,6 +61,17 @@ export function useCars() {
     }
   }
 
+  /** Выйти из чужой машины (`DELETE …/members/me`); владелец выйти не может (400) */
+  async function leaveCar(id: number) {
+    leavingId.value = id
+    try {
+      await $fetch(`/api/cars/${id}/members/me`, { method: 'DELETE' })
+      cars.value = cars.value.filter((c) => c.id !== id)
+    } finally {
+      leavingId.value = null
+    }
+  }
+
   async function fetchCar(id: number) {
     return $fetch<CarDetail>(`/api/cars/${id}`)
   }
@@ -69,11 +81,13 @@ export function useCars() {
     loading,
     saving,
     deletingId,
+    leavingId,
     fetchCars,
     createCar,
     updateCar,
     updateMileage,
     deleteCar,
+    leaveCar,
     fetchCar,
   }
 }
