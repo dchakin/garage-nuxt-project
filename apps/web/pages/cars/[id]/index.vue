@@ -78,7 +78,8 @@ watch(carId, (id) => Number.isInteger(id) && load(), { immediate: true })
 // перечитываем молча, без скелетона: прежние данные остаются на экране
 const { savedCount, open: openEntrySheet } = useEntrySheet()
 const { open: openEntryDetail, hiddenIds, changedCount } = useEntryDetailSheet()
-watch([savedCount, changedCount, reminderChangedCount], async () => {
+const { savedCount: mileageSavedCount, open: openMileageSheet } = useMileageSheet()
+watch([savedCount, changedCount, reminderChangedCount, mileageSavedCount], async () => {
   try {
     await Promise.all([fetchReminders({ isActive: true }), fetchEntries(), fetchAnalytics()])
   } catch {
@@ -110,6 +111,7 @@ onBeforeUnmount(() => clearTimeout(skeletonTimer))
         :mileage="currentCar.currentMileage"
         :updated-at="currentCar.mileageUpdatedAt"
         :today="today"
+        @update="openMileageSheet"
       />
       <OverviewAttentionList
         :car-id="carId"

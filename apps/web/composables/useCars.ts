@@ -1,5 +1,5 @@
 import type { Car, CarDetail } from '@garage/shared/types'
-import type { CarInput } from '@garage/shared/schemas/car'
+import type { CarInput, CarMileageInput } from '@garage/shared/schemas/car'
 
 export function useCars() {
   const cars = useState<Car[]>('cars', () => [])
@@ -38,6 +38,18 @@ export function useCars() {
     }
   }
 
+  /** Обновить пробег (`PATCH …/mileage`); уменьшение требует `confirmDecrease: true` */
+  async function updateMileage(id: number, input: CarMileageInput) {
+    saving.value = true
+    try {
+      const updated = await $fetch<Car>(`/api/cars/${id}/mileage`, { method: 'PATCH', body: input })
+      cars.value = cars.value.map((c) => (c.id === id ? updated : c))
+      return updated
+    } finally {
+      saving.value = false
+    }
+  }
+
   async function deleteCar(id: number) {
     deletingId.value = id
     try {
@@ -52,5 +64,16 @@ export function useCars() {
     return $fetch<CarDetail>(`/api/cars/${id}`)
   }
 
-  return { cars, loading, saving, deletingId, fetchCars, createCar, updateCar, deleteCar, fetchCar }
+  return {
+    cars,
+    loading,
+    saving,
+    deletingId,
+    fetchCars,
+    createCar,
+    updateCar,
+    updateMileage,
+    deleteCar,
+    fetchCar,
+  }
 }

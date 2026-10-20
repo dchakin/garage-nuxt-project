@@ -84,6 +84,7 @@ const { open: openEntrySheet } = useEntrySheet()
     <EntryDetailSheet />
     <ReminderSheet />
     <ReminderEditSheet />
+    <CarMileageSheet />
     <CarSwitcherSheet
       v-if="car"
       v-model:open="switcherOpen"

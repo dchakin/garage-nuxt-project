@@ -13,8 +13,7 @@ test('Обзор (Б1): цифры совпадают с макетом', async 
   const mileage = page.getByTestId('overview-mileage')
   await expect(mileage).toHaveText(/87\s450\s+км/)
   await expect(page.getByText('обновлён 3 дня назад')).toBeVisible()
-  // Кнопка «Обновить» появится в этапе 8
-  await expect(page.getByRole('button', { name: 'Обновить' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Обновить', exact: true })).toBeVisible()
 
   // Требует внимания: 2 просрочено + 1 скоро, «Все сроки» → напоминания
   const attention = page.locator('section', {
