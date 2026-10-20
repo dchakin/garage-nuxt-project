@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm'
 import { db, schema } from '../../database'
 import { reminderBaseSchema } from '@garage/shared/schemas/reminder'
 import { deriveTriggerType } from '@garage/shared/utils/reminderTrigger'
+import { computeNextDue } from '@garage/shared/utils/reminderDue'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireAuth(event)

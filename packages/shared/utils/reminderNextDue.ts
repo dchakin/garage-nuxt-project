@@ -1,5 +1,6 @@
 import type { ReminderTriggerType } from '../schemas/reminder'
 import { formatDate, formatMileage } from './format'
+import { computeNextDue } from './reminderDue'
 
 export interface NextDueSource {
   triggerType: ReminderTriggerType
@@ -14,40 +15,22 @@ export interface NextDue {
   nextDueMileage: number | null
 }
 
-function addMonthsIso(date: string, months: number): string {
-  const result = new Date(`${date}T00:00:00Z`)
-  result.setUTCMonth(result.getUTCMonth() + months)
-  return result.toISOString().slice(0, 10)
-}
-
 /**
- * Предпросмотр срока после закрытия напоминания записью — те же правила, что у сервера
- * (`computeNextDue`): интервал считается от записи, иначе остаётся прежний срок.
+ * Предпросмотр срока после закрытия напоминания записью — `computeNextDue`, тот же код,
+ * что у сервера: интервал считается от записи, иначе остаётся прежний срок.
  */
 export function previewNextDue(
   reminder: NextDueSource,
   closing: { date: string; mileage: number | null },
 ): NextDue {
-  const wantsDate = reminder.triggerType === 'date' || reminder.triggerType === 'both'
-  const wantsMileage = reminder.triggerType === 'mileage' || reminder.triggerType === 'both'
-
-  let nextDueDate: string | null = null
-  if (wantsDate) {
-    nextDueDate =
-      reminder.intervalMonths && closing.date
-        ? addMonthsIso(closing.date, reminder.intervalMonths)
-        : reminder.nextDueDate
-  }
-
-  let nextDueMileage: number | null = null
-  if (wantsMileage) {
-    nextDueMileage =
-      reminder.intervalKm && closing.mileage != null
-        ? closing.mileage + reminder.intervalKm
-        : reminder.nextDueMileage
-  }
-
-  return { nextDueDate, nextDueMileage }
+  return computeNextDue({
+    triggerType: reminder.triggerType,
+    intervalKm: reminder.intervalKm,
+    intervalMonths: reminder.intervalMonths,
+    lastEntry: closing,
+    nextDueDateOverride: reminder.nextDueDate,
+    nextDueMileageOverride: reminder.nextDueMileage,
+  })
 }
 
 /** «на 97 450 км или 10 окт 2027»; `null`, если срок не задан */

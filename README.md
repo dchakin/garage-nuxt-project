@@ -98,7 +98,7 @@ apps/
       routes/             — [...path].get.ts — раздача собранного клиента (NUXT_WEB_DIST_DIR)
       tasks/              — reminders/notify.ts — ежедневная рассылка push о напоминаниях
       utils/              — auth.ts (cookie + Bearer), tokens.ts (JWT/refresh), password.ts, access.ts
-                            (доступ к авто), reminderDue.ts, push.ts, webStatic.ts
+                            (доступ к авто), push.ts, webStatic.ts
     tests/                — unit, server (на временной SQLite), integration (реальный dev-сервер)
   web/                    — @garage/web: Nuxt SPA (ssr: false)
     pages/ components/ composables/ middleware/ plugins/ layouts/

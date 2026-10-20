@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { computeNextDue } from '../../server/utils/reminderDue'
+import { addMonths, computeNextDue } from '../utils/reminderDue'
 
 describe('computeNextDue', () => {
   it('считает дату по интервалу месяцев от последней записи', () => {
@@ -17,7 +17,7 @@ describe('computeNextDue', () => {
       intervalMonths: 1,
       lastEntry: { date: '2026-01-31', mileage: null },
     })
-    // JS Date.setMonth переносит 31 фев -> 3 марта, это ожидаемое поведение реализации
+    // Date.setUTCMonth переносит 31 фев -> 3 марта, это ожидаемое поведение реализации
     expect(result.nextDueDate).toBe('2026-03-03')
   })
 
@@ -81,5 +81,12 @@ describe('computeNextDue', () => {
       lastEntry: { date: '2026-01-01', mileage: 1000 },
     })
     expect(result.nextDueMileage).toBeNull()
+  })
+})
+
+describe('addMonths', () => {
+  it('не зависит от часового пояса: дата не «съезжает» на день', () => {
+    expect(addMonths('2026-10-10', 12)).toBe('2027-10-10')
+    expect(addMonths('2026-10-01', 1)).toBe('2026-11-01')
   })
 })

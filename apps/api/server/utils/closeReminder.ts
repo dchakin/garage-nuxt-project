@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { db, schema } from '../database'
-import { computeNextDue } from './reminderDue'
+import { computeNextDue } from '@garage/shared/utils/reminderDue'
 
 /**
  * Закрывает напоминание записью: запись становится `lastEntryId`, срок пересчитывается

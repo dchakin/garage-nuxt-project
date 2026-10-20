@@ -47,10 +47,7 @@ test('Напоминания (Г1): группы по статусам на эт
 
   // Внимание требуют — «Всё в порядке» не показываем
   await expect(page.getByText('Всё в порядке')).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'Добавить напоминание' })).toHaveAttribute(
-    'href',
-    `/cars/${seededCar.carId}/reminders/new`,
-  )
+  await expect(page.getByRole('button', { name: 'Добавить напоминание' })).toBeVisible()
 
   await snap(page, 'reminders')
 })
@@ -59,10 +56,7 @@ test('Напоминания (Г2): у машины их нет — пусто �
   await page.goto(`/cars/${seededCar.carIds.rio}/reminders`)
 
   await expect(page.getByRole('heading', { name: 'Напоминаний пока нет' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Добавить напоминание' })).toHaveAttribute(
-    'href',
-    `/cars/${seededCar.carIds.rio}/reminders/new`,
-  )
+  await expect(page.getByRole('button', { name: 'Добавить напоминание' })).toBeVisible()
   await expect(page.getByRole('article')).toHaveCount(0)
 
   await snap(page, 'reminders-empty')
@@ -114,11 +108,4 @@ test('Напоминания: ошибка загрузки и «Повтори�
   await page.unroute(REMINDERS_API)
   await page.getByRole('button', { name: 'Повторить' }).click()
   await expect(page.getByRole('article')).toHaveCount(5)
-})
-
-test('Напоминания: тап по карточке открывает напоминание', async ({ page, seededCar }) => {
-  await page.goto(`/cars/${seededCar.carId}/reminders`)
-
-  await page.getByRole('button', { name: 'ОСАГО' }).click()
-  await expect(page).toHaveURL(new RegExp(`/cars/${seededCar.carId}/reminders/\\d+$`))
 })

@@ -6,7 +6,7 @@ import { countAttentionReminders } from '@garage/shared/utils/reminderBadge'
 import { averageKmPerMonth } from '@garage/shared/utils/reminderRemaining'
 
 // Экран «Напоминания» (Г1/Г2/Г3/Т3). Файл reminders/index.vue, а не reminders.vue:
-// иначе reminders/new.vue стал бы вложенным маршрутом.
+// иначе подкаталог reminders/ сделал бы вкладки вложенными маршрутами.
 definePageMeta({ middleware: 'auth', layout: 'car' })
 
 /** Скелетон показываем, только если данные идут дольше этого, мс (иначе мелькает на быстрой сети) */
@@ -64,7 +64,8 @@ watch(carId, (id) => Number.isInteger(id) && load(), { immediate: true })
 // Запись добавлена из шторки — пробег и сроки могли сдвинуться; перечитываем молча
 const { savedCount } = useEntrySheet()
 const { changedCount } = useEntryDetailSheet()
-watch([savedCount, changedCount], async () => {
+const { savedCount: reminderSavedCount, open: openReminderSheet } = useReminderSheet()
+watch([savedCount, changedCount, reminderSavedCount], async () => {
   try {
     await Promise.all([fetchReminders(), fetchEntries()])
   } catch {
@@ -73,11 +74,7 @@ watch([savedCount, changedCount], async () => {
 })
 onBeforeUnmount(() => clearTimeout(skeletonTimer))
 
-// Правка — прежняя страница напоминания до шторки Е4 (#63)
-function openReminder(reminder: Reminder) {
-  navigateTo(`/cars/${carId.value}/reminders/${reminder.id}`)
-}
-
+// Тап по карточке (`open`) подключит шторка правки Е4 (#63): страницы правки больше нет.
 const { open: openEntrySheet } = useEntrySheet()
 function markDone(reminder: Reminder) {
   openEntrySheet({ carId: carId.value, reminder })
@@ -109,7 +106,7 @@ function markDone(reminder: Reminder) {
           message="Добавьте замену масла, ОСАГО или техосмотр — Гараж подскажет, когда подходит срок."
         >
           <template #action>
-            <UiButton :to="`/cars/${carId}/reminders/new`" :icon="Plus">
+            <UiButton :icon="Plus" @click="openReminderSheet({ carId })">
               Добавить напоминание
             </UiButton>
           </template>
@@ -118,7 +115,7 @@ function markDone(reminder: Reminder) {
 
       <template v-else>
         <div class="flex justify-end">
-          <UiButton :to="`/cars/${carId}/reminders/new`" size="sm" :icon="Plus">
+          <UiButton size="sm" :icon="Plus" @click="openReminderSheet({ carId })">
             Добавить напоминание
           </UiButton>
         </div>
@@ -134,7 +131,6 @@ function markDone(reminder: Reminder) {
           :current-mileage="currentCar.currentMileage"
           :avg-km-per-month="avgKmPerMonth"
           :today="today"
-          @open="openReminder"
           @done="markDone"
         />
       </template>
