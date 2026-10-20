@@ -39,6 +39,11 @@ export function formatMoney(amount: number): string {
   return `${formatNumber(amount)}${NBSP}₽`
 }
 
+/** `8.6` → `8,6 ₽/км`: стоимость километра из аналитики (одна цифра после запятой). */
+export function formatCostPerKm(rubPerKm: number): string {
+  return `${formatNumber(rubPerKm, 1)}${NBSP}₽/км`
+}
+
 /** `87450` → `87 450 км`. */
 export function formatMileage(km: number): string {
   return `${formatNumber(km)}${NBSP}км`

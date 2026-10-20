@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   formatCompactAmount,
+  formatCostPerKm,
   formatDate,
   formatDays,
   formatMileage,
@@ -16,6 +17,14 @@ import {
 // В ожиданиях пробел обычный, `nb()` превращает его в неразрывный
 const nb = (text: string) => text.replaceAll(' ', NBSP)
 const TODAY = '2026-10-10'
+
+describe('formatCostPerKm', () => {
+  it('рубли за километр с одной цифрой после запятой', () => {
+    expect(formatCostPerKm(8.6)).toBe(nb('8,6 ₽/км'))
+    expect(formatCostPerKm(12)).toBe(nb('12,0 ₽/км'))
+    expect(formatCostPerKm(0)).toBe(nb('0,0 ₽/км'))
+  })
+})
 
 describe('formatMonthYear', () => {
   it('месяц и год с заглавной буквы', () => {
