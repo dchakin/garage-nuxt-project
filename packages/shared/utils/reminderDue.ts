@@ -1,11 +1,11 @@
-import type { ReminderTriggerType } from '@garage/shared/schemas/reminder'
+import type { ReminderTriggerType } from '../schemas/reminder'
 
 interface LastEntryLike {
   date: string
   mileage: number | null
 }
 
-interface ComputeNextDueInput {
+export interface ComputeNextDueInput {
   triggerType: ReminderTriggerType
   intervalMonths?: number | null
   intervalKm?: number | null
@@ -14,9 +14,10 @@ interface ComputeNextDueInput {
   nextDueMileageOverride?: number | null
 }
 
-function addMonths(dateStr: string, months: number): string {
-  const d = new Date(`${dateStr}T00:00:00`)
-  d.setMonth(d.getMonth() + months)
+/** Дата `YYYY-MM-DD` плюс месяцы; считается в UTC, поэтому не зависит от часового пояса машины */
+export function addMonths(dateStr: string, months: number): string {
+  const d = new Date(`${dateStr}T00:00:00Z`)
+  d.setUTCMonth(d.getUTCMonth() + months)
   return d.toISOString().slice(0, 10)
 }
 
@@ -24,6 +25,7 @@ function addMonths(dateStr: string, months: number): string {
  * Считает следующую дату/пробег срабатывания напоминания.
  * Если есть привязанная запись (lastEntry) и задан интервал — считаем от неё,
  * иначе используем то, что явно указал пользователь.
+ * Общий код: сервер (создание/правка/закрытие напоминания) и клиент (предпросмотр срока).
  */
 export function computeNextDue(input: ComputeNextDueInput): {
   nextDueDate: string | null

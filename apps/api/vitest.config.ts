@@ -5,9 +5,8 @@ export default defineConfig({
     name: 'api',
     environment: 'node',
     include: ['tests/**/*.test.ts'],
-    // computeNextDue строит даты через локальный Date().toISOString() (см.
-    // "Ловушки" в docs/plans/conventions.md) — фиксируем UTC, иначе тесты
-    // дат зависят от часового пояса машины, на которой они запущены.
+    // Фиксируем UTC, иначе тесты дат (getReminderStatus, todayIso) зависят от
+    // часового пояса машины, на которой они запущены.
     env: { TZ: 'UTC' },
     setupFiles: ['./tests/setup/node-globals.ts'],
     // Один раз собирает API; интеграционные тесты запускают готовую сборку (tests/helpers/apiServer.ts)

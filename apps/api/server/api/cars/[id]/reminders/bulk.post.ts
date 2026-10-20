@@ -2,6 +2,7 @@ import { db, schema } from '../../../../database'
 import { reminderBulkSchema } from '@garage/shared/schemas/reminder'
 import { deriveTriggerType } from '@garage/shared/utils/reminderTrigger'
 import { todayIso } from '@garage/shared/utils/format'
+import { computeNextDue } from '@garage/shared/utils/reminderDue'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireAuth(event)
