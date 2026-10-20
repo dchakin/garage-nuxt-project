@@ -12,7 +12,16 @@ const SKELETON_DELAY_MS = 300
 const route = useRoute()
 const carId = computed(() => Number(route.params.id))
 const { car } = useCurrentCar()
-const { reminders, fetchReminders } = useReminders(carId)
+const { reminders: loadedReminders, fetchReminders } = useReminders(carId)
+const {
+  open: openReminderEdit,
+  hiddenIds: hiddenReminderIds,
+  changedCount: reminderChangedCount,
+} = useReminderEditSheet()
+// Удаляемое (ждёт «Отменить») напоминание пропадает сразу, до DELETE
+const reminders = computed(() =>
+  loadedReminders.value.filter((reminder) => !hiddenReminderIds.value.includes(reminder.id)),
+)
 const { entries, fetchEntries } = useEntries(carId)
 const { analytics, fetchAnalytics } = useAnalytics(carId)
 
@@ -69,7 +78,7 @@ watch(carId, (id) => Number.isInteger(id) && load(), { immediate: true })
 // перечитываем молча, без скелетона: прежние данные остаются на экране
 const { savedCount, open: openEntrySheet } = useEntrySheet()
 const { open: openEntryDetail, hiddenIds, changedCount } = useEntryDetailSheet()
-watch([savedCount, changedCount], async () => {
+watch([savedCount, changedCount, reminderChangedCount], async () => {
   try {
     await Promise.all([fetchReminders({ isActive: true }), fetchEntries(), fetchAnalytics()])
   } catch {
@@ -108,6 +117,7 @@ onBeforeUnmount(() => clearTimeout(skeletonTimer))
         :current-mileage="currentCar.currentMileage"
         :avg-km-per-month="avgKmPerMonth"
         :today="today"
+        @open="openReminderEdit"
         @done="(reminder) => openEntrySheet({ carId, reminder })"
       />
       <OverviewMonthExpensesCard :analytics="shownAnalytics ?? analytics" :today="today" />
