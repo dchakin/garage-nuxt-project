@@ -1,6 +1,14 @@
 import type { CarAnalytics } from '@garage/shared/types'
-import type { AnalyticsQuery } from '@garage/shared/schemas/analytics'
+import type { AnalyticsPeriod, AnalyticsQuery } from '@garage/shared/schemas/analytics'
 import { todayIso } from '@garage/shared/utils/format'
+import type { ExpensesQuery } from '~/utils/expensesPeriod'
+
+/** Аналитика выбранного периода экрана «Расходы» и суммы ближайших периодов с тратами (Ж3) */
+export interface PeriodReport {
+  query: ExpensesQuery
+  analytics: CarAnalytics
+  neighbourTotals: { prev: number | null; next: number | null }
+}
 
 export function useAnalytics(carId: MaybeRefOrGetter<number>) {
   const analytics = ref<CarAnalytics | null>(null)
@@ -30,5 +38,30 @@ export function useAnalytics(carId: MaybeRefOrGetter<number>) {
     }
   }
 
-  return { analytics, loading, fetchAnalytics }
+  /** Сумма трат за период; ближайшие периоды в Ж3 («7 500 ₽ в июне и 9 900 ₽ в августе») */
+  async function fetchPeriodTotal(period: AnalyticsPeriod, date: string): Promise<number> {
+    const result = await $fetch<CarAnalytics>(`/api/cars/${toValue(carId)}/analytics`, {
+      query: { period, date },
+    })
+    return result.total
+  }
+
+  /**
+   * Экран «Расходы»: аналитика выбранного периода без записи в общее состояние. Если трат за
+   * период нет, но у машины они есть, дополнительно подтягивает суммы ближайших периодов.
+   */
+  async function fetchPeriodReport(query: ExpensesQuery): Promise<PeriodReport> {
+    const result = await $fetch<CarAnalytics>(`/api/cars/${toValue(carId)}/analytics`, {
+      query: query.date ? { period: query.period, date: query.date } : { period: query.period },
+    })
+    const isEmptyPeriod = result.total === 0 && result.hasAnyExpenses
+    const [prev, next] = await Promise.all(
+      [result.prevPeriodWithExpenses, result.nextPeriodWithExpenses].map((date) =>
+        isEmptyPeriod && date ? fetchPeriodTotal(query.period, date) : null,
+      ),
+    )
+    return { query, analytics: result, neighbourTotals: { prev: prev ?? null, next: next ?? null } }
+  }
+
+  return { analytics, loading, fetchAnalytics, fetchPeriodReport }
 }

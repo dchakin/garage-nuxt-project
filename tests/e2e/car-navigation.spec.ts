@@ -26,7 +26,8 @@ test('вкладки машины и бейдж напоминаний', async (
 
   await tabs.getByRole('link', { name: 'Расходы' }).click()
   await expect(page).toHaveURL(new RegExp(`/cars/${camry}/expenses$`))
-  await expect(page.getByRole('heading', { name: 'Расходы скоро появятся' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Расходы', level: 1 })).toBeAttached()
+  await expect(tabs.getByRole('link', { name: 'Расходы' })).toHaveAttribute('aria-current', 'page')
 
   await tabs.getByRole('link', { name: 'Обзор' }).click()
   await expect(page).toHaveURL(new RegExp(`/cars/${camry}$`))
