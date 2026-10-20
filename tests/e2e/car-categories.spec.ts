@@ -2,8 +2,8 @@ import type { Page } from '@playwright/test'
 import { expect, test } from './fixtures'
 import { snap } from './helpers/snap'
 
-const OWN_NAME = 'Кузов'
-const RENAMED = 'Кузовные работы'
+const OWN_NAME = 'Автозвук'
+const RENAMED = 'Мультимедиа'
 
 async function openCategoriesFromSettings(page: Page, carId: number) {
   await page.goto(`/cars/${carId}/settings`)
