@@ -64,6 +64,130 @@ test('З2: строка «Пробег» открывает шторку обн�
   await expect(page.getByRole('button', { name: /Пробег/ })).toContainText(/87\s550\sкм/)
 })
 
+async function openAddMemberSheet(page: Page, carId: number) {
+  await page.goto(`/cars/${carId}/settings`)
+  await page.getByRole('button', { name: 'Пригласить участника' }).click()
+  const sheet = page.getByRole('dialog', { name: 'Пригласить участника' })
+  await expect(sheet).toBeVisible()
+  return sheet
+}
+
+test('И1: участник добавляется по email и появляется в списке', async ({ page, seededCar }) => {
+  const { carId, users } = seededCar
+  const sheet = await openAddMemberSheet(page, carId)
+
+  await expect(sheet.getByTestId('add-member-rights')).toContainText('добавляет записи')
+  const submit = sheet.getByRole('button', { name: 'Добавить', exact: true })
+  await expect(submit).toBeDisabled()
+  await sheet.getByLabel('Email участника').fill(users.sergey.email)
+  await expect(submit).toBeEnabled()
+  await snap(page, 'add-member-sheet')
+
+  await submit.click()
+  await expect(sheet).toBeHidden()
+  await expect(page.getByRole('status').filter({ hasText: 'Участник добавлен' })).toBeVisible()
+  const members = page.getByTestId('members-list')
+  await expect(members).toContainText(users.sergey.name)
+  await expect(members).toContainText(users.sergey.email)
+})
+
+test('И8: email не найден — ошибка у поля и «Поделиться ссылкой»', async ({ page, seededCar }) => {
+  const sheet = await openAddMemberSheet(page, seededCar.carId)
+  await page.evaluate(() => {
+    const shared: unknown[] = []
+    Object.assign(window, { __shared: shared })
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: async (data: unknown) => void shared.push(data),
+    })
+  })
+
+  const field = sheet.getByLabel('Email участника')
+  const submit = sheet.getByRole('button', { name: 'Добавить', exact: true })
+  await field.fill('nobody@mail.ru')
+  await submit.click()
+
+  await expect(sheet.getByText('Пользователь с таким email не найден')).toBeVisible()
+  await expect(field).toHaveAttribute('aria-invalid', 'true')
+  await expect(submit).toBeDisabled()
+  await snap(page, 'add-member-not-found')
+
+  // Пока email не изменён, «Добавить» неактивна; после правки — снова доступна
+  await field.fill('nobody2@mail.ru')
+  await expect(submit).toBeEnabled()
+  await field.fill('nobody@mail.ru')
+  await expect(submit).toBeDisabled()
+
+  await sheet.getByRole('button', { name: 'Поделиться ссылкой на приложение' }).click()
+  const shared = await page.evaluate(
+    () => (window as unknown as { __shared: { url: string }[] }).__shared,
+  )
+  expect(shared).toHaveLength(1)
+  expect(shared[0].url).toMatch(/^https?:\/\//)
+})
+
+test('И8: без Web Share ссылка копируется и показывается toast', async ({ page, seededCar }) => {
+  const sheet = await openAddMemberSheet(page, seededCar.carId)
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'share', { configurable: true, value: undefined })
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async (text: string) => void Object.assign(window, { __copied: text }) },
+    })
+  })
+
+  await sheet.getByLabel('Email участника').fill('nobody@mail.ru')
+  await sheet.getByRole('button', { name: 'Добавить', exact: true }).click()
+  await sheet.getByRole('button', { name: 'Поделиться ссылкой на приложение' }).click()
+
+  await expect(page.getByRole('status').filter({ hasText: 'Ссылка скопирована' })).toBeVisible()
+  const copied = await page.evaluate(() => (window as unknown as { __copied: string }).__copied)
+  expect(copied).toMatch(/^https?:\/\//)
+})
+
+test('И9: email участника — «уже участник», кнопка ждёт правки', async ({ page, seededCar }) => {
+  const { carId, users } = seededCar
+  const sheet = await openAddMemberSheet(page, carId)
+
+  const field = sheet.getByLabel('Email участника')
+  const submit = sheet.getByRole('button', { name: 'Добавить', exact: true })
+  await field.fill(users.anna.email)
+  await submit.click()
+
+  await expect(sheet.getByText(`${users.anna.name} уже участник этой машины`)).toBeVisible()
+  await expect(submit).toBeDisabled()
+  await expect(sheet.getByRole('button', { name: 'Поделиться ссылкой на приложение' })).toHaveCount(
+    0,
+  )
+  await snap(page, 'add-member-already')
+
+  await field.fill(users.sergey.email)
+  await expect(submit).toBeEnabled()
+})
+
+test('Сценарий 5: владелец убирает участника после подтверждения', async ({ page, seededCar }) => {
+  const { carId, users } = seededCar
+  await page.goto(`/cars/${carId}/settings`)
+  const members = page.getByTestId('members-list')
+  await expect(members).toContainText(users.anna.name)
+
+  await page.getByRole('button', { name: `Убрать участника ${users.anna.name}` }).click()
+  const dialog = page.getByRole('alertdialog', { name: `Убрать ${users.anna.name}?` })
+  await expect(dialog).toBeVisible()
+
+  // Отмена ничего не удаляет
+  await dialog.getByRole('button', { name: 'Отмена' }).click()
+  await expect(dialog).toBeHidden()
+  await expect(members).toContainText(users.anna.name)
+
+  await page.getByRole('button', { name: `Убрать участника ${users.anna.name}` }).click()
+  await dialog.getByRole('button', { name: 'Убрать', exact: true }).click()
+  await expect(dialog).toBeHidden()
+  await expect(page.getByRole('status').filter({ hasText: 'больше не участник' })).toBeVisible()
+  await expect(members).not.toContainText(users.anna.name)
+  await expect(members).toContainText(`${users.dmitry.name} (вы)`)
+})
+
 test('И2: диалог удаления перечисляет записи, напоминания и участников; машина удаляется', async ({
   page,
   seededCar,
