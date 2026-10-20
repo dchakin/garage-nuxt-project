@@ -2,11 +2,12 @@
 import { computed } from 'vue'
 import { formatNumber } from '@garage/shared/utils/format'
 import { formatMileageAge } from '~/utils/mileageAge'
+import UiButton from '~/components/ui/Button.vue'
 import UiCard from '~/components/ui/Card.vue'
 
 /**
- * Карточка «Пробег» на Обзоре: крупный пробег и «обновлён N дней назад». Кнопка «Обновить»
- * придёт в этапе 8 через слот `action`.
+ * Карточка «Пробег» на Обзоре: крупный пробег, «обновлён N дней назад» и кнопка «Обновить»
+ * (событие `update` — страница открывает шторку Б5).
  */
 const props = defineProps<{
   mileage: number
@@ -14,6 +15,8 @@ const props = defineProps<{
   updatedAt: string | null
   today?: string
 }>()
+
+defineEmits<{ update: [] }>()
 
 const age = computed(() => formatMileageAge(props.updatedAt, props.today))
 </script>
@@ -29,7 +32,9 @@ const age = computed(() => formatMileageAge(props.updatedAt, props.today))
         </p>
         <p v-if="age" class="mt-sp-1 text-sm text-text-2">{{ age }}</p>
       </div>
-      <slot name="action" />
+      <UiButton variant="secondary" size="sm" class="shrink-0" @click="$emit('update')">
+        Обновить
+      </UiButton>
     </div>
   </UiCard>
 </template>

@@ -36,12 +36,18 @@ describe('formatMileageAge', () => {
 })
 
 describe('MileageCard', () => {
-  it('показывает пробег и давность обновления, без кнопки «Обновить»', () => {
+  it('показывает пробег и давность обновления', () => {
     const updatedAt = new Date(2026, 9, 7, 12, 0).toISOString()
     const wrapper = mount(MileageCard, { props: { mileage: MILEAGE, updatedAt, today: TODAY } })
     expect(wrapper.get('[data-testid="overview-mileage"]').text()).toContain(`87${NBSP}450`)
     expect(wrapper.text()).toContain('обновлён')
-    expect(wrapper.find('button').exists()).toBe(false)
+  })
+
+  it('кнопка «Обновить» эмитит update', async () => {
+    const wrapper = mount(MileageCard, { props: { mileage: MILEAGE, updatedAt: null } })
+    await wrapper.get('button').trigger('click')
+    expect(wrapper.emitted('update')).toHaveLength(1)
+    expect(wrapper.get('button').text()).toBe('Обновить')
   })
 
   it('без даты обновления подпись не рендерится', () => {
