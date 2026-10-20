@@ -118,6 +118,8 @@ test('Е3: «Открыть «…»» закрывает шторку созда
 
   await sheet.getByRole('button', { name: 'Открыть «ОСАГО»' }).click()
 
-  await expect(sheet).toBeHidden()
+  // шторка создания закрыта, вместо неё открылась шторка правки (Е4)
+  await expect(page.getByRole('dialog', { name: 'Новое напоминание' })).toBeHidden()
+  await expect(page.getByRole('dialog', { name: 'Изменить напоминание' })).toBeVisible()
   await expect(reminderHeadings(page, 'ОСАГО')).toHaveCount(1)
 })
