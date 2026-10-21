@@ -41,6 +41,20 @@ export function useAuth() {
     return storeSession(response)
   }
 
+  /** Просит сервер отправить письмо со ссылкой сброса (всегда 204, есть ли такой email — не видно). */
+  async function requestPasswordReset(email: string) {
+    await $fetch('/api/auth/password-reset', { method: 'POST', body: { email } })
+  }
+
+  /** Задаёт новый пароль по токену из письма и сразу входит (как `login`). */
+  async function confirmPasswordReset(token: string, password: string) {
+    const response = await $fetch<AuthResponse>('/api/auth/password-reset/confirm', {
+      method: 'POST',
+      body: { token, password, authMode },
+    })
+    return storeSession(response)
+  }
+
   /** Сбрасывает локальное состояние сессии, не обращаясь к серверу. */
   function clear() {
     localTokenStore.clear()
@@ -59,5 +73,15 @@ export function useAuth() {
     }
   }
 
-  return { user, loggedIn, fetch: fetchSession, login, register, logout, clear }
+  return {
+    user,
+    loggedIn,
+    fetch: fetchSession,
+    login,
+    register,
+    requestPasswordReset,
+    confirmPasswordReset,
+    logout,
+    clear,
+  }
 }

@@ -5,7 +5,11 @@ import { expect, test } from './helpers/test'
 const forgotLink = (page: import('@playwright/test').Page) =>
   page.getByRole('link', { name: 'Забыли пароль?' })
 
-test('вход: экран А1, без почты ссылки «Забыли пароль?» нет', async ({ page }) => {
+test('вход: экран А1, без почты на сервере ссылки «Забыли пароль?» нет', async ({ page }) => {
+  // e2e-сервер запущен с outbox, поэтому «выключенную» почту подменяем ответом конфига
+  await page.route('**/api/auth/config', (route) =>
+    route.fulfill({ json: { passwordReset: false } }),
+  )
   const configLoaded = page.waitForResponse('**/api/auth/config')
   await page.goto('/login')
   await configLoaded
@@ -19,9 +23,6 @@ test('вход: экран А1, без почты ссылки «Забыли п
 test('вход: ссылка «Забыли пароль?» появляется, когда на сервере включена почта', async ({
   page,
 }) => {
-  await page.route('**/api/auth/config', (route) =>
-    route.fulfill({ json: { passwordReset: true } }),
-  )
   await page.goto('/login')
 
   await expect(forgotLink(page)).toBeVisible()
