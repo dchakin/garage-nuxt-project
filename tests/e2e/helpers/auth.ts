@@ -6,11 +6,11 @@ export interface TestUser {
   password: string
 }
 
-// Подписи полей в текущих формах не связаны с input (нет for/id), поэтому поля ищутся по типу.
-// После редизайна форм перейти на getByLabel.
-const nameInput = (page: Page) => page.locator('input[type="text"]')
-const emailInput = (page: Page) => page.locator('input[type="email"]')
-const passwordInput = (page: Page) => page.locator('input[type="password"]')
+// exact: у поля пароля есть кнопка с aria-label «Показать пароль», обычный поиск по подписи
+// «Пароль» нашёл бы и её.
+const nameInput = (page: Page) => page.getByLabel('Имя', { exact: true })
+const emailInput = (page: Page) => page.getByLabel('Email', { exact: true })
+const passwordInput = (page: Page) => page.getByLabel('Пароль', { exact: true })
 
 let userCounter = 0
 
@@ -24,7 +24,7 @@ export function createTestUser(name = 'Дмитрий'): TestUser {
   }
 }
 
-/** Регистрация через форму /register; заканчивается на списке машин. */
+/** Регистрация через форму /register; заканчивается на списке машин (через /onboarding). */
 export async function registerViaUi(page: Page, user: TestUser) {
   await page.goto('/register')
   await nameInput(page).fill(user.name)

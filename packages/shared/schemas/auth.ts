@@ -9,9 +9,11 @@ export type AuthMode = (typeof authModes)[number]
 
 const authModeSchema = z.enum(authModes).default('cookie')
 
+export const MIN_PASSWORD_LENGTH = 6
+
 export const registerSchema = z.object({
   email: z.string().email('Некорректный email'),
-  password: z.string().min(6, 'Минимум 6 символов'),
+  password: z.string().min(MIN_PASSWORD_LENGTH, `Минимум ${MIN_PASSWORD_LENGTH} символов`),
   name: z.string().min(1, 'Укажите имя'),
   authMode: authModeSchema,
 })

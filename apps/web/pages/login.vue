@@ -1,23 +1,37 @@
 <script setup lang="ts">
-import { CarFront } from 'lucide-vue-next'
 definePageMeta({ middleware: 'auth' })
 
+const INVALID_CREDENTIALS_TITLE = 'Неверный email или пароль'
+const LOGIN_FAILED_TITLE = 'Не удалось войти'
+
 const { login } = useAuth()
+const { passwordReset, fetchAuthConfig } = useAuthConfig()
 const router = useRouter()
 
 const email = ref('')
 const password = ref('')
-const error = ref('')
+const errorTitle = ref('')
+const errorMessage = ref('')
 const loading = ref(false)
 
+onMounted(fetchAuthConfig)
+
 async function onSubmit() {
-  error.value = ''
+  errorTitle.value = ''
+  errorMessage.value = ''
   loading.value = true
   try {
     await login(email.value, password.value)
-    router.push('/cars')
+    await router.push('/cars')
   } catch (e: any) {
-    error.value = e?.data?.statusMessage || 'Не удалось войти'
+    // Неверные данные — только плашка, поля не подсвечиваются (макет А2)
+    if (e?.statusCode === 401 || e?.status === 401) {
+      errorTitle.value = INVALID_CREDENTIALS_TITLE
+      errorMessage.value = 'Проверьте данные и попробуйте ещё раз.'
+    } else {
+      errorTitle.value = LOGIN_FAILED_TITLE
+      errorMessage.value = 'Проверьте соединение и попробуйте ещё раз.'
+    }
   } finally {
     loading.value = false
   }
@@ -25,31 +39,31 @@ async function onSubmit() {
 </script>
 
 <template>
-  <div class="max-w-sm mx-auto mt-16">
-    <div class="flex justify-center mb-4">
-      <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-accent text-on-accent">
-        <CarFront class="h-6 w-6" aria-hidden="true" />
-      </span>
-    </div>
-    <h1 class="text-h1 text-text mb-6 text-center">Вход в Гараж</h1>
-    <div class="card p-6 shadow-sm">
-      <form class="space-y-4" @submit.prevent="onSubmit">
-        <div>
-          <label class="label">Email</label>
-          <input v-model="email" type="email" required class="input" />
-        </div>
-        <div>
-          <label class="label">Пароль</label>
-          <PasswordInput v-model="password" />
-        </div>
-        <p v-if="error" class="alert-error">{{ error }}</p>
-        <UiButton type="submit" :loading="loading" class="w-full">
-          {{ loading ? 'Входим…' : 'Войти' }}
-        </UiButton>
-      </form>
-    </div>
-    <p class="text-sm text-text-2 text-center mt-4">
-      Нет аккаунта? <NuxtLink to="/register" class="link">Зарегистрироваться</NuxtLink>
+  <div class="mx-auto flex max-w-sm flex-col pt-sp-8">
+    <AuthHeader title="Вход в Гараж" subtitle="Учёт обслуживания и расходов на машину" />
+    <form class="flex flex-col gap-sp-4" @submit.prevent="onSubmit">
+      <UiAlert v-if="errorTitle" variant="error" :title="errorTitle" :message="errorMessage" />
+      <UiField
+        v-model="email"
+        label="Email"
+        type="email"
+        placeholder="name@example.com"
+        autocomplete="email"
+        required
+      />
+      <PasswordInput v-model="password" autocomplete="current-password" />
+      <div v-if="passwordReset" class="-mt-sp-2 flex justify-end">
+        <NuxtLink to="/forgot-password" class="text-sm font-semibold text-accent-text">
+          Забыли пароль?
+        </NuxtLink>
+      </div>
+      <UiButton type="submit" :loading="loading" class="w-full">
+        {{ loading ? 'Входим…' : 'Войти' }}
+      </UiButton>
+    </form>
+    <p class="mt-sp-6 text-center text-sm text-text-2">
+      Нет аккаунта?
+      <NuxtLink to="/register" class="font-semibold text-accent-text">Зарегистрироваться</NuxtLink>
     </p>
   </div>
 </template>
