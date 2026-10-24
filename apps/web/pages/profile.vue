@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CarFront, LogOut } from 'lucide-vue-next'
 
-// Экран «Профиль» (З1, #54): push, тема, список машин, выход. Блок «Аккаунт» — этап 11.
+// Экран «Профиль» (З1, #54): push, тема, список машин, аккаунт (#73), выход.
 definePageMeta({ middleware: 'auth', layout: 'plain' })
 
 const { user, logout: logoutSession } = useAuth()
@@ -63,6 +63,8 @@ async function logout() {
           <ProfileThemeSetting />
         </UiCard>
       </section>
+
+      <ProfileAccountSection />
 
       <UiButton variant="secondary" :icon="LogOut" class="w-full" @click="logoutDialogOpen = true">
         Выйти

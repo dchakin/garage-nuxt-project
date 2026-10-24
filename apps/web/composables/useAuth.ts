@@ -55,6 +55,28 @@ export function useAuth() {
     return storeSession(response)
   }
 
+  /** Меняет имя; сервер обновляет куку сессии, клиент берёт имя из ответа. */
+  async function updateName(name: string) {
+    const updated = await $fetch<AuthUser>('/api/auth/me', { method: 'PATCH', body: { name } })
+    user.value = updated
+    return updated
+  }
+
+  /** Меняет пароль; остальные устройства теряют refresh-токены, текущее (мобильное) сохраняет свой. */
+  async function changePassword(currentPassword: string, newPassword: string) {
+    const refreshToken = localTokenStore.read()?.refreshToken
+    await $fetch('/api/auth/password', {
+      method: 'POST',
+      body: { currentPassword, newPassword, refreshToken },
+    })
+  }
+
+  /** Удаляет аккаунт на сервере и сбрасывает локальную сессию. */
+  async function deleteAccount() {
+    await $fetch('/api/auth/account', { method: 'DELETE' })
+    clear()
+  }
+
   /** Сбрасывает локальное состояние сессии, не обращаясь к серверу. */
   function clear() {
     localTokenStore.clear()
@@ -81,6 +103,9 @@ export function useAuth() {
     register,
     requestPasswordReset,
     confirmPasswordReset,
+    updateName,
+    changePassword,
+    deleteAccount,
     logout,
     clear,
   }
