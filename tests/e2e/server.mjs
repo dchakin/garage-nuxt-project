@@ -69,6 +69,10 @@ Object.assign(process.env, {
   DB_FILE_NAME: dbFileName,
   NUXT_WEB_DIST_DIR: webDistDir,
   NUXT_SESSION_PASSWORD: 'e2e-session-password-at-least-32-characters',
+  // Почта включена: письма пишутся файлами в outbox рядом с БД (путь знает и helpers/mailbox.ts),
+  // ссылки в них ведут на этот же сервер
+  NUXT_MAIL_OUTBOX_DIR: path.join(tmpDir, 'mail-outbox'),
+  NUXT_APP_URL: `http://127.0.0.1:${process.env.E2E_PORT || '3100'}`,
 })
 
 // Сервер Nitro стартует при импорте; в том же процессе, чтобы Playwright гасил его вместе с нами
