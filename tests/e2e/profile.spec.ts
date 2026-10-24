@@ -9,7 +9,7 @@ test('профиль: тема, список машин, выход', async ({ p
   await page.getByRole('link', { name: 'Профиль' }).click()
   await expect(page).toHaveURL(/\/profile$/)
   await expect(page.getByRole('heading', { name: 'Профиль', level: 1 })).toBeVisible()
-  await expect(page.getByText(users.dmitry.email)).toBeVisible()
+  await expect(page.getByTestId('account-email').getByText(users.dmitry.email)).toBeVisible()
 
   // Push без VAPID: переключатель недоступен, причина названа
   const pushToggle = page.getByRole('switch', { name: 'Push-уведомления' })
