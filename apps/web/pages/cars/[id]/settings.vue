@@ -12,7 +12,6 @@ import { formatMileage } from '@garage/shared/utils/format'
 definePageMeta({ middleware: 'auth', layout: 'plain' })
 
 const SETTINGS_FORM_ID = 'car-settings-form'
-const CAR_UNAVAILABLE_STATUSES = [403, 404]
 
 const route = useRoute()
 const carId = Number(route.params.id)
@@ -21,6 +20,7 @@ const { car, loadCurrentCar } = useCurrentCar()
 const { updateCar, deleteCar, leaveCar, saving, deletingId, leavingId } = useCars()
 const { categories, fetchCategories } = useCategories(carId)
 const { getLastCarId, forgetLastCar } = useLastCar()
+const { isCarUnavailable, showCarError } = useCarUnavailable()
 const { open: openMileageSheet, savedCount } = useMileageSheet()
 const toast = useToast()
 
@@ -44,9 +44,8 @@ async function load() {
   try {
     await loadCurrentCar(carId)
   } catch (error: any) {
-    if (CAR_UNAVAILABLE_STATUSES.includes(error?.statusCode)) {
-      if (getLastCarId() === carId) forgetLastCar()
-      await navigateTo('/cars', { replace: true })
+    if (isCarUnavailable(error)) {
+      showCarError(error, carId)
       return
     }
     loadFailed.value = true

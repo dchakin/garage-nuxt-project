@@ -1,3 +1,5 @@
+import { loginLocation } from '~/utils/redirectTarget'
+
 /** Страницы только для гостей: вошедшего отсюда уводит на список машин. */
 const GUEST_ONLY_PAGES = ['/login', '/register', '/forgot-password']
 /** Доступны всем: ссылка из письма сброса может открыться и в браузере, где уже есть сессия. */
@@ -8,7 +10,8 @@ export default defineNuxtRouteMiddleware((to) => {
 
   if (OPEN_PAGES.includes(to.path)) return
   if (!loggedIn.value && !GUEST_ONLY_PAGES.includes(to.path)) {
-    return navigateTo('/login')
+    // Маршрут сохраняется: после входа login.vue вернёт на него
+    return navigateTo(loginLocation(to.fullPath))
   }
   if (loggedIn.value && GUEST_ONLY_PAGES.includes(to.path)) {
     return navigateTo('/cars')

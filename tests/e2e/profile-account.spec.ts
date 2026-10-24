@@ -1,4 +1,5 @@
 import { expect, test } from './fixtures'
+import { loginRedirectingTo } from './helpers/auth'
 import { snap } from './helpers/snap'
 
 test('З1: смена имени, email только для чтения', async ({ page, seededCar }) => {
@@ -99,7 +100,7 @@ test('И10: удаление аккаунта перечисляет свои и
 
   // Сессии больше нет, войти нельзя
   await page.goto('/profile')
-  await expect(page).toHaveURL(/\/login$/)
+  await expect(page).toHaveURL(loginRedirectingTo('/profile'))
   const login = await page.request.post('/api/auth/login', {
     data: { email: users.dmitry.email, password: users.dmitry.password },
   })

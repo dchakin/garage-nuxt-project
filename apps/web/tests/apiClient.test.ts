@@ -174,6 +174,69 @@ describe('createApiClient', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
+  describe('конец сессии (И7)', () => {
+    it('refresh удался, но повтор снова 401 — сообщает о конце сессии один раз', async () => {
+      const tokens = memoryTokenStore(oldTokens)
+      const onUnauthorized = vi.fn()
+      fetchMock.mockImplementation(async (url: string) =>
+        String(url).endsWith('/api/auth/refresh') ? json({ tokens: newTokens }) : json({}, 401),
+      )
+      const api = createApiClient({ baseURL: '', authMode: 'token', tokens, onUnauthorized })
+
+      await expect(api('/api/cars')).rejects.toMatchObject({ statusCode: 401 })
+
+      expect(onUnauthorized).toHaveBeenCalledOnce()
+      expect(fetchMock).toHaveBeenCalledTimes(3)
+    })
+
+    it('token-режим без сохранённых токенов — сразу конец сессии, refresh не вызывается', async () => {
+      const onUnauthorized = vi.fn()
+      fetchMock.mockResolvedValue(json({}, 401))
+      const api = createApiClient({
+        baseURL: '',
+        authMode: 'token',
+        tokens: memoryTokenStore(null),
+        onUnauthorized,
+      })
+
+      await expect(api('/api/cars')).rejects.toMatchObject({ statusCode: 401 })
+
+      expect(onUnauthorized).toHaveBeenCalledOnce()
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('onUnauthorized вызывается до того, как ошибка дойдёт до вызывающего', async () => {
+      const order: string[] = []
+      fetchMock.mockResolvedValue(json({}, 401))
+      const api = createApiClient({
+        baseURL: '',
+        authMode: 'cookie',
+        tokens: memoryTokenStore(null),
+        onUnauthorized: () => {
+          order.push('unauthorized')
+        },
+      })
+
+      await api('/api/cars').catch(() => order.push('caller'))
+
+      expect(order).toEqual(['unauthorized', 'caller'])
+    })
+
+    it.each([403, 404, 500])('%i не считается концом сессии', async (status) => {
+      const onUnauthorized = vi.fn()
+      fetchMock.mockImplementation(async () => json({}, status))
+      const api = createApiClient({
+        baseURL: '',
+        authMode: 'cookie',
+        tokens: memoryTokenStore(null),
+        onUnauthorized,
+      })
+
+      await expect(api('/api/cars/1')).rejects.toMatchObject({ statusCode: status })
+      expect(onUnauthorized).not.toHaveBeenCalled()
+    })
+  })
+
   it('не-401 ошибки пробрасываются как есть', async () => {
     const onUnauthorized = vi.fn()
     fetchMock.mockResolvedValue(json({}, 403))

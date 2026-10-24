@@ -1,4 +1,5 @@
 import { expect, test } from './fixtures'
+import { loginRedirectingTo } from './helpers/auth'
 import { snap } from './helpers/snap'
 
 test('профиль: тема, список машин, выход', async ({ page, seededCar }) => {
@@ -53,5 +54,5 @@ test('профиль: тема, список машин, выход', async ({ p
   await expect(page).toHaveURL(/\/login$/)
 
   await page.goto('/profile')
-  await expect(page).toHaveURL(/\/login$/)
+  await expect(page).toHaveURL(loginRedirectingTo('/profile'))
 })
