@@ -24,14 +24,14 @@ export function createTestUser(name = 'Дмитрий'): TestUser {
   }
 }
 
-/** Регистрация через форму /register; заканчивается на списке машин (через /onboarding). */
+/** Регистрация через форму /register; заканчивается на мастере первого запуска (/onboarding). */
 export async function registerViaUi(page: Page, user: TestUser) {
   await page.goto('/register')
   await nameInput(page).fill(user.name)
   await emailInput(page).fill(user.email)
   await passwordInput(page).fill(user.password)
   await page.getByRole('button', { name: 'Зарегистрироваться' }).click()
-  await expect(page).toHaveURL(/\/cars$/)
+  await expect(page).toHaveURL(/\/onboarding$/)
 }
 
 /** Вход через форму /login; заканчивается на списке машин. */

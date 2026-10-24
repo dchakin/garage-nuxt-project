@@ -66,17 +66,13 @@ test('регистрация: экран А3, после неё открывае
   await expect(page.getByText('Минимум 6 символов')).toBeVisible()
   await snap(page, 'auth-register')
 
-  const visited: string[] = []
-  page.on('framenavigated', (frame) => {
-    if (frame === page.mainFrame()) visited.push(new URL(frame.url()).pathname)
-  })
   await page.getByLabel('Имя', { exact: true }).fill(user.name)
   await page.getByLabel('Email', { exact: true }).fill(user.email)
   await page.getByLabel('Пароль', { exact: true }).fill(user.password)
   await page.getByRole('button', { name: 'Зарегистрироваться' }).click()
 
-  await expect(page).toHaveURL(/\/cars$/)
-  expect(visited).toContain('/onboarding')
+  await expect(page).toHaveURL(/\/onboarding$/)
+  await expect(page.getByRole('heading', { name: 'Первая машина' })).toBeVisible()
 })
 
 test('регистрация с занятым email: ошибка сервера в плашке', async ({ page }) => {
