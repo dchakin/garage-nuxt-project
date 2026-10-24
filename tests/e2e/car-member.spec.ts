@@ -49,7 +49,7 @@ test('З4: участник видит данные для чтения, обн�
   await expect(page.getByRole('button', { name: /Toyota Camry/ })).toBeVisible()
   await expect(page.getByRole('button', { name: /Lada Largus/ })).toHaveCount(0)
 
-  // Доступ закрыт
+  // Доступ закрыт — экран «Нет доступа» (И6)
   await page.goto(`/cars/${carIds.largus}/settings`)
-  await expect(page).toHaveURL(/\/cars$/)
+  await expect(page.getByRole('heading', { name: 'Нет доступа' })).toBeVisible()
 })

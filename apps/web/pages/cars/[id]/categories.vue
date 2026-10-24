@@ -10,13 +10,13 @@ import type { CarCategory } from '~/composables/useCategories'
 definePageMeta({ middleware: 'auth', layout: 'plain' })
 
 const SKELETON_DELAY_MS = 300
-const CAR_UNAVAILABLE_STATUSES = [403, 404]
 const NAME_TAKEN_STATUS = 409
 
 const route = useRoute()
 const carId = Number(route.params.id)
 const { categories, fetchCategories, createCategory, renameCategory, deleteCategory } =
   useCategories(carId)
+const { isCarUnavailable, showCarError } = useCarUnavailable()
 const toast = useToast()
 
 const loaded = ref(false)
@@ -43,8 +43,8 @@ async function load() {
     await fetchCategories(true)
     loaded.value = true
   } catch (error: any) {
-    if (CAR_UNAVAILABLE_STATUSES.includes(error?.statusCode)) {
-      await navigateTo('/cars', { replace: true })
+    if (isCarUnavailable(error)) {
+      showCarError(error, carId)
       return
     }
     loadFailed.value = !categories.value.length

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { REDIRECT_QUERY_KEY, safeRedirect } from '~/utils/redirectTarget'
+
 definePageMeta({ middleware: 'auth' })
 
 const INVALID_CREDENTIALS_TITLE = 'Неверный email или пароль'
@@ -7,6 +9,7 @@ const LOGIN_FAILED_TITLE = 'Не удалось войти'
 const { login } = useAuth()
 const { passwordReset, fetchAuthConfig } = useAuthConfig()
 const router = useRouter()
+const route = useRoute()
 
 const email = ref('')
 const password = ref('')
@@ -22,7 +25,7 @@ async function onSubmit() {
   loading.value = true
   try {
     await login(email.value, password.value)
-    await router.push('/cars')
+    await router.push(safeRedirect(route.query[REDIRECT_QUERY_KEY]))
   } catch (e: any) {
     // Неверные данные — только плашка, поля не подсвечиваются (макет А2)
     if (e?.statusCode === 401 || e?.status === 401) {

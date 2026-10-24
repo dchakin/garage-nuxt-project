@@ -60,6 +60,13 @@ export async function loginViaApi(page: Page, user: Pick<TestUser, 'email' | 'pa
   expect(response.ok(), await response.text()).toBe(true)
 }
 
+/**
+ * Предикат для `toHaveURL`: экран входа с `?redirect=<path>`. Сравнивается разобранный параметр,
+ * а не строка: vue-router не кодирует `/` в query, и в адресной строке путь лежит как есть.
+ */
+export const loginRedirectingTo = (redirectPath: string) => (url: URL) =>
+  url.pathname === '/login' && url.searchParams.get('redirect') === redirectPath
+
 /** Выход: удаляет куку сессии из контекста. */
 export async function logout(page: Page) {
   await page.request.post('/api/auth/logout')

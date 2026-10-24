@@ -18,23 +18,21 @@ const TAB_BY_ROUTE_NAME: Record<string, CarTab> = {
 const route = useRoute()
 const { user } = useAuth()
 const { car, attentionCount, loadCurrentCar } = useCurrentCar()
-const { rememberLastCar, forgetLastCar } = useLastCar()
+const { rememberLastCar } = useLastCar()
+const { showCarError } = useCarUnavailable()
 
 const carId = computed(() => Number(route.params.id))
 const activeTab = computed(() => TAB_BY_ROUTE_NAME[String(route.name)] ?? null)
 const switcherOpen = ref(false)
 
-const CAR_UNAVAILABLE_STATUSES = [403, 404]
-
 async function openCar(id: number) {
   try {
     await loadCurrentCar(id)
     rememberLastCar(id)
-  } catch (error: any) {
-    // Машину удалили или доступ отозвали — не открывать её снова с `/`
-    if (!CAR_UNAVAILABLE_STATUSES.includes(error?.statusCode)) throw error
-    forgetLastCar()
-    await navigateTo('/cars', { replace: true })
+  } catch (error) {
+    // 403 / 404 / сбой — экран ошибки (И6 / И4 / И5); 401 уже показал plugins/api.ts
+    if ((error as { statusCode?: number })?.statusCode === 401) return
+    showCarError(error, id)
   }
 }
 
