@@ -24,6 +24,7 @@ const reminders = computed(() =>
 )
 const { entries, fetchEntries } = useEntries(carId)
 const { analytics, fetchAnalytics } = useAnalytics(carId)
+const { banner: onboardingBanner, dismissBanner: dismissOnboardingBanner } = useOnboardingBanner()
 
 const today = todayIso()
 const loading = ref(true)
@@ -107,6 +108,11 @@ onBeforeUnmount(() => clearTimeout(skeletonTimer))
     </UiCard>
 
     <template v-else-if="ready && currentCar && analytics">
+      <OverviewOnboardingBanner
+        v-if="onboardingBanner?.carId === carId"
+        :count="onboardingBanner.count"
+        @dismiss="dismissOnboardingBanner"
+      />
       <OverviewMileageCard
         :mileage="currentCar.currentMileage"
         :updated-at="currentCar.mileageUpdatedAt"
