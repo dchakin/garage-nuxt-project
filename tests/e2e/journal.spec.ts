@@ -92,6 +92,37 @@ test('Журнал (В3): ничего не найдено и «Сбросить
   await expect(page.getByRole('searchbox', { name: 'Поиск по описанию и месту' })).toHaveValue('')
 })
 
+test('Журнал: чип без записей → «Все» не показывает «Записей пока нет»', async ({
+  page,
+  seededCar,
+}) => {
+  await page.goto(`/cars/${seededCar.carId}/journal`)
+  await expect(groupedRows(page)).toHaveCount(CAMRY_ENTRIES_COUNT)
+
+  // «Ремонт» отвечает пустым списком, а возврат к «Все» идёт медленно: пока ответа нет,
+  // пустое состояние журнала показываться не должно
+  await page.route(ENTRIES_URL, async (route) => {
+    if (new URL(route.request().url()).searchParams.get('type') === 'repair') {
+      await route.fulfill({ json: [] })
+      return
+    }
+    await new Promise((resolve) => setTimeout(resolve, SLOW_RESPONSE_MS))
+    await route.continue()
+  })
+
+  await page.getByRole('button', { name: 'Ремонт', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Ничего не найдено' })).toBeVisible()
+
+  await page.getByRole('button', { name: 'Все', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Записей пока нет' })).toHaveCount(0)
+  await expect(page.getByTestId('journal-filters')).toBeVisible()
+
+  await expect(groupedRows(page)).toHaveCount(CAMRY_ENTRIES_COUNT, { timeout: 10_000 })
+  await expect(page.getByRole('heading', { name: 'Записей пока нет' })).toHaveCount(0)
+  await expect(page.getByTestId('journal-filters')).toBeVisible()
+  await snap(page, 'journal-after-empty-filter')
+})
+
 test('Журнал: по пробегу — без групп по месяцам', async ({ page, seededCar }) => {
   await page.goto(`/cars/${seededCar.carId}/journal`)
   await expect(groupedRows(page)).toHaveCount(CAMRY_ENTRIES_COUNT)
