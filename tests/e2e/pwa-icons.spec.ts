@@ -28,6 +28,15 @@ test('манифест ссылается на иконки нового лог�
   const logo = await request.get('/logo.svg')
   expect(await logo.text()).toContain('#2648E0')
 
-  await page.goto('/logo.svg')
+  // fullPage-скриншот самостоятельного SVG-документа в Chromium зависает — показываем через <img>
+  await page.goto('/login')
+  await page.evaluate(() => {
+    document.body.innerHTML = '<img src="/logo.svg" alt="Логотип" width="192" height="192" />'
+  })
+  await page.locator('img[alt="Логотип"]').waitFor()
+  await page.waitForFunction(() => {
+    const image = document.querySelector('img')
+    return Boolean(image?.complete && image.naturalWidth > 0)
+  })
   await snap(page, 'logo')
 })
