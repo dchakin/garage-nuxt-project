@@ -5,11 +5,13 @@
  * прибита к низу. Фокус переходит внутрь после анимации появления (`[autofocus]` или панель)
  * и возвращается на открывший элемент.
  */
-import { computed, ref, useId } from 'vue'
+import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { X } from 'lucide-vue-next'
 import IconButton from './IconButton.vue'
 import { useModalOverlay } from '~/composables/useModalOverlay'
 import { useSheetSwipe } from '~/composables/useSheetSwipe'
+
+const MORE_BELOW_GAP_PX = 4
 
 defineProps<{ title: string }>()
 const open = defineModel<boolean>('open', { required: true })
@@ -20,6 +22,30 @@ const titleId = useId()
 function close() {
   open.value = false
 }
+
+const body = ref<HTMLElement | null>(null)
+const hasMoreBelow = ref(false)
+let resizeObserver: ResizeObserver | null = null
+
+/** Ниже видимой области есть контент — у нижнего края рисуется градиент-подсказка */
+function updateMoreBelow() {
+  const element = body.value
+  hasMoreBelow.value =
+    !!element && element.scrollHeight - element.scrollTop - element.clientHeight > MORE_BELOW_GAP_PX
+}
+
+watch(body, (element) => {
+  resizeObserver?.disconnect()
+  if (!element) return
+  updateMoreBelow()
+  if (typeof ResizeObserver === 'undefined') return
+  // Размер тела меняется при раскрытии «Категория и место», размер содержимого — при вводе
+  resizeObserver = new ResizeObserver(updateMoreBelow)
+  resizeObserver.observe(element)
+  Array.from(element.children).forEach((child) => resizeObserver?.observe(child))
+})
+
+onBeforeUnmount(() => resizeObserver?.disconnect())
 
 const { focusInitial } = useModalOverlay({ open, panel, onEscape: close })
 const { offset, dragging, onPointerDown, reset } = useSheetSwipe({ panel, onClose: close })
@@ -60,8 +86,21 @@ const panelStyle = computed(() => (offset.value ? { translate: `0 ${offset.value
               />
             </div>
           </header>
-          <div class="min-h-0 flex-1 overflow-y-auto px-sp-5 pb-sp-4">
-            <slot />
+          <div class="relative flex min-h-0 flex-1 flex-col">
+            <div
+              ref="body"
+              class="min-h-0 flex-1 overflow-y-auto px-sp-5 pb-sp-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              data-testid="sheet-body"
+              @scroll.passive="updateMoreBelow"
+            >
+              <slot />
+            </div>
+            <div
+              v-if="hasMoreBelow"
+              class="pointer-events-none absolute inset-x-0 bottom-0 h-sp-6 bg-gradient-to-t from-surface to-transparent"
+              aria-hidden="true"
+              data-testid="sheet-more-below"
+            />
           </div>
           <footer
             v-if="$slots.footer"

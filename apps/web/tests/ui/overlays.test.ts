@@ -1,8 +1,9 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, ref, type Component } from 'vue'
 import { mount, type VueWrapper } from '@vue/test-utils'
 import UiSheet from '~/components/ui/Sheet.vue'
 import UiDialog from '~/components/ui/Dialog.vue'
+import { resetOverlayHistory } from '~/utils/overlayHistory'
 
 // Пропсы оверлеев задаются динамически — типизация пропсов в обёртке не нужна
 type OverlayWrapper = VueWrapper<any>
@@ -43,6 +44,7 @@ function createOpener() {
 
 afterEach(() => {
   mounted.splice(0).forEach((wrapper) => wrapper.unmount())
+  resetOverlayHistory()
   document.body.innerHTML = ''
   document.body.style.overflow = ''
 })
@@ -107,6 +109,34 @@ describe('UiSheet', () => {
 
     await swipeTo(150)
     expect(wrapper.props('open')).toBe(false)
+  })
+
+  it('тело прокручивается, но полоса прокрутки скрыта', () => {
+    mountOverlay(UiSheet, { title: 'Новая запись' }, { default: () => h('p', 'Поля формы') })
+    const body = byTestId('sheet-body')!
+    expect(body.classList).toContain('overflow-y-auto')
+    expect(body.classList).toContain('[scrollbar-width:none]')
+    expect(body.classList).toContain('[&::-webkit-scrollbar]:hidden')
+  })
+
+  it('градиент у нижнего края виден, пока ниже есть непоказанный контент', async () => {
+    const wrapper = mountOverlay(UiSheet, { title: 'Новая запись' })
+    const body = byTestId('sheet-body')!
+    expect(byTestId('sheet-more-below')).toBeNull()
+
+    Object.defineProperties(body, {
+      scrollHeight: { value: 800, configurable: true },
+      clientHeight: { value: 400, configurable: true },
+    })
+    body.scrollTop = 0
+    body.dispatchEvent(new Event('scroll'))
+    await wrapper.vm.$nextTick()
+    expect(byTestId('sheet-more-below')).not.toBeNull()
+
+    body.scrollTop = 400
+    body.dispatchEvent(new Event('scroll'))
+    await wrapper.vm.$nextTick()
+    expect(byTestId('sheet-more-below')).toBeNull()
   })
 
   it('показывает тело и кнопку действия из слотов', () => {
@@ -200,5 +230,24 @@ describe('UiDialog', () => {
     pressEscape()
     await wrapper.vm.$nextTick()
     expect(byTestId('sheet')).toBeNull()
+  })
+})
+
+describe('жест «назад»', () => {
+  const props = { title: 'Удалить?', message: 'Нельзя отменить.', confirmText: 'Удалить' }
+
+  it.each([
+    ['UiSheet', UiSheet, { title: 'Пробег' }],
+    ['UiDialog', UiDialog, props],
+  ])('%s: открытие добавляет запись истории, popstate закрывает', async (_name, component, p) => {
+    const pushState = vi.spyOn(window.history, 'pushState')
+    const wrapper = mountOverlay(component, p)
+    expect(pushState).toHaveBeenCalledTimes(1)
+
+    window.dispatchEvent(new PopStateEvent('popstate', { state: null }))
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.props('open')).toBe(false)
+    pushState.mockRestore()
   })
 })

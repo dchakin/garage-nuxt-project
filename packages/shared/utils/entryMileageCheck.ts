@@ -19,16 +19,20 @@ export interface EntryMileageCheckInput {
   entries: MileageCheckEntry[]
   /** Правка существующей записи: её саму с соседями не сравниваем. */
   editingEntryId?: number
+  /** Сохранённые пробег и дата правимой записи: не менялись — правило не применяется. */
+  original?: { mileage: number | null; date: string }
 }
 
 /**
  * Правило пробега для записи (Д3). Дата «сегодня» (или позже) и пробег меньше текущего —
  * `error` (опечатка, сохранять нельзя). Дата в прошлом — пробег сверяется с ближайшими по дате
  * записями: меньше пробега предыдущей или больше пробега следующей — `warning`.
+ * При правке (`original`) нетронутые пробег и дата не проверяются: можно поменять, например, цену.
  */
 export function checkEntryMileage(input: EntryMileageCheckInput): EntryMileageCheck {
-  const { mileage, date, today, currentMileage } = input
+  const { mileage, date, today, currentMileage, original } = input
   if (mileage == null) return { level: 'ok' }
+  if (original && original.mileage === mileage && original.date === date) return { level: 'ok' }
 
   if (date >= today) {
     if (mileage < currentMileage) {

@@ -29,6 +29,8 @@ const props = withDefaults(
     options?: FieldOption[]
     /** Моноширинный шрифт значения (VIN, госномер) */
     mono?: boolean
+    /** Вводимый текст всегда заглавными (госномер); курсор остаётся на месте */
+    uppercase?: boolean
     id?: string
   }>(),
   { type: 'text', icon: undefined, options: undefined, id: undefined },
@@ -54,7 +56,14 @@ const inputMode = computed(() => (props.type === 'number' ? 'numeric' : undefine
 
 function onInput(event: Event) {
   if (props.type === 'number') return onNumberInput(event)
-  model.value = (event.target as HTMLInputElement | HTMLSelectElement).value
+  const control = event.target as HTMLInputElement | HTMLSelectElement
+  if (props.uppercase && control instanceof HTMLInputElement) {
+    const caret = control.selectionStart
+    control.value = control.value.toUpperCase()
+    // Присвоение value сбрасывает курсор в конец — возвращаем туда, где он был
+    if (caret !== null) control.setSelectionRange(caret, caret)
+  }
+  model.value = control.value
 }
 
 const boxStateClass = computed(() => {

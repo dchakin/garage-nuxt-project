@@ -12,7 +12,7 @@ const { online, lastOnlineAt } = useOnline()
 </script>
 
 <template>
-  <Transition name="collapse" v-on="collapseTransitionHooks">
+  <Transition name="collapse" v-bind="collapseTransitionHooks">
     <div v-if="!online" class="overflow-hidden" data-testid="offline-banner">
       <div class="pb-sp-4 pt-sp-2">
         <UiAlert
