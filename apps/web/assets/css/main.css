@@ -18,6 +18,22 @@
     @apply antialiased bg-bg text-text font-sans text-body;
     /* Табличные цифры: суммы и пробег не «прыгают» при изменении */
     font-variant-numeric: tabular-nums;
+    /* Приложение, а не документ: долгий тап не выделяет слово и не вызывает панель
+       поиска Chrome / меню iOS; серая вспышка при тапе тоже ни к чему */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Что можно выделять: ввод пользователя и то, что имеет смысл скопировать
+     (VIN, email — класс `selectable`) */
+  input,
+  textarea,
+  [contenteditable='true'],
+  .selectable {
+    -webkit-user-select: text;
+    user-select: text;
   }
 }
 
