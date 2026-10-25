@@ -12,6 +12,8 @@
      (жестовая панель, safe-area) и зону оверскролла — цветом темы, а не белым */
   html {
     @apply bg-bg;
+    /* Приложение, а не страница: без зума двойным тапом (pinch блокирует viewport и gesturestart) */
+    touch-action: manipulation;
   }
 
   body {
