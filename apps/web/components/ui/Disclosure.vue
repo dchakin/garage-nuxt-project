@@ -34,7 +34,7 @@ function revealContent(element: Element) {
         aria-hidden="true"
       />
     </button>
-    <Transition name="collapse" v-on="collapseTransitionHooks" @after-enter="revealContent">
+    <Transition name="collapse" v-bind="collapseTransitionHooks" @after-enter="revealContent">
       <div v-if="open" :id="contentId" class="collapse-body overflow-hidden">
         <div class="pt-sp-2">
           <slot />

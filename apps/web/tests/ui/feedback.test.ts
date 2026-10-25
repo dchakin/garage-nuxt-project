@@ -174,4 +174,16 @@ describe('UiDisclosure', () => {
     expect(wrapper.find(`#${CSS.escape(button.attributes('aria-controls')!)}`).exists()).toBe(true)
     expect(wrapper.emitted('update:open')).toEqual([[true]])
   })
+
+  it('хуки высоты подключены к Transition: раскрывающийся блок стартует с height: 0', async () => {
+    const wrapper = mount(UiDisclosure, {
+      props: { label: 'Категория, место, заметка' },
+      slots: { default: '<input name="place" />' },
+      global: { stubs: { transition: false } },
+      attachTo: document.body,
+    })
+    await wrapper.get('button').trigger('click')
+    expect(wrapper.get('.collapse-body').attributes('style')).toContain('height: 0px')
+    wrapper.unmount()
+  })
 })

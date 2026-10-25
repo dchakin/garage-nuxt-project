@@ -1,5 +1,5 @@
 /**
- * Хуки для `<Transition name="collapse" v-on="collapseTransitionHooks">` — высота 0 → auto и обратно
+ * Хуки для `<Transition name="collapse" v-bind="collapseTransitionHooks">` — высота 0 → auto и обратно
  * («09 · Анимации»: «Раскрытие секции», «Офлайн-плашка»). CSS не умеет анимировать до `auto`,
  * поэтому на время перехода высота фиксируется в px, сами переходы — в `assets/css/motion.css`.
  */
