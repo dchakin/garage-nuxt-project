@@ -67,3 +67,22 @@ test('экран списка машин в обеих темах', async ({ pag
   await expect(page.getByRole('heading', { name: 'Мои автомобили' })).toBeVisible()
   await snap(page, 'cars-theme')
 })
+
+test('нижняя область закрашена фоном темы: фон на <html>, viewport-fit=cover (#114)', async ({
+  page,
+}) => {
+  await registerViaApi(page, createTestUser())
+  await page.goto('/profile')
+
+  await expect(page.locator('meta[name="viewport"]')).toHaveAttribute(
+    'content',
+    /viewport-fit=cover/,
+  )
+  await expect(html(page)).toHaveCSS('background-color', 'rgb(245, 244, 240)')
+  await snap(page, 'profile-bottom-area')
+
+  const themeGroup = page.getByRole('radiogroup', { name: 'Тема' })
+  await themeGroup.getByRole('radio', { name: 'Тёмная' }).click()
+  await expect(html(page)).toHaveCSS('background-color', 'rgb(15, 15, 14)')
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(15, 15, 14)')
+})

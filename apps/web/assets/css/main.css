@@ -8,6 +8,12 @@
 @tailwind utilities;
 
 @layer base {
+  /* Фон и на <html>: он закрашивает всё за пределами body — системную область снизу
+     (жестовая панель, safe-area) и зону оверскролла — цветом темы, а не белым */
+  html {
+    @apply bg-bg;
+  }
+
   body {
     @apply antialiased bg-bg text-text font-sans text-body;
     /* Табличные цифры: суммы и пробег не «прыгают» при изменении */
