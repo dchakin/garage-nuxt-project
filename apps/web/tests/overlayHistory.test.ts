@@ -13,6 +13,7 @@ import {
   releaseOverlayEntry,
   resetOverlayHistory,
   settleOverlayHistory,
+  startOverlayHistory,
 } from '~/utils/overlayHistory'
 
 const DEPTH_KEY = 'garageOverlayDepth'
@@ -33,7 +34,8 @@ beforeEach(() => {
   window.history.replaceState(PAGE_STATE, '')
   pushState = vi.spyOn(window.history, 'pushState')
   go = vi.spyOn(window.history, 'go').mockImplementation(() => {})
-  // Слушатель роутера регистрируется раньше нашего, но capture-слушатель всё равно идёт первым
+  // Как в приложении: плагин с ранним order подписывается до vue-router (порядок вызова = порядок подписки)
+  startOverlayHistory()
   routerPopState = vi.fn<(event: PopStateEvent) => void>()
   window.addEventListener('popstate', routerPopState)
 })

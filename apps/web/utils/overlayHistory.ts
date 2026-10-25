@@ -2,7 +2,7 @@
  * История браузера для модальных оверлеев (шторки, диалоги): открытие добавляет запись, жест
  * «назад» закрывает верхний оверлей, а страница под ним остаётся на месте.
  *
- * Роутер записей оверлеев не видит: слушатель `popstate` стоит в фазе capture и гасит
+ * Роутер записей оверлеев не видит: слушатель `popstate` (подписан раньше vue-router) гасит
  * (`stopImmediatePropagation`) события, которые относятся к оверлеям, — vue-router обрабатывает
  * только настоящие переходы. Программное закрытие возвращает запись через `history.go(-n)`;
  * переход роутера дожидается этого в `settleOverlayHistory()` (глобальный guard), иначе
@@ -81,7 +81,12 @@ function onPopState(event: PopStateEvent) {
   if (depth > 0 || statePosition === basePosition) event.stopImmediatePropagation()
 }
 
-function ensureListening() {
+/**
+ * Подписаться на `popstate`. Слушатель обязан встать раньше слушателя vue-router: на `window`
+ * события доставляются в порядке подписки (фаза capture этого не меняет), и `stopImmediatePropagation`
+ * не остановит того, кто подписался раньше. Поэтому зовётся из плагина с ранним `order`.
+ */
+export function startOverlayHistory() {
   if (listening) return
   listening = true
   window.addEventListener('popstate', onPopState, { capture: true })
@@ -89,7 +94,7 @@ function ensureListening() {
 
 /** Оверлей открылся: добавить запись истории (адрес не меняется) */
 export function pushOverlayEntry(id: symbol, onBack: () => void) {
-  ensureListening()
+  startOverlayHistory()
   if (!entries.length) {
     basePosition = (window.history.state as { position?: unknown } | null)?.position
   }
