@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { registerSchema, loginSchema, refreshSchema } from '../schemas/auth'
-import { carSchema, inviteSchema } from '../schemas/car'
+import { carSchema, carUpdateSchema, inviteSchema } from '../schemas/car'
 import { entrySchema, entryFilterSchema } from '../schemas/entry'
 import { reminderSchema, reminderFilterSchema } from '../schemas/reminder'
 
@@ -35,6 +35,17 @@ describe('carSchema', () => {
   it('допускает пустую строку в photoUrl', () => {
     const result = carSchema.parse({ brand: 'Toyota', model: 'Corolla', photoUrl: '' })
     expect(result.photoUrl).toBe('')
+  })
+
+  it('приводит госномер к верхнему регистру при создании и правке', () => {
+    const created = carSchema.parse({ brand: 'Lada', model: 'Largus', plateNumber: ' у911рв 77 ' })
+    expect(created.plateNumber).toBe('У911РВ 77')
+    expect(carUpdateSchema.parse({ plateNumber: 'a123bc' }).plateNumber).toBe('A123BC')
+  })
+
+  it('госномер: null и отсутствие поля сохраняются как есть', () => {
+    expect(carSchema.parse({ brand: 'A', model: 'B', plateNumber: null }).plateNumber).toBeNull()
+    expect(carUpdateSchema.parse({}).plateNumber).toBeUndefined()
   })
 
   it('inviteSchema требует валидный email', () => {

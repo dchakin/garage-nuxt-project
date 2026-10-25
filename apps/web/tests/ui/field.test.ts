@@ -54,6 +54,23 @@ describe('UiField', () => {
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([874500])
   })
 
+  it('uppercase: вводимый текст становится заглавным, курсор не сбивается', async () => {
+    const wrapper = mount(UiField, { props: { modelValue: '', uppercase: true } })
+    const input = wrapper.find('input')
+    input.element.value = 'у911рв'
+    input.element.setSelectionRange(2, 2)
+    await input.trigger('input')
+    expect(input.element.value).toBe('У911РВ')
+    expect(input.element.selectionStart).toBe(2)
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['У911РВ'])
+  })
+
+  it('без uppercase регистр не меняется', async () => {
+    const wrapper = mount(UiField, { props: { modelValue: '' } })
+    await wrapper.find('input').setValue('abc')
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['abc'])
+  })
+
   it('пароль: кнопка показывает и скрывает значение', async () => {
     const wrapper = mount(UiField, { props: { type: 'password', modelValue: 'secret' } })
     expect(wrapper.find('input').attributes('type')).toBe('password')

@@ -76,7 +76,7 @@ function onSubmit() {
         :maxlength="YEAR_LENGTH"
         :error="yearError"
       />
-      <UiField v-model="form.plateNumber" label="Госномер" placeholder="А123ВС 77" mono />
+      <UiField v-model="form.plateNumber" label="Госномер" placeholder="А123ВС 77" mono uppercase />
     </div>
     <UiButton type="submit" class="mt-sp-2 w-full">Далее</UiButton>
   </form>

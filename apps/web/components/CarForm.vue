@@ -45,7 +45,7 @@ function onSubmit() {
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div>
         <label class="label">Гос. номер</label>
-        <input v-model="form.plateNumber" class="input font-mono font-semibold" />
+        <input v-model="form.plateNumber" class="input font-mono font-semibold uppercase" />
       </div>
       <div>
         <label class="label">VIN</label>

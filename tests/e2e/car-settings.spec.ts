@@ -52,6 +52,20 @@ test('З2: данные машины, пробег, категории и уча
   ).toBeVisible()
 })
 
+test('З2: госномер вводится и сохраняется заглавными буквами', async ({ page, seededCar }) => {
+  await page.goto(`/cars/${seededCar.carId}/settings`)
+  const plate = page.getByLabel('Госномер')
+  await plate.fill('')
+  await plate.pressSequentially('у911рв')
+  await expect(plate).toHaveValue('У911РВ')
+  await snap(page, 'car-settings-plate-uppercase')
+
+  await page.getByRole('button', { name: 'Готово' }).click()
+  await expect(page.getByRole('status').filter({ hasText: 'Изменения сохранены' })).toBeVisible()
+  await page.goto(`/cars/${seededCar.carId}/settings`)
+  await expect(page.getByLabel('Госномер')).toHaveValue('У911РВ')
+})
+
 test('З2: строка «Пробег» открывает шторку обновления пробега', async ({ page, seededCar }) => {
   await page.goto(`/cars/${seededCar.carId}/settings`)
   await page.getByRole('button', { name: /Пробег/ }).click()
