@@ -55,6 +55,21 @@ async function buildApi(workDir: string) {
 }
 
 /**
+ * Nitro оставляет внешние зависимости (drizzle-orm, better-sqlite3…) в `import` и не всегда
+ * копирует их в `output/server/node_modules`. На проде сборка лежит внутри репозитория и находит
+ * корневой `node_modules`, а во временном каталоге — нет, поэтому подставляем ссылку на него.
+ */
+function linkDependencies(serverDir: string) {
+  const dependenciesDir = path.join(serverDir, 'node_modules')
+  const rootDependenciesDir = path.join(apiRoot, '../../node_modules')
+  // Сборка может оставить каталог только с package.json-заглушками — файлов пакетов в нём нет
+  if (fs.existsSync(path.join(dependenciesDir, 'drizzle-orm', 'index.js'))) return
+  fs.rmSync(dependenciesDir, { recursive: true, force: true })
+  // junction не требует прав администратора на Windows
+  fs.symlinkSync(rootDependenciesDir, dependenciesDir, 'junction')
+}
+
+/**
  * Собирает apps/api (как `nitropack build`) для интеграционных тестов. Каждый тест-файл затем
  * запускает готовый `server/index.mjs` за доли секунды, а не компилирует сервер заново, как это
  * делал `nitropack dev`. Сборка лежит во временном каталоге (свой на каждый worktree), чтобы не
@@ -74,6 +89,7 @@ export default async function buildApiForTests(project: TestProject) {
     await buildApi(workDir)
     fs.writeFileSync(hashFile, inputsHash)
   }
+  linkDependencies(path.join(workDir, 'output', 'server'))
 
   project.provide('apiServerEntry', serverEntry)
 }

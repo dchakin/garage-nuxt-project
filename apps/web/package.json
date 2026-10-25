@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "nuxt dev",
-    "build": "nuxt generate",
+    "pwa-assets": "pwa-assets-generator",
+    "build": "npm run pwa-assets && nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck"
@@ -33,5 +34,9 @@
     "typescript": "^5.7.2",
     "vue-tsc": "^3.3.7",
     "workbox-precaching": "^7.4.1"
+  },
+  "optionalDependencies": {
+    "@img/sharp-libvips-linux-x64": "^1.3.3",
+    "@img/sharp-linux-x64": "^0.35.4"
   }
 }
