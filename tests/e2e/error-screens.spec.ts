@@ -76,6 +76,8 @@ test('И7: сессия истекла посреди работы — экра�
   const { carId, users } = seededCar
   await page.goto(`/cars/${carId}/journal`)
   await expect(page.getByRole('heading', { name: 'Журнал', level: 1 })).toBeAttached()
+  // Иначе 401 получит ещё не завершённая загрузка журнала, и экран откроется раньше клика
+  await page.waitForLoadState('networkidle')
 
   // Сессия «истекла»: кука пропала, следующий запрос данных получает 401
   await page.context().clearCookies()
