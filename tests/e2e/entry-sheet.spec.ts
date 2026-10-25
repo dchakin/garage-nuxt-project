@@ -171,3 +171,34 @@ test('«Категория и место» раскрывается плавно
   await expect(sheet.getByLabel('Место')).toBeVisible()
   await snap(page, 'entry-sheet-more-open')
 })
+
+test('в шторке нет полосы прокрутки, длинное содержимое прокручивается', async ({
+  page,
+  seededCar,
+}) => {
+  await page.setViewportSize({ width: 390, height: 560 })
+  await page.goto(`/cars/${seededCar.carId}`)
+  await addEntryButton(page).click()
+  const sheet = entrySheet(page)
+  await expect(sheet).toBeVisible()
+  await sheet.getByRole('button', { name: 'Категория и место' }).click()
+  await expect(sheet.getByLabel('Место')).toBeVisible()
+
+  const body = sheet.getByTestId('sheet-body')
+  const metrics = () =>
+    body.evaluate((element) => ({
+      scrollbarWidth: (element as HTMLElement).offsetWidth - element.clientWidth,
+      overflows: element.scrollHeight > element.clientHeight,
+      scrollTop: element.scrollTop,
+    }))
+
+  const before = await metrics()
+  expect(before.overflows).toBe(true)
+  expect(before.scrollbarWidth).toBe(0)
+  await expect(sheet.getByTestId('sheet-more-below')).toBeVisible()
+  await snap(page, 'entry-sheet-no-scrollbar')
+
+  await body.evaluate((element) => element.scrollTo({ top: element.scrollHeight }))
+  await expect(sheet.getByTestId('sheet-more-below')).toHaveCount(0)
+  expect((await metrics()).scrollTop).toBeGreaterThan(0)
+})
