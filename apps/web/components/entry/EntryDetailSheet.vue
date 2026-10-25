@@ -53,6 +53,7 @@ const mileageCheck = computed(() =>
         currentMileage: currentMileage.value,
         entries: carEntries.value,
         editingEntryId: entry.value.id,
+        original: { mileage: entry.value.mileage, date: entry.value.date },
       })
     : ({ level: 'ok' } as const),
 )
