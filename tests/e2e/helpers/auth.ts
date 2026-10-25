@@ -6,11 +6,11 @@ export interface TestUser {
   password: string
 }
 
-// Подписи полей в текущих формах не связаны с input (нет for/id), поэтому поля ищутся по типу.
-// После редизайна форм перейти на getByLabel.
-const nameInput = (page: Page) => page.locator('input[type="text"]')
-const emailInput = (page: Page) => page.locator('input[type="email"]')
-const passwordInput = (page: Page) => page.locator('input[type="password"]')
+// exact: у поля пароля есть кнопка с aria-label «Показать пароль», обычный поиск по подписи
+// «Пароль» нашёл бы и её.
+const nameInput = (page: Page) => page.getByLabel('Имя', { exact: true })
+const emailInput = (page: Page) => page.getByLabel('Email', { exact: true })
+const passwordInput = (page: Page) => page.getByLabel('Пароль', { exact: true })
 
 let userCounter = 0
 
@@ -24,14 +24,14 @@ export function createTestUser(name = 'Дмитрий'): TestUser {
   }
 }
 
-/** Регистрация через форму /register; заканчивается на списке машин. */
+/** Регистрация через форму /register; заканчивается на мастере первого запуска (/onboarding). */
 export async function registerViaUi(page: Page, user: TestUser) {
   await page.goto('/register')
   await nameInput(page).fill(user.name)
   await emailInput(page).fill(user.email)
   await passwordInput(page).fill(user.password)
   await page.getByRole('button', { name: 'Зарегистрироваться' }).click()
-  await expect(page).toHaveURL(/\/cars$/)
+  await expect(page).toHaveURL(/\/onboarding$/)
 }
 
 /** Вход через форму /login; заканчивается на списке машин. */
@@ -59,6 +59,13 @@ export async function loginViaApi(page: Page, user: Pick<TestUser, 'email' | 'pa
   })
   expect(response.ok(), await response.text()).toBe(true)
 }
+
+/**
+ * Предикат для `toHaveURL`: экран входа с `?redirect=<path>`. Сравнивается разобранный параметр,
+ * а не строка: vue-router не кодирует `/` в query, и в адресной строке путь лежит как есть.
+ */
+export const loginRedirectingTo = (redirectPath: string) => (url: URL) =>
+  url.pathname === '/login' && url.searchParams.get('redirect') === redirectPath
 
 /** Выход: удаляет куку сессии из контекста. */
 export async function logout(page: Page) {

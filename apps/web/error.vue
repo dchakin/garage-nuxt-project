@@ -1,72 +1,48 @@
 <script setup lang="ts">
-import { Lock, Map as MapIcon, ShieldX, TriangleAlert } from 'lucide-vue-next'
+/**
+ * Экраны ошибок на весь экран: И4 (404), И5 (500), И6 (403), И7 (сессия истекла).
+ * 403/404 на машине показывает `useCarUnavailable`, И7 — `plugins/api.ts` при окончательном 401
+ * (маршрут лежит в `error.data.redirect`: после входа вернём пользователя на него).
+ */
+import ErrorScreen from '~/components/errors/ErrorScreen.vue'
+import { resolveErrorKind } from '~/utils/errorScreens'
+import { loginLocation } from '~/utils/redirectTarget'
+
 const props = defineProps<{
   error: {
     statusCode?: number
-    statusMessage?: string
-    message?: string
+    data?: { redirect?: string } | null
   }
 }>()
 
-const { clear } = useAuth()
-
-const statusCode = computed(() => props.error?.statusCode ?? 500)
-
-const content = computed(() => {
-  switch (statusCode.value) {
-    case 401:
-      return {
-        icon: Lock,
-        title: 'Сессия истекла',
-        text: 'Похоже, вы вышли из системы или сессия устарела. Войдите заново, чтобы продолжить.',
-      }
-    case 403:
-      return {
-        icon: ShieldX,
-        title: 'Нет доступа',
-        text: 'У вас нет прав для просмотра этой страницы или автомобиля.',
-      }
-    case 404:
-      return {
-        icon: MapIcon,
-        title: 'Страница не найдена',
-        text: 'Такой страницы не существует или она была удалена.',
-      }
-    default:
-      return {
-        icon: TriangleAlert,
-        title: 'Что-то пошло не так',
-        text:
-          props.error?.statusMessage || props.error?.message || 'Произошла непредвиденная ошибка.',
-      }
-  }
-})
+const route = useRoute()
+const kind = computed(() => resolveErrorKind(props.error?.statusCode))
 
 async function goToLogin() {
-  await clear()
-  await clearError({ redirect: '/login' })
+  const redirectTo = props.error?.data?.redirect ?? route.fullPath
+  await clearError({ redirect: loginLocation(redirectTo) })
 }
 
-async function goHome() {
+async function goToCars() {
   await clearError({ redirect: '/cars' })
+}
+
+function retry() {
+  window.location.reload()
 }
 </script>
 
 <template>
-  <div class="max-w-sm mx-auto mt-16 text-center">
-    <div class="flex justify-center mb-4">
-      <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-accent text-on-accent">
-        <component :is="content.icon" class="h-6 w-6" aria-hidden="true" />
-      </span>
-    </div>
-    <h1 class="text-h1 text-text mb-2">{{ content.title }}</h1>
-    <p class="text-sm text-text-2 mb-6">{{ content.text }}</p>
-
-    <div class="card p-6 shadow-sm space-y-3">
-      <UiButton v-if="statusCode === 401" class="w-full" @click="goToLogin">
-        Войти заново
-      </UiButton>
-      <UiButton v-else class="w-full" @click="goHome">На главную</UiButton>
-    </div>
-  </div>
+  <ErrorScreen :kind="kind">
+    <template #actions>
+      <template v-if="kind === 'session-expired'">
+        <UiButton class="w-full" @click="goToLogin">Войти</UiButton>
+      </template>
+      <template v-else-if="kind === 'server'">
+        <UiButton class="w-full" @click="retry">Повторить</UiButton>
+        <UiButton variant="text" class="w-full" @click="goToCars">К моим машинам</UiButton>
+      </template>
+      <UiButton v-else class="w-full" @click="goToCars">К моим машинам</UiButton>
+    </template>
+  </ErrorScreen>
 </template>

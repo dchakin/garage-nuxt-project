@@ -102,6 +102,15 @@
   opacity: 0;
 }
 
+/* Смена темы — без анимаций, все цвета разом. Класс `theme-switching` ставит useTheme
+   до пересчёта стилей и снимает сразу после, поэтому анимации компонентов не страдают */
+.theme-switching,
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
+
 /* Уменьшенное движение: сдвиги и масштаб → fade dur-fast (принцип 08 фрейма «09») */
 @media (prefers-reduced-motion: reduce) {
   .toast-enter-active,

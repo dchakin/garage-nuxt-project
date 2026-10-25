@@ -41,6 +41,42 @@ export function useAuth() {
     return storeSession(response)
   }
 
+  /** Просит сервер отправить письмо со ссылкой сброса (всегда 204, есть ли такой email — не видно). */
+  async function requestPasswordReset(email: string) {
+    await $fetch('/api/auth/password-reset', { method: 'POST', body: { email } })
+  }
+
+  /** Задаёт новый пароль по токену из письма и сразу входит (как `login`). */
+  async function confirmPasswordReset(token: string, password: string) {
+    const response = await $fetch<AuthResponse>('/api/auth/password-reset/confirm', {
+      method: 'POST',
+      body: { token, password, authMode },
+    })
+    return storeSession(response)
+  }
+
+  /** Меняет имя; сервер обновляет куку сессии, клиент берёт имя из ответа. */
+  async function updateName(name: string) {
+    const updated = await $fetch<AuthUser>('/api/auth/me', { method: 'PATCH', body: { name } })
+    user.value = updated
+    return updated
+  }
+
+  /** Меняет пароль; остальные устройства теряют refresh-токены, текущее (мобильное) сохраняет свой. */
+  async function changePassword(currentPassword: string, newPassword: string) {
+    const refreshToken = localTokenStore.read()?.refreshToken
+    await $fetch('/api/auth/password', {
+      method: 'POST',
+      body: { currentPassword, newPassword, refreshToken },
+    })
+  }
+
+  /** Удаляет аккаунт на сервере и сбрасывает локальную сессию. */
+  async function deleteAccount() {
+    await $fetch('/api/auth/account', { method: 'DELETE' })
+    clear()
+  }
+
   /** Сбрасывает локальное состояние сессии, не обращаясь к серверу. */
   function clear() {
     localTokenStore.clear()
@@ -59,5 +95,18 @@ export function useAuth() {
     }
   }
 
-  return { user, loggedIn, fetch: fetchSession, login, register, logout, clear }
+  return {
+    user,
+    loggedIn,
+    fetch: fetchSession,
+    login,
+    register,
+    requestPasswordReset,
+    confirmPasswordReset,
+    updateName,
+    changePassword,
+    deleteAccount,
+    logout,
+    clear,
+  }
 }

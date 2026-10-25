@@ -40,6 +40,39 @@ test('«Тёмная» переживает перезагрузку и меня
   await expect(themeColor(page)).toHaveAttribute('content', LIGHT_BG)
 })
 
+test('смена темы перекрашивает всё разом, без transition у части элементов (#122)', async ({
+  page,
+}) => {
+  await registerViaApi(page, createTestUser())
+  await page.goto('/profile')
+  // До наблюдателя: snap() сам переключает класс `dark`
+  await snap(page, 'theme-switch-before')
+  // У UiButton transition-colors (dur-fast 120ms): через 40ms после смены класса фон был бы
+  // промежуточным, если бы transition не выключались на время смены
+  const logout = page.getByRole('button', { name: 'Выйти' })
+  await logout.evaluate((button) => {
+    const sample = window as unknown as { themeSwitchSample?: string }
+    new MutationObserver((_, observer) => {
+      observer.disconnect()
+      setTimeout(() => {
+        sample.themeSwitchSample = getComputedStyle(button).backgroundColor
+      }, 40)
+    }).observe(document.documentElement, { attributeFilter: ['class'] })
+  })
+
+  await page
+    .getByRole('radiogroup', { name: 'Тема' })
+    .getByRole('radio', { name: 'Тёмная' })
+    .click()
+  const duringSwitch = await page.waitForFunction(
+    () => (window as unknown as { themeSwitchSample?: string }).themeSwitchSample,
+  )
+  await page.waitForTimeout(300)
+  const settled = await logout.evaluate((button) => getComputedStyle(button).backgroundColor)
+  expect(await duringSwitch.jsonValue()).toBe(settled)
+  await snap(page, 'theme-switch-after')
+})
+
 test('тема ставится до загрузки бандла — без вспышки', async ({ page }) => {
   await page.goto('/login')
   await page.evaluate(() => localStorage.setItem('garage:theme', 'dark'))
@@ -66,4 +99,23 @@ test('экран списка машин в обеих темах', async ({ pag
   await page.goto('/cars')
   await expect(page.getByRole('heading', { name: 'Мои автомобили' })).toBeVisible()
   await snap(page, 'cars-theme')
+})
+
+test('нижняя область закрашена фоном темы: фон на <html>, viewport-fit=cover (#114)', async ({
+  page,
+}) => {
+  await registerViaApi(page, createTestUser())
+  await page.goto('/profile')
+
+  await expect(page.locator('meta[name="viewport"]')).toHaveAttribute(
+    'content',
+    /viewport-fit=cover/,
+  )
+  await expect(html(page)).toHaveCSS('background-color', 'rgb(245, 244, 240)')
+  await snap(page, 'profile-bottom-area')
+
+  const themeGroup = page.getByRole('radiogroup', { name: 'Тема' })
+  await themeGroup.getByRole('radio', { name: 'Тёмная' }).click()
+  await expect(html(page)).toHaveCSS('background-color', 'rgb(15, 15, 14)')
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(15, 15, 14)')
 })

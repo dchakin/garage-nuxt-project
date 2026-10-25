@@ -111,3 +111,26 @@ describe('checkEntryMileage — дата в прошлом', () => {
     expect(check({ mileage: 79_000, date: '2026-06-16', editingEntryId: 2 }).level).toBe('warning')
   })
 })
+
+describe('checkEntryMileage — правка старой записи', () => {
+  const original = { mileage: 8_745, date: TODAY }
+
+  it('пробег и дата не менялись — ошибки нет, даже если пробег меньше текущего', () => {
+    expect(check({ mileage: 8_745, editingEntryId: 9, original }).level).toBe('ok')
+  })
+
+  it('нетронутый пробег не даёт предупреждения у записи в прошлом', () => {
+    const old = { mileage: 79_000, date: '2026-06-16' }
+    expect(check({ ...old, editingEntryId: 2, original: old }).level).toBe('ok')
+  })
+
+  it('пробег изменён — по-прежнему проверяется', () => {
+    expect(check({ mileage: 8_000, editingEntryId: 9, original }).level).toBe('error')
+  })
+
+  it('дата изменена — по-прежнему проверяется', () => {
+    const old = { mileage: 79_000, date: '2026-06-16' }
+    const result = check({ mileage: 79_000, date: '2026-06-17', editingEntryId: 2, original: old })
+    expect(result.level).toBe('warning')
+  })
+})

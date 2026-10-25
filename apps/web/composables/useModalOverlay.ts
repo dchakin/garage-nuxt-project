@@ -1,4 +1,5 @@
 import { onBeforeUnmount, watch, type Ref } from 'vue'
+import { pushOverlayEntry, releaseOverlayEntry } from '~/utils/overlayHistory'
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -32,7 +33,8 @@ function trapTab(event: KeyboardEvent, panel: HTMLElement) {
 
 /**
  * Общее поведение модальных оверлеев (`UiSheet`, `UiDialog`): Esc, удержание фокуса внутри,
- * блокировка прокрутки страницы, возврат фокуса на элемент, открывший оверлей.
+ * блокировка прокрутки страницы, возврат фокуса на элемент, открывший оверлей, запись в истории
+ * браузера (жест «назад» закрывает оверлей через `onEscape`, см. `utils/overlayHistory.ts`).
  * `focusInitial` вызывается после анимации появления (`@after-enter`), иначе на мобильных
  * клавиатура выезжает посреди анимации и дёргает шторку.
  */
@@ -62,6 +64,7 @@ export function useModalOverlay(options: {
     overlayStack.push(id)
     if (overlayStack.length === 1) document.body.style.overflow = 'hidden'
     document.addEventListener('keydown', onKeydown)
+    pushOverlayEntry(id, options.onEscape)
   }
 
   function deactivate() {
@@ -70,6 +73,7 @@ export function useModalOverlay(options: {
     overlayStack.splice(index, 1)
     if (!overlayStack.length) document.body.style.overflow = ''
     document.removeEventListener('keydown', onKeydown)
+    releaseOverlayEntry(id)
     returnFocusTo?.focus()
     returnFocusTo = null
   }

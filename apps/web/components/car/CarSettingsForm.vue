@@ -76,7 +76,7 @@ function onSubmit() {
       autocomplete="off"
       :error="submitted ? errors.year : undefined"
     />
-    <UiField v-model="plateNumber" label="Госномер" mono autocomplete="off" />
+    <UiField v-model="plateNumber" label="Госномер" mono uppercase autocomplete="off" />
     <UiField v-model="vin" label="VIN" mono autocomplete="off" />
   </form>
 </template>

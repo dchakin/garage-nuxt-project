@@ -1,4 +1,5 @@
 import { expect, test } from './fixtures'
+import { loginRedirectingTo } from './helpers/auth'
 import { snap } from './helpers/snap'
 
 test('профиль: тема, список машин, выход', async ({ page, seededCar }) => {
@@ -9,7 +10,7 @@ test('профиль: тема, список машин, выход', async ({ p
   await page.getByRole('link', { name: 'Профиль' }).click()
   await expect(page).toHaveURL(/\/profile$/)
   await expect(page.getByRole('heading', { name: 'Профиль', level: 1 })).toBeVisible()
-  await expect(page.getByText(users.dmitry.email)).toBeVisible()
+  await expect(page.getByTestId('account-email').getByText(users.dmitry.email)).toBeVisible()
 
   // Push без VAPID: переключатель недоступен, причина названа
   const pushToggle = page.getByRole('switch', { name: 'Push-уведомления' })
@@ -53,5 +54,5 @@ test('профиль: тема, список машин, выход', async ({ p
   await expect(page).toHaveURL(/\/login$/)
 
   await page.goto('/profile')
-  await expect(page).toHaveURL(/\/login$/)
+  await expect(page).toHaveURL(loginRedirectingTo('/profile'))
 })

@@ -3,177 +3,6 @@
   "children": [
     {
       "type": "frame",
-      "id": "RpsjJ",
-      "x": -700,
-      "y": 0,
-      "name": "Logo / App Icon",
-      "reusable": true,
-      "clip": true,
-      "width": 512,
-      "height": 512,
-      "layout": "none",
-      "children": [
-        {
-          "type": "rectangle",
-          "id": "ZRjE6",
-          "x": 0,
-          "y": 0,
-          "name": "Background",
-          "fill": {
-            "type": "gradient",
-            "gradientType": "linear",
-            "enabled": true,
-            "rotation": 225,
-            "size": {
-              "height": 1
-            },
-            "colors": [
-              {
-                "color": "#5C77FF",
-                "position": 0
-              },
-              {
-                "color": "#2E4FE0",
-                "position": 0.55
-              },
-              {
-                "color": "#1B2EA8",
-                "position": 1
-              }
-            ]
-          },
-          "width": 512,
-          "height": 512
-        },
-        {
-          "type": "path",
-          "id": "btQm3",
-          "x": 116,
-          "y": 116,
-          "name": "Garage arch",
-          "geometry": "M0 280v-140a140 140 0 0 1 280 0v140h-44v-140a96 96 0 0 0-192 0v140z",
-          "viewBox": [
-            0,
-            0,
-            280,
-            280
-          ],
-          "fill": "#FFFFFF",
-          "width": 280,
-          "height": 280
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": [
-            30,
-            30,
-            0,
-            0
-          ],
-          "id": "NRcpe",
-          "x": 192,
-          "y": 240,
-          "name": "Cabin",
-          "fill": "#FFFFFF",
-          "width": 128,
-          "height": 72
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": [
-            18,
-            18,
-            6,
-            6
-          ],
-          "id": "y6k5U4",
-          "x": 206,
-          "y": 253,
-          "name": "Windshield",
-          "fill": "#2E4FE0",
-          "width": 100,
-          "height": 38
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": 24,
-          "id": "z92S1P",
-          "x": 172,
-          "y": 298,
-          "name": "Body",
-          "fill": "#FFFFFF",
-          "width": 168,
-          "height": 76
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "id": "N2RWiy",
-          "x": 190,
-          "y": 366,
-          "name": "Wheel L",
-          "fill": "#FFFFFF",
-          "width": 30,
-          "height": 22
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "id": "ckF2d",
-          "x": 292,
-          "y": 366,
-          "name": "Wheel R",
-          "fill": "#FFFFFF",
-          "width": 30,
-          "height": 22
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": 5,
-          "id": "ZmwO1",
-          "x": 240,
-          "y": 346,
-          "name": "Grille",
-          "fill": "#2E4FE0",
-          "width": 32,
-          "height": 10
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": 10,
-          "id": "mhork",
-          "x": 186,
-          "y": 318,
-          "name": "Headlight L",
-          "fill": "#FFC857",
-          "width": 50,
-          "height": 20
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": 10,
-          "id": "M2QMMb",
-          "x": 276,
-          "y": 318,
-          "name": "Headlight R",
-          "fill": "#FFC857",
-          "width": 50,
-          "height": 20
-        }
-      ]
-    },
-    {
-      "type": "frame",
       "id": "LOmR1",
       "x": 0,
       "y": 0,
@@ -20368,156 +20197,199 @@
       "clip": true,
       "width": 72,
       "height": 72,
-      "fill": {
-        "type": "gradient",
-        "gradientType": "linear",
-        "enabled": true,
-        "rotation": 225,
-        "size": {
-          "height": 1
-        },
-        "colors": [
-          {
-            "color": "#5C77FF",
-            "position": 0
-          },
-          {
-            "color": "#2E4FE0",
-            "position": 0.55
-          },
-          {
-            "color": "#1B2EA8",
-            "position": 1
-          }
-        ]
-      },
-      "cornerRadius": 18,
+      "fill": "#2648E0",
+      "cornerRadius": 15.333333333333334,
       "layout": "none",
       "children": [
         {
           "type": "path",
-          "id": "gq0gK",
-          "x": 16.3125,
-          "y": 16.3125,
-          "name": "Garage arch",
-          "geometry": "",
+          "id": "Xuf4D",
+          "x": 0,
+          "y": 0,
+          "name": "Roof",
+          "geometry": "M227 357l283.2-134.3q29.8-14.2 59.6 0l283.2 134.3a42 42 0 0 1-36 76l-257.1-122.1q-19.9-9.4-39.8 0l-257.1 122.1a42 42 0 0 1-36-76z",
           "viewBox": [
             0,
             0,
-            280,
-            280
+            1080,
+            1080
           ],
           "fill": "#FFFFFF",
-          "width": 39.375,
-          "height": 39.375
+          "width": 72,
+          "height": 72
         },
         {
           "type": "rectangle",
           "cornerRadius": [
-            4.21875,
-            4.21875,
             0,
-            0
+            0,
+            0.6666666666666666,
+            2.266666666666667
           ],
-          "id": "SYqK0",
-          "x": 27,
-          "y": 33.75,
+          "id": "b7zsdN",
+          "x": 16.333333333333336,
+          "y": 26.333333333333336,
+          "name": "Wall L",
+          "fill": "#FFFFFF",
+          "width": 4.333333333333334,
+          "height": 29.666666666666668
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": [
+            0,
+            0,
+            2.266666666666667,
+            0.6666666666666666
+          ],
+          "id": "MS0qn",
+          "x": 51.333333333333336,
+          "y": 26.333333333333336,
+          "name": "Wall R",
+          "fill": "#FFFFFF",
+          "width": 4.333333333333334,
+          "height": 29.666666666666668
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 0.8,
+          "id": "T472YB",
+          "x": 23.000000000000004,
+          "y": 27.866666666666667,
+          "name": "Slat 1",
+          "fill": "#FFFFFF",
+          "width": 26,
+          "height": 2.5333333333333337
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 0.8,
+          "id": "o89B9",
+          "x": 23.000000000000004,
+          "y": 32.2,
+          "name": "Slat 2",
+          "fill": "#FFFFFF",
+          "width": 26,
+          "height": 2.5333333333333337
+        },
+        {
+          "type": "path",
+          "id": "SBLiK",
+          "x": 0,
+          "y": 0,
+          "name": "Mirror L",
+          "geometry": "M372 626h26l16 16-12 20h-22q-20-4-20-20 0-16 12-16z",
+          "viewBox": [
+            0,
+            0,
+            1080,
+            1080
+          ],
+          "fill": "#FFFFFF",
+          "width": 72,
+          "height": 72
+        },
+        {
+          "type": "path",
+          "id": "szDwo",
+          "x": 0,
+          "y": 0,
+          "name": "Mirror R",
+          "geometry": "M708 626h-26l-16 16 12 20h22q20-4 20-20 0-16-12-16z",
+          "viewBox": [
+            0,
+            0,
+            1080,
+            1080
+          ],
+          "fill": "#FFFFFF",
+          "width": 72,
+          "height": 72
+        },
+        {
+          "type": "path",
+          "id": "VgfAF",
+          "x": 0,
+          "y": 0,
           "name": "Cabin",
-          "fill": "#FFFFFF",
-          "width": 18,
-          "height": 10.125
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": [
-            2.53125,
-            2.53125,
-            0.84375,
-            0.84375
+          "geometry": "M468 562h144q24 0 38 22l40 60h-300l40-60q14-22 38-22z",
+          "viewBox": [
+            0,
+            0,
+            1080,
+            1080
           ],
-          "id": "yo5KW",
-          "x": 28.96875,
-          "y": 35.578125,
-          "name": "Windshield",
-          "fill": "#2E4FE0",
-          "width": 14.0625,
-          "height": 5.34375
+          "fill": "#FFFFFF",
+          "width": 72,
+          "height": 72
         },
         {
-          "type": "rectangle",
-          "cornerRadius": 3.375,
-          "id": "SZ0jn",
-          "x": 24.1875,
-          "y": 41.90625,
+          "type": "path",
+          "id": "korX1",
+          "x": 0,
+          "y": 0,
           "name": "Body",
-          "fill": "#FFFFFF",
-          "width": 23.625,
-          "height": 10.6875
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": [
+          "geometry": "M398 636h284l24 32q14 22 14 44v72q0 28-28 28h-20q-20 0-20-20v-10h-224v10q0 20-20 20h-20q-28 0-28-28v-72q0-22 14-44z",
+          "viewBox": [
             0,
             0,
-            1.125,
-            1.125
+            1080,
+            1080
           ],
-          "id": "Pc8vF",
-          "x": 26.71875,
-          "y": 51.46875,
-          "name": "Wheel L",
           "fill": "#FFFFFF",
-          "width": 4.21875,
-          "height": 3.09375
+          "width": 72,
+          "height": 72
         },
         {
-          "type": "rectangle",
-          "cornerRadius": [
+          "type": "path",
+          "id": "oWbLi",
+          "x": 0,
+          "y": 0,
+          "name": "Windshield",
+          "geometry": "M480 586h120q13 0 21 12l31 44q6 10-6 10h-212q-12 0-6-10l31-44q8-12 21-12z",
+          "viewBox": [
             0,
             0,
-            1.125,
-            1.125
+            1080,
+            1080
           ],
-          "id": "Vzhq6",
-          "x": 41.0625,
-          "y": 51.46875,
-          "name": "Wheel R",
-          "fill": "#FFFFFF",
-          "width": 4.21875,
-          "height": 3.09375
+          "fill": "#2648E0",
+          "width": 72,
+          "height": 72
         },
         {
-          "type": "rectangle",
-          "cornerRadius": 0.703125,
-          "id": "VOA11",
-          "x": 33.75,
-          "y": 48.65625,
-          "name": "Grille",
-          "fill": "#2E4FE0",
-          "width": 4.5,
-          "height": 1.40625
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": 1.40625,
-          "id": "OfeRa",
-          "x": 26.15625,
-          "y": 44.71875,
+          "type": "path",
+          "id": "a2uxz",
+          "x": 0,
+          "y": 0,
           "name": "Headlight L",
-          "fill": "#FFC857",
-          "width": 7.03125,
-          "height": 2.8125
+          "geometry": "M404 688l36 5q22 4 31 26 4 13-10 13l-43-2q-19-2-25-21-5-23 11-21z",
+          "viewBox": [
+            0,
+            0,
+            1080,
+            1080
+          ],
+          "fill": "#8A9DF8",
+          "width": 72,
+          "height": 72
         },
         {
-          "type": "rectangle",
-          "cornerRadius": 1.40625,
-          "id": "QyKiS",
-          "x": 38.8125,
-          "y": 44.71875,
+          "type": "path",
+          "id": "zeAXq",
+          "x": 0,
+          "y": 0,
           "name": "Headlight R",
-          "fill": "#FFC857",
-          "width": 7.03125,
-          "height": 2.8125
+          "geometry": "M676 688l-36 5q-22 4-31 26-4 13 10 13l43-2q19-2 25-21 5-23-11-21z",
+          "viewBox": [
+            0,
+            0,
+            1080,
+            1080
+          ],
+          "fill": "#8A9DF8",
+          "width": 72,
+          "height": 72
         }
       ]
     },
@@ -49835,450 +49707,1034 @@
           "fontWeight": "700"
         },
         {
+          "type": "text",
+          "id": "jKZTL",
+          "name": "Title 3",
+          "fill": "#1C1B19",
+          "content": "Выбранный вариант · перерисовка референса",
+          "fontFamily": "Onest",
+          "fontSize": 32,
+          "fontWeight": "700"
+        },
+        {
           "type": "frame",
-          "id": "V6HUV",
-          "name": "Row",
-          "gap": 48,
+          "id": "vIzse",
+          "name": "Row 3",
+          "gap": 40,
+          "alignItems": "end",
           "children": [
             {
               "type": "frame",
-              "id": "lwGRI",
-              "name": "A · Монограмма",
-              "width": 256,
-              "layout": "vertical",
-              "gap": 16,
+              "id": "m7k7CO",
+              "name": "Ref 512",
+              "clip": true,
+              "width": 512,
+              "height": 512,
+              "fill": "#2648E0",
+              "cornerRadius": 109.03703703703704,
+              "layout": "none",
               "children": [
                 {
-                  "type": "frame",
-                  "id": "yScWi",
-                  "name": "Tile",
-                  "clip": true,
-                  "width": 256,
-                  "height": 256,
-                  "fill": {
-                    "type": "gradient",
-                    "gradientType": "linear",
-                    "enabled": true,
-                    "rotation": 225,
-                    "size": {
-                      "height": 1
-                    },
-                    "colors": [
-                      {
-                        "color": "#5C77FF",
-                        "position": 0
-                      },
-                      {
-                        "color": "#2E4FE0",
-                        "position": 0.55
-                      },
-                      {
-                        "color": "#1B2EA8",
-                        "position": 1
-                      }
-                    ]
-                  },
-                  "cornerRadius": 58,
-                  "layout": "none",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "uiYYj",
-                      "x": 0,
-                      "y": 0,
-                      "name": "Mark",
-                      "width": 256,
-                      "height": 256,
-                      "gap": 6,
-                      "padding": [
-                        0,
-                        0,
-                        18,
-                        0
-                      ],
-                      "justifyContent": "center",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "ixRON",
-                          "name": "Letter",
-                          "fill": "#FFFFFF",
-                          "content": "г",
-                          "lineHeight": 1,
-                          "fontFamily": "Onest",
-                          "fontSize": 210,
-                          "fontWeight": "800",
-                          "letterSpacing": -6
-                        },
-                        {
-                          "type": "frame",
-                          "id": "JK5Vb",
-                          "name": "DotWrap",
-                          "height": 150,
-                          "layout": "vertical",
-                          "justifyContent": "end",
-                          "children": [
-                            {
-                              "type": "ellipse",
-                              "id": "WYMOx",
-                              "name": "Dot",
-                              "fill": "#FFC857",
-                              "width": 40,
-                              "height": 40
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
+                  "type": "path",
+                  "id": "TXOGI",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Roof",
+                  "geometry": "M227 357l283.2-134.3q29.8-14.2 59.6 0l283.2 134.3a42 42 0 0 1-36 76l-257.1-122.1q-19.9-9.4-39.8 0l-257.1 122.1a42 42 0 0 1-36-76z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 512,
+                  "height": 512
                 },
                 {
-                  "type": "text",
-                  "id": "m1gQjA",
-                  "name": "Caption",
-                  "fill": "#1C1B19",
-                  "content": "A · Монограмма «г»",
-                  "fontFamily": "Onest",
-                  "fontSize": 18,
-                  "fontWeight": "600"
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    0,
+                    0,
+                    4.7407407407407405,
+                    16.11851851851852
+                  ],
+                  "id": "jjx2H",
+                  "x": 116.14814814814815,
+                  "y": 187.25925925925927,
+                  "name": "Wall L",
+                  "fill": "#FFFFFF",
+                  "width": 30.814814814814817,
+                  "height": 210.96296296296296
                 },
                 {
-                  "type": "text",
-                  "id": "X0rCW",
-                  "name": "Note",
-                  "fill": "#5E5B54",
-                  "textGrowth": "fixed-width",
-                  "width": "fill_container",
-                  "content": "Строчная «г» плотным начертанием и янтарная точка-фара. Типографичный, как у финтех-приложений.",
-                  "lineHeight": 1.45,
-                  "fontFamily": "Onest",
-                  "fontSize": 14,
-                  "fontWeight": "normal"
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    0,
+                    0,
+                    16.11851851851852,
+                    4.7407407407407405
+                  ],
+                  "id": "R0Ldb",
+                  "x": 365.03703703703707,
+                  "y": 187.25925925925927,
+                  "name": "Wall R",
+                  "fill": "#FFFFFF",
+                  "width": 30.814814814814817,
+                  "height": 210.96296296296296
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 5.688888888888889,
+                  "id": "aHuNI",
+                  "x": 163.55555555555557,
+                  "y": 198.16296296296298,
+                  "name": "Slat 1",
+                  "fill": "#FFFFFF",
+                  "width": 184.88888888888889,
+                  "height": 18.014814814814816
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 5.688888888888889,
+                  "id": "c27HF",
+                  "x": 163.55555555555557,
+                  "y": 228.9777777777778,
+                  "name": "Slat 2",
+                  "fill": "#FFFFFF",
+                  "width": 184.88888888888889,
+                  "height": 18.014814814814816
+                },
+                {
+                  "type": "path",
+                  "id": "J7ZlbJ",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Mirror L",
+                  "geometry": "M372 626h26l16 16-12 20h-22q-20-4-20-20 0-16 12-16z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 512,
+                  "height": 512
+                },
+                {
+                  "type": "path",
+                  "id": "Z9fUR",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Mirror R",
+                  "geometry": "M708 626h-26l-16 16 12 20h22q20-4 20-20 0-16-12-16z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 512,
+                  "height": 512
+                },
+                {
+                  "type": "path",
+                  "id": "WY9gA",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Cabin",
+                  "geometry": "M468 562h144q24 0 38 22l40 60h-300l40-60q14-22 38-22z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 512,
+                  "height": 512
+                },
+                {
+                  "type": "path",
+                  "id": "U6sjL",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Body",
+                  "geometry": "M398 636h284l24 32q14 22 14 44v72q0 28-28 28h-20q-20 0-20-20v-10h-224v10q0 20-20 20h-20q-28 0-28-28v-72q0-22 14-44z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 512,
+                  "height": 512
+                },
+                {
+                  "type": "path",
+                  "id": "v9CSpo",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Windshield",
+                  "geometry": "M480 586h120q13 0 21 12l31 44q6 10-6 10h-212q-12 0-6-10l31-44q8-12 21-12z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#2648E0",
+                  "width": 512,
+                  "height": 512
+                },
+                {
+                  "type": "path",
+                  "id": "aEMBP",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Headlight L",
+                  "geometry": "M404 688l36 5q22 4 31 26 4 13-10 13l-43-2q-19-2-25-21-5-23 11-21z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#8A9DF8",
+                  "width": 512,
+                  "height": 512
+                },
+                {
+                  "type": "path",
+                  "id": "OJ7rD",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Headlight R",
+                  "geometry": "M676 688l-36 5q-22 4-31 26-4 13 10 13l43-2q19-2 25-21 5-23-11-21z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#8A9DF8",
+                  "width": 512,
+                  "height": 512
                 }
               ]
             },
             {
               "type": "frame",
-              "id": "N47yB",
-              "name": "B · Крыша и фары",
+              "id": "C1WAA",
+              "name": "Ref 256",
+              "clip": true,
               "width": 256,
-              "layout": "vertical",
-              "gap": 16,
+              "height": 256,
+              "fill": "#2648E0",
+              "cornerRadius": 54.51851851851852,
+              "layout": "none",
               "children": [
                 {
-                  "type": "frame",
-                  "id": "c5035",
-                  "name": "Tile",
-                  "clip": true,
+                  "type": "path",
+                  "id": "E2Bod",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Roof",
+                  "geometry": "M227 357l283.2-134.3q29.8-14.2 59.6 0l283.2 134.3a42 42 0 0 1-36 76l-257.1-122.1q-19.9-9.4-39.8 0l-257.1 122.1a42 42 0 0 1-36-76z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
                   "width": 256,
-                  "height": 256,
-                  "fill": "#1C1B19",
-                  "cornerRadius": 58,
-                  "layout": "none",
-                  "children": [
-                    {
-                      "type": "path",
-                      "id": "FZyjw",
-                      "x": 48,
-                      "y": 68,
-                      "name": "Roof",
-                      "geometry": "M0 72l80-72 80 72h-38l-42-38-42 38z",
-                      "viewBox": [
-                        0,
-                        0,
-                        160,
-                        72
-                      ],
-                      "fill": "#FFFFFF",
-                      "width": 160,
-                      "height": 72
-                    },
-                    {
-                      "type": "rectangle",
-                      "cornerRadius": 13,
-                      "id": "g57l2",
-                      "x": 62,
-                      "y": 162,
-                      "name": "Light L",
-                      "fill": "#FFC857",
-                      "width": 52,
-                      "height": 26
-                    },
-                    {
-                      "type": "rectangle",
-                      "cornerRadius": 13,
-                      "id": "N69sJX",
-                      "x": 142,
-                      "y": 162,
-                      "name": "Light R",
-                      "fill": "#FFC857",
-                      "width": 52,
-                      "height": 26
-                    }
-                  ]
+                  "height": 256
                 },
                 {
-                  "type": "text",
-                  "id": "TlkFg",
-                  "name": "Caption",
-                  "fill": "#1C1B19",
-                  "content": "B · Крыша и фары",
-                  "fontFamily": "Onest",
-                  "fontSize": 18,
-                  "fontWeight": "600"
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    0,
+                    0,
+                    2.3703703703703702,
+                    8.05925925925926
+                  ],
+                  "id": "oE12K",
+                  "x": 58.074074074074076,
+                  "y": 93.62962962962963,
+                  "name": "Wall L",
+                  "fill": "#FFFFFF",
+                  "width": 15.407407407407408,
+                  "height": 105.48148148148148
                 },
                 {
-                  "type": "text",
-                  "id": "UIHyh",
-                  "name": "Note",
-                  "fill": "#5E5B54",
-                  "textGrowth": "fixed-width",
-                  "width": "fill_container",
-                  "content": "Шеврон крыши гаража и две фары под ним. Минимум деталей, хорошо читается в 16 px.",
-                  "lineHeight": 1.45,
-                  "fontFamily": "Onest",
-                  "fontSize": 14,
-                  "fontWeight": "normal"
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    0,
+                    0,
+                    8.05925925925926,
+                    2.3703703703703702
+                  ],
+                  "id": "dIj1t",
+                  "x": 182.51851851851853,
+                  "y": 93.62962962962963,
+                  "name": "Wall R",
+                  "fill": "#FFFFFF",
+                  "width": 15.407407407407408,
+                  "height": 105.48148148148148
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2.8444444444444446,
+                  "id": "c8fola",
+                  "x": 81.77777777777779,
+                  "y": 99.08148148148149,
+                  "name": "Slat 1",
+                  "fill": "#FFFFFF",
+                  "width": 92.44444444444444,
+                  "height": 9.007407407407408
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2.8444444444444446,
+                  "id": "hVgMt",
+                  "x": 81.77777777777779,
+                  "y": 114.4888888888889,
+                  "name": "Slat 2",
+                  "fill": "#FFFFFF",
+                  "width": 92.44444444444444,
+                  "height": 9.007407407407408
+                },
+                {
+                  "type": "path",
+                  "id": "B54r6G",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Mirror L",
+                  "geometry": "M372 626h26l16 16-12 20h-22q-20-4-20-20 0-16 12-16z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 256,
+                  "height": 256
+                },
+                {
+                  "type": "path",
+                  "id": "K9s1LO",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Mirror R",
+                  "geometry": "M708 626h-26l-16 16 12 20h22q20-4 20-20 0-16-12-16z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 256,
+                  "height": 256
+                },
+                {
+                  "type": "path",
+                  "id": "YHSlY",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Cabin",
+                  "geometry": "M468 562h144q24 0 38 22l40 60h-300l40-60q14-22 38-22z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 256,
+                  "height": 256
+                },
+                {
+                  "type": "path",
+                  "id": "vIxwm",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Body",
+                  "geometry": "M398 636h284l24 32q14 22 14 44v72q0 28-28 28h-20q-20 0-20-20v-10h-224v10q0 20-20 20h-20q-28 0-28-28v-72q0-22 14-44z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 256,
+                  "height": 256
+                },
+                {
+                  "type": "path",
+                  "id": "rI0p8",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Windshield",
+                  "geometry": "M480 586h120q13 0 21 12l31 44q6 10-6 10h-212q-12 0-6-10l31-44q8-12 21-12z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#2648E0",
+                  "width": 256,
+                  "height": 256
+                },
+                {
+                  "type": "path",
+                  "id": "j8Syy",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Headlight L",
+                  "geometry": "M404 688l36 5q22 4 31 26 4 13-10 13l-43-2q-19-2-25-21-5-23 11-21z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#8A9DF8",
+                  "width": 256,
+                  "height": 256
+                },
+                {
+                  "type": "path",
+                  "id": "X3k0z",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Headlight R",
+                  "geometry": "M676 688l-36 5q-22 4-31 26-4 13 10 13l43-2q19-2 25-21 5-23-11-21z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#8A9DF8",
+                  "width": 256,
+                  "height": 256
                 }
               ]
             },
             {
               "type": "frame",
-              "id": "PD0sG",
-              "name": "C · Спидометр",
-              "width": 256,
-              "layout": "vertical",
-              "gap": 16,
+              "id": "LoYTP",
+              "name": "Ref 128",
+              "clip": true,
+              "width": 128,
+              "height": 128,
+              "fill": "#2648E0",
+              "cornerRadius": 27.25925925925926,
+              "layout": "none",
               "children": [
                 {
-                  "type": "frame",
-                  "id": "X3SaWn",
-                  "name": "Tile",
-                  "clip": true,
-                  "width": 256,
-                  "height": 256,
-                  "fill": {
-                    "type": "gradient",
-                    "gradientType": "linear",
-                    "enabled": true,
-                    "rotation": 225,
-                    "size": {
-                      "height": 1
-                    },
-                    "colors": [
-                      {
-                        "color": "#5C77FF",
-                        "position": 0
-                      },
-                      {
-                        "color": "#2E4FE0",
-                        "position": 0.55
-                      },
-                      {
-                        "color": "#1B2EA8",
-                        "position": 1
-                      }
-                    ]
-                  },
-                  "cornerRadius": 58,
-                  "layout": "none",
-                  "children": [
-                    {
-                      "type": "ellipse",
-                      "id": "KpjpE",
-                      "x": 48,
-                      "y": 48,
-                      "name": "Track",
-                      "innerRadius": 0.74,
-                      "startAngle": -45,
-                      "sweepAngle": 270,
-                      "fill": "#FFFFFF40",
-                      "width": 160,
-                      "height": 160
-                    },
-                    {
-                      "type": "ellipse",
-                      "id": "deIIA",
-                      "x": 48,
-                      "y": 48,
-                      "name": "Progress",
-                      "innerRadius": 0.74,
-                      "startAngle": 225,
-                      "sweepAngle": -170,
-                      "fill": "#FFFFFF",
-                      "width": 160,
-                      "height": 160
-                    },
-                    {
-                      "type": "ellipse",
-                      "id": "c5TejZ",
-                      "x": 48,
-                      "y": 48,
-                      "name": "Tip",
-                      "innerRadius": 0.74,
-                      "startAngle": 55,
-                      "sweepAngle": -28,
-                      "fill": "#FFC857",
-                      "width": 160,
-                      "height": 160
-                    },
-                    {
-                      "type": "ellipse",
-                      "id": "FZFJv",
-                      "x": 110,
-                      "y": 110,
-                      "name": "Hub",
-                      "fill": "#FFFFFF",
-                      "width": 36,
-                      "height": 36
-                    }
-                  ]
+                  "type": "path",
+                  "id": "H0gbIu",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Roof",
+                  "geometry": "M227 357l283.2-134.3q29.8-14.2 59.6 0l283.2 134.3a42 42 0 0 1-36 76l-257.1-122.1q-19.9-9.4-39.8 0l-257.1 122.1a42 42 0 0 1-36-76z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 128,
+                  "height": 128
                 },
                 {
-                  "type": "text",
-                  "id": "jHo8X",
-                  "name": "Caption",
-                  "fill": "#1C1B19",
-                  "content": "C · Шкала обслуживания",
-                  "fontFamily": "Onest",
-                  "fontSize": 18,
-                  "fontWeight": "600"
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    0,
+                    0,
+                    1.1851851851851851,
+                    4.02962962962963
+                  ],
+                  "id": "rCsml",
+                  "x": 29.037037037037038,
+                  "y": 46.81481481481482,
+                  "name": "Wall L",
+                  "fill": "#FFFFFF",
+                  "width": 7.703703703703704,
+                  "height": 52.74074074074074
                 },
                 {
-                  "type": "text",
-                  "id": "cuMYQ",
-                  "name": "Note",
-                  "fill": "#5E5B54",
-                  "textGrowth": "fixed-width",
-                  "width": "fill_container",
-                  "content": "Кольцо-спидометр с янтарным сегментом прогресса — про отслеживание ТО и пробега.",
-                  "lineHeight": 1.45,
-                  "fontFamily": "Onest",
-                  "fontSize": 14,
-                  "fontWeight": "normal"
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    0,
+                    0,
+                    4.02962962962963,
+                    1.1851851851851851
+                  ],
+                  "id": "G1Lld8",
+                  "x": 91.25925925925927,
+                  "y": 46.81481481481482,
+                  "name": "Wall R",
+                  "fill": "#FFFFFF",
+                  "width": 7.703703703703704,
+                  "height": 52.74074074074074
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 1.4222222222222223,
+                  "id": "KQ2uy",
+                  "x": 40.88888888888889,
+                  "y": 49.540740740740745,
+                  "name": "Slat 1",
+                  "fill": "#FFFFFF",
+                  "width": 46.22222222222222,
+                  "height": 4.503703703703704
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 1.4222222222222223,
+                  "id": "a25eFx",
+                  "x": 40.88888888888889,
+                  "y": 57.24444444444445,
+                  "name": "Slat 2",
+                  "fill": "#FFFFFF",
+                  "width": 46.22222222222222,
+                  "height": 4.503703703703704
+                },
+                {
+                  "type": "path",
+                  "id": "WBR6P",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Mirror L",
+                  "geometry": "M372 626h26l16 16-12 20h-22q-20-4-20-20 0-16 12-16z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 128,
+                  "height": 128
+                },
+                {
+                  "type": "path",
+                  "id": "JN33x",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Mirror R",
+                  "geometry": "M708 626h-26l-16 16 12 20h22q20-4 20-20 0-16-12-16z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 128,
+                  "height": 128
+                },
+                {
+                  "type": "path",
+                  "id": "ccedl",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Cabin",
+                  "geometry": "M468 562h144q24 0 38 22l40 60h-300l40-60q14-22 38-22z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 128,
+                  "height": 128
+                },
+                {
+                  "type": "path",
+                  "id": "S4k5A2",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Body",
+                  "geometry": "M398 636h284l24 32q14 22 14 44v72q0 28-28 28h-20q-20 0-20-20v-10h-224v10q0 20-20 20h-20q-28 0-28-28v-72q0-22 14-44z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 128,
+                  "height": 128
+                },
+                {
+                  "type": "path",
+                  "id": "i3Cweb",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Windshield",
+                  "geometry": "M480 586h120q13 0 21 12l31 44q6 10-6 10h-212q-12 0-6-10l31-44q8-12 21-12z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#2648E0",
+                  "width": 128,
+                  "height": 128
+                },
+                {
+                  "type": "path",
+                  "id": "DgKEK",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Headlight L",
+                  "geometry": "M404 688l36 5q22 4 31 26 4 13-10 13l-43-2q-19-2-25-21-5-23 11-21z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#8A9DF8",
+                  "width": 128,
+                  "height": 128
+                },
+                {
+                  "type": "path",
+                  "id": "p93LOM",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Headlight R",
+                  "geometry": "M676 688l-36 5q-22 4-31 26-4 13 10 13l43-2q19-2 25-21 5-23-11-21z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#8A9DF8",
+                  "width": 128,
+                  "height": 128
                 }
               ]
             },
             {
               "type": "frame",
-              "id": "G2MJBZ",
-              "name": "D · Номерной знак",
-              "width": 256,
-              "layout": "vertical",
-              "gap": 16,
+              "id": "vYYYY",
+              "name": "Ref 64",
+              "clip": true,
+              "width": 64,
+              "height": 64,
+              "fill": "#2648E0",
+              "cornerRadius": 13.62962962962963,
+              "layout": "none",
               "children": [
                 {
-                  "type": "frame",
-                  "id": "M8THHx",
-                  "name": "Tile",
-                  "clip": true,
-                  "width": 256,
-                  "height": 256,
-                  "fill": {
-                    "type": "gradient",
-                    "gradientType": "linear",
-                    "enabled": true,
-                    "rotation": 225,
-                    "size": {
-                      "height": 1
-                    },
-                    "colors": [
-                      {
-                        "color": "#5C77FF",
-                        "position": 0
-                      },
-                      {
-                        "color": "#2E4FE0",
-                        "position": 0.55
-                      },
-                      {
-                        "color": "#1B2EA8",
-                        "position": 1
-                      }
-                    ]
-                  },
-                  "cornerRadius": 58,
-                  "layout": "none",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "t7Eyu",
-                      "x": 40,
-                      "y": 76,
-                      "name": "Plate",
-                      "width": 176,
-                      "height": 104,
-                      "fill": "#FFFFFF",
-                      "cornerRadius": 22,
-                      "gap": 14,
-                      "justifyContent": "center",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "wwy9e",
-                          "name": "Letter",
-                          "fill": "#2E4FE0",
-                          "content": "Г",
-                          "lineHeight": 1,
-                          "fontFamily": "JetBrains Mono",
-                          "fontSize": 76,
-                          "fontWeight": "800"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "edlEC",
-                          "name": "Dots",
-                          "layout": "vertical",
-                          "gap": 10,
-                          "children": [
-                            {
-                              "type": "rectangle",
-                              "cornerRadius": 6,
-                              "id": "tDDrG",
-                              "name": "Dot 1",
-                              "fill": "#FFC857",
-                              "width": 22,
-                              "height": 22
-                            },
-                            {
-                              "type": "rectangle",
-                              "cornerRadius": 6,
-                              "id": "sKr7i",
-                              "name": "Dot 2",
-                              "fill": "#2E4FE0",
-                              "width": 22,
-                              "height": 22
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
+                  "type": "path",
+                  "id": "RFcVb",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Roof",
+                  "geometry": "M227 357l283.2-134.3q29.8-14.2 59.6 0l283.2 134.3a42 42 0 0 1-36 76l-257.1-122.1q-19.9-9.4-39.8 0l-257.1 122.1a42 42 0 0 1-36-76z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 64,
+                  "height": 64
                 },
                 {
-                  "type": "text",
-                  "id": "R420X",
-                  "name": "Caption",
-                  "fill": "#1C1B19",
-                  "content": "D · Номерной знак",
-                  "fontFamily": "Onest",
-                  "fontSize": 18,
-                  "fontWeight": "600"
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    0,
+                    0,
+                    0.5925925925925926,
+                    2.014814814814815
+                  ],
+                  "id": "v14Gs",
+                  "x": 14.518518518518519,
+                  "y": 23.40740740740741,
+                  "name": "Wall L",
+                  "fill": "#FFFFFF",
+                  "width": 3.851851851851852,
+                  "height": 26.37037037037037
                 },
                 {
-                  "type": "text",
-                  "id": "s5ZVvw",
-                  "name": "Note",
-                  "fill": "#5E5B54",
-                  "textGrowth": "fixed-width",
-                  "width": "fill_container",
-                  "content": "Белая «табличка» с моноширинной «Г» — отсылка к госномеру и компоненту Plate.",
-                  "lineHeight": 1.45,
-                  "fontFamily": "Onest",
-                  "fontSize": 14,
-                  "fontWeight": "normal"
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    0,
+                    0,
+                    2.014814814814815,
+                    0.5925925925925926
+                  ],
+                  "id": "C0iuEM",
+                  "x": 45.62962962962963,
+                  "y": 23.40740740740741,
+                  "name": "Wall R",
+                  "fill": "#FFFFFF",
+                  "width": 3.851851851851852,
+                  "height": 26.37037037037037
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 0.7111111111111111,
+                  "id": "k6wBN",
+                  "x": 20.444444444444446,
+                  "y": 24.770370370370372,
+                  "name": "Slat 1",
+                  "fill": "#FFFFFF",
+                  "width": 23.11111111111111,
+                  "height": 2.251851851851852
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 0.7111111111111111,
+                  "id": "o54m4p",
+                  "x": 20.444444444444446,
+                  "y": 28.622222222222224,
+                  "name": "Slat 2",
+                  "fill": "#FFFFFF",
+                  "width": 23.11111111111111,
+                  "height": 2.251851851851852
+                },
+                {
+                  "type": "path",
+                  "id": "im9nq",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Mirror L",
+                  "geometry": "M372 626h26l16 16-12 20h-22q-20-4-20-20 0-16 12-16z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 64,
+                  "height": 64
+                },
+                {
+                  "type": "path",
+                  "id": "a5tCpP",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Mirror R",
+                  "geometry": "M708 626h-26l-16 16 12 20h22q20-4 20-20 0-16-12-16z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 64,
+                  "height": 64
+                },
+                {
+                  "type": "path",
+                  "id": "V6PrLa",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Cabin",
+                  "geometry": "M468 562h144q24 0 38 22l40 60h-300l40-60q14-22 38-22z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 64,
+                  "height": 64
+                },
+                {
+                  "type": "path",
+                  "id": "rkkgp",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Body",
+                  "geometry": "M398 636h284l24 32q14 22 14 44v72q0 28-28 28h-20q-20 0-20-20v-10h-224v10q0 20-20 20h-20q-28 0-28-28v-72q0-22 14-44z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 64,
+                  "height": 64
+                },
+                {
+                  "type": "path",
+                  "id": "w3Ixco",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Windshield",
+                  "geometry": "M480 586h120q13 0 21 12l31 44q6 10-6 10h-212q-12 0-6-10l31-44q8-12 21-12z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#2648E0",
+                  "width": 64,
+                  "height": 64
+                },
+                {
+                  "type": "path",
+                  "id": "wmMSh",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Headlight L",
+                  "geometry": "M404 688l36 5q22 4 31 26 4 13-10 13l-43-2q-19-2-25-21-5-23 11-21z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#8A9DF8",
+                  "width": 64,
+                  "height": 64
+                },
+                {
+                  "type": "path",
+                  "id": "xoaeF",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Headlight R",
+                  "geometry": "M676 688l-36 5q-22 4-31 26-4 13 10 13l43-2q19-2 25-21 5-23-11-21z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#8A9DF8",
+                  "width": 64,
+                  "height": 64
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "jpDtG",
+              "name": "Ref 32",
+              "clip": true,
+              "width": 32,
+              "height": 32,
+              "fill": "#2648E0",
+              "cornerRadius": 6.814814814814815,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "path",
+                  "id": "oOwn2",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Roof",
+                  "geometry": "M227 357l283.2-134.3q29.8-14.2 59.6 0l283.2 134.3a42 42 0 0 1-36 76l-257.1-122.1q-19.9-9.4-39.8 0l-257.1 122.1a42 42 0 0 1-36-76z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 32,
+                  "height": 32
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    0,
+                    0,
+                    0.2962962962962963,
+                    1.0074074074074075
+                  ],
+                  "id": "S71LI",
+                  "x": 7.2592592592592595,
+                  "y": 11.703703703703704,
+                  "name": "Wall L",
+                  "fill": "#FFFFFF",
+                  "width": 1.925925925925926,
+                  "height": 13.185185185185185
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    0,
+                    0,
+                    1.0074074074074075,
+                    0.2962962962962963
+                  ],
+                  "id": "e0d9Q",
+                  "x": 22.814814814814817,
+                  "y": 11.703703703703704,
+                  "name": "Wall R",
+                  "fill": "#FFFFFF",
+                  "width": 1.925925925925926,
+                  "height": 13.185185185185185
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 0.35555555555555557,
+                  "id": "mjnuc",
+                  "x": 10.222222222222223,
+                  "y": 12.385185185185186,
+                  "name": "Slat 1",
+                  "fill": "#FFFFFF",
+                  "width": 11.555555555555555,
+                  "height": 1.125925925925926
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 0.35555555555555557,
+                  "id": "m5xRR",
+                  "x": 10.222222222222223,
+                  "y": 14.311111111111112,
+                  "name": "Slat 2",
+                  "fill": "#FFFFFF",
+                  "width": 11.555555555555555,
+                  "height": 1.125925925925926
+                },
+                {
+                  "type": "path",
+                  "id": "FqUBr",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Mirror L",
+                  "geometry": "M372 626h26l16 16-12 20h-22q-20-4-20-20 0-16 12-16z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 32,
+                  "height": 32
+                },
+                {
+                  "type": "path",
+                  "id": "XooAG",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Mirror R",
+                  "geometry": "M708 626h-26l-16 16 12 20h22q20-4 20-20 0-16-12-16z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 32,
+                  "height": 32
+                },
+                {
+                  "type": "path",
+                  "id": "mLM3G",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Cabin",
+                  "geometry": "M468 562h144q24 0 38 22l40 60h-300l40-60q14-22 38-22z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 32,
+                  "height": 32
+                },
+                {
+                  "type": "path",
+                  "id": "na9No",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Body",
+                  "geometry": "M398 636h284l24 32q14 22 14 44v72q0 28-28 28h-20q-20 0-20-20v-10h-224v10q0 20-20 20h-20q-28 0-28-28v-72q0-22 14-44z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#FFFFFF",
+                  "width": 32,
+                  "height": 32
+                },
+                {
+                  "type": "path",
+                  "id": "rjmL0",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Windshield",
+                  "geometry": "M480 586h120q13 0 21 12l31 44q6 10-6 10h-212q-12 0-6-10l31-44q8-12 21-12z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#2648E0",
+                  "width": 32,
+                  "height": 32
+                },
+                {
+                  "type": "path",
+                  "id": "verya",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Headlight L",
+                  "geometry": "M404 688l36 5q22 4 31 26 4 13-10 13l-43-2q-19-2-25-21-5-23 11-21z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#8A9DF8",
+                  "width": 32,
+                  "height": 32
+                },
+                {
+                  "type": "path",
+                  "id": "vY0J1",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Headlight R",
+                  "geometry": "M676 688l-36 5q-22 4-31 26-4 13 10 13l43-2q19-2 25-21 5-23-11-21z",
+                  "viewBox": [
+                    0,
+                    0,
+                    1080,
+                    1080
+                  ],
+                  "fill": "#8A9DF8",
+                  "width": 32,
+                  "height": 32
                 }
               ]
             }

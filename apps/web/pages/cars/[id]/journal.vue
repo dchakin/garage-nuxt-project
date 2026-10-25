@@ -40,9 +40,15 @@ const query = computed<Partial<EntryFilterInput>>(() => ({
   sortBy: sortBy.value,
 }))
 const hasFilters = computed(() => Boolean(query.value.type || query.value.search))
+/** Были ли фильтры у запроса, чей ответ сейчас в `entries`: пустой список относится к нему, а не к текущим чипам */
+const loadedWithFilters = ref(false)
 const loaded = computed(() => loadedCarId.value === carId.value && !failed.value)
-const journalEmpty = computed(() => loaded.value && !entries.value.length && !hasFilters.value)
-const nothingFound = computed(() => loaded.value && !entries.value.length && hasFilters.value)
+const journalEmpty = computed(
+  () => loaded.value && !entries.value.length && !loadedWithFilters.value,
+)
+const nothingFound = computed(
+  () => loaded.value && !entries.value.length && loadedWithFilters.value,
+)
 /** При сортировке по пробегу месяцев нет — один плоский список */
 const groups = computed(() => (sortBy.value === 'date' ? groupEntriesByMonth(entries.value) : []))
 
@@ -57,9 +63,13 @@ async function load() {
   skeletonVisible.value = false
   clearTimeout(skeletonTimer)
   skeletonTimer = setTimeout(() => (skeletonVisible.value = true), SKELETON_DELAY_MS)
+  const requestHasFilters = hasFilters.value
   try {
     await fetchEntries(query.value)
-    if (token === loadToken) loadedCarId.value = carId.value
+    if (token === loadToken) {
+      loadedCarId.value = carId.value
+      loadedWithFilters.value = requestHasFilters
+    }
   } catch {
     // Уже показанные записи этой машины остаются (нет сети — плашка в layout), не экран ошибки
     if (token === loadToken && loadedCarId.value !== carId.value) failed.value = true

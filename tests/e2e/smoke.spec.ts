@@ -1,4 +1,10 @@
-import { createTestUser, loginViaUi, logout, registerViaUi } from './helpers/auth'
+import {
+  createTestUser,
+  loginRedirectingTo,
+  loginViaUi,
+  logout,
+  registerViaUi,
+} from './helpers/auth'
 import { snap } from './helpers/snap'
 import { expect, test } from './helpers/test'
 
@@ -9,7 +15,7 @@ test('регистрация → вход → список машин', async ({
   await logout(page)
 
   await page.goto('/cars')
-  await expect(page).toHaveURL(/\/login$/)
+  await expect(page).toHaveURL(loginRedirectingTo('/cars'))
   await snap(page, 'login')
 
   await loginViaUi(page, user)

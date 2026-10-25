@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div class="min-h-screen bg-bg pb-sp-6">
+  <div class="min-h-screen bg-bg pb-[calc(var(--sp-6)+env(safe-area-inset-bottom))]">
     <main class="mx-auto max-w-3xl">
       <slot />
     </main>

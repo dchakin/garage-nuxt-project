@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { CarFront } from 'lucide-vue-next'
+import { MIN_PASSWORD_LENGTH } from '@garage/shared/schemas/auth'
+
 definePageMeta({ middleware: 'auth' })
+
+/** Куда ведёт регистрация: мастер первого запуска (#72). */
+const AFTER_REGISTER_PATH = '/onboarding'
 
 const { register } = useAuth()
 const router = useRouter()
@@ -8,17 +12,20 @@ const router = useRouter()
 const name = ref('')
 const email = ref('')
 const password = ref('')
-const error = ref('')
+const errorTitle = ref('')
+const errorMessage = ref('')
 const loading = ref(false)
 
 async function onSubmit() {
-  error.value = ''
+  errorTitle.value = ''
+  errorMessage.value = ''
   loading.value = true
   try {
     await register(name.value, email.value, password.value)
-    router.push('/cars')
+    await router.push(AFTER_REGISTER_PATH)
   } catch (e: any) {
-    error.value = e?.data?.statusMessage || 'Не удалось зарегистрироваться'
+    errorTitle.value = 'Не удалось зарегистрироваться'
+    errorMessage.value = e?.data?.statusMessage || 'Проверьте соединение и попробуйте ещё раз.'
   } finally {
     loading.value = false
   }
@@ -26,35 +33,32 @@ async function onSubmit() {
 </script>
 
 <template>
-  <div class="max-w-sm mx-auto mt-16">
-    <div class="flex justify-center mb-4">
-      <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-accent text-on-accent">
-        <CarFront class="h-6 w-6" aria-hidden="true" />
-      </span>
-    </div>
-    <h1 class="text-h1 text-text mb-6 text-center">Регистрация</h1>
-    <div class="card p-6 shadow-sm">
-      <form class="space-y-4" @submit.prevent="onSubmit">
-        <div>
-          <label class="label">Имя</label>
-          <input v-model="name" type="text" required class="input" />
-        </div>
-        <div>
-          <label class="label">Email</label>
-          <input v-model="email" type="email" required class="input" />
-        </div>
-        <div>
-          <label class="label">Пароль</label>
-          <PasswordInput v-model="password" :minlength="6" />
-        </div>
-        <p v-if="error" class="alert-error">{{ error }}</p>
-        <UiButton type="submit" :loading="loading" class="w-full">
-          {{ loading ? 'Регистрируем…' : 'Зарегистрироваться' }}
-        </UiButton>
-      </form>
-    </div>
-    <p class="text-sm text-text-2 text-center mt-4">
-      Уже есть аккаунт? <NuxtLink to="/login" class="link">Войти</NuxtLink>
+  <div class="mx-auto flex max-w-sm flex-col pt-sp-8">
+    <AuthHeader title="Регистрация" subtitle="Создайте аккаунт, чтобы вести учёт машины" />
+    <form class="flex flex-col gap-sp-4" @submit.prevent="onSubmit">
+      <UiAlert v-if="errorTitle" variant="error" :title="errorTitle" :message="errorMessage" />
+      <UiField v-model="name" label="Имя" autocomplete="name" required />
+      <UiField
+        v-model="email"
+        label="Email"
+        type="email"
+        placeholder="name@example.com"
+        autocomplete="email"
+        required
+      />
+      <PasswordInput
+        v-model="password"
+        autocomplete="new-password"
+        :minlength="MIN_PASSWORD_LENGTH"
+        :hint="`Минимум ${MIN_PASSWORD_LENGTH} символов`"
+      />
+      <UiButton type="submit" :loading="loading" class="w-full">
+        {{ loading ? 'Регистрируем…' : 'Зарегистрироваться' }}
+      </UiButton>
+    </form>
+    <p class="mt-sp-6 text-center text-sm text-text-2">
+      Уже есть аккаунт?
+      <NuxtLink to="/login" class="font-semibold text-accent-text">Войти</NuxtLink>
     </p>
   </div>
 </template>

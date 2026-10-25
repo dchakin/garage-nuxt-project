@@ -2,17 +2,19 @@
 
 Монорепа (npm workspaces): клиент — Nuxt 3 SPA (`apps/web`), API — Nitro + Drizzle (SQLite) (`apps/api`), общие Zod-схемы и типы — `packages/shared`. TypeScript и Tailwind везде, где есть UI; шрифты Onest и JetBrains Mono — из бандла (`@fontsource`), иконки — `lucide-vue-next`.
 
-Реализовано в этой версии (v1, по этапам 1–3 из ТЗ):
+Интерфейс сделан по макету `design/garage.pen` (план — `docs/plans/redesign.md`, итог сверки — `docs/plans/design-audit.md`). Что есть:
 
-- Авторизация (регистрация/логин/логаут): сессии на куках для веба, access + refresh токены (`Authorization: Bearer`) для будущего мобильного клиента.
-- CRUD автомобилей, список, карточка авто, приглашение участников по email.
-- Журнал записей: создание/просмотр/редактирование/удаление, фильтры по типу/категории/датам, сортировка по дате/пробегу.
-- Категории (сидятся по умолчанию).
-- Напоминания: создание/редактирование/удаление, привязка к последней записи журнала (авто-расчёт следующей даты/пробега по интервалу), статусы «скоро/просрочено/ок», бейдж-уведомление на карточке авто.
-- PWA: манифест и свой service worker (`@vite-pwa/nuxt`, `apps/web/service-worker/sw.ts`), браузер предлагает установить приложение на главный экран; иконки сгенерированы из `apps/web/public/logo.svg`.
-- Push-уведомления о напоминаниях (Web Push, VAPID): включаются кнопкой на странице «Мои автомобили». Проверка идёт раз в день в 09:00 МСК (Nitro scheduled task) и сразу после записи с новым пробегом. Одно уведомление на каждый статус «скоро»/«просрочено» по каждому сроку.
+- Авторизация: сессии на куках для веба, access + refresh токены (`Authorization: Bearer`) для мобильного клиента. Восстановление пароля по email (нужна почта, см. переменные ниже), смена имени и пароля, удаление аккаунта.
+- Мастер первого запуска: машина и напоминания по шаблонам одним шагом.
+- Экраны машины с нижней панелью: «Обзор» (пробег, «Требует внимания», расходы месяца, последние записи), «Журнал» (по месяцам, фильтр по типу, поиск, сортировка), «Напоминания», «Расходы» (месяц / год / всё время, графики). Переключатель машин в шапке, открывается последняя машина. Светлая и тёмная тема.
+- Записи и напоминания в шторках с любого экрана машины. «Сделал» закрывает напоминание записью и пересчитывает срок. Удаление — сразу, с «Отменить» в течение 5 с.
+- Пробег обновляется отдельно от записи (владелец и участники), уменьшение — с подтверждением.
+- Участники: владелец добавляет по email сразу, без приглашения, и убирает; участник может покинуть машину. Свои категории у каждой машины.
+- Экраны 403 / 404 / 500 / «Сессия истекла» (после входа — возврат на тот же экран), плашка «Нет соединения».
+- PWA: манифест и свой service worker (`@vite-pwa/nuxt`, `apps/web/service-worker/sw.ts`), браузер предлагает установить приложение на главный экран; иконки генерируются из `apps/web/public/logo.svg` (экспорт `Logo / App Icon` из макета) командой `npm run pwa-assets -w @garage/web`, она же — первый шаг `npm run build` в `apps/web`; PNG/ICO в `public/` руками не правятся.
+- Push-уведомления о напоминаниях (Web Push, VAPID): включаются в «Профиле» или кнопкой на «Обзоре» после мастера. Проверка идёт раз в день в 09:00 МСК (Nitro scheduled task) и сразу после записи с новым пробегом или обновления пробега. Одно уведомление на каждый статус «скоро»/«просрочено» по каждому сроку; выключенные напоминания не шлют push.
 
-Пока не реализовано (следующие этапы): экран аналитики (API уже есть), вложения к записям.
+Не реализовано: вложения к записям, сохранение записей без сети. Часть экранов ещё расходится с макетом в вёрстке и подписях — задачи этапа 12 (`docs/plans/design-audit.md`).
 
 ## Запуск локально
 
@@ -43,7 +45,7 @@
    npm run db:seed
    ```
 
-4. Прогнать тесты (Vitest — юнит-тесты логики, Zod-схем и клиента API + интеграционные тесты API через реальный dev-сервер Nitro):
+4. Прогнать тесты (Vitest — юнит-тесты логики, Zod-схем и клиента API + интеграционные тесты API по HTTP на собранном сервере Nitro):
 
    ```bash
    npm test
@@ -57,12 +59,12 @@
 
    Клиент — http://localhost:3000, API — http://localhost:3001. Браузер ходит только на клиент: dev-сервер Nuxt проксирует `/api/**` на API (`nitro.devProxy`), так что cookie-сессия работает без CORS. По отдельности: `npm run dev:api`, `npm run dev:web`.
 
-Первый экран — регистрация, после неё сразу открывается список автомобилей.
+Первый экран — вход; после регистрации открывается мастер первого запуска (машина → напоминания) и затем «Обзор».
 
 ## Сборка и запуск как в проде
 
 ```bash
-npm run build   # параллельно: apps/api → .output (Nitro), apps/web → .output/public (nuxt generate)
+npm run build   # параллельно: apps/api → .output (Nitro), apps/web → .output/public (пересборка PWA-иконок + nuxt generate)
 NUXT_WEB_DIST_DIR=apps/web/.output/public node apps/api/.output/server/index.mjs
 ```
 
@@ -92,28 +94,31 @@ API раздаёт собранный клиент (SPA-фолбэк на `200.h
 apps/
   api/                    — @garage/api: Nitro без Nuxt
     server/
-      api/                — API-роуты (auth, cars, entries, reminders, categories, push, health)
+      api/                — API-роуты (auth, cars — с пробегом, участниками, аналитикой, категориями;
+                            entries, reminders, categories, push, health)
       database/           — схема Drizzle, миграции, seed
       middleware/         — cors.ts — CORS для origin'ов Capacitor и NUXT_CORS_ORIGINS
       routes/             — [...path].get.ts — раздача собранного клиента (NUXT_WEB_DIST_DIR)
       tasks/              — reminders/notify.ts — ежедневная рассылка push о напоминаниях
       utils/              — auth.ts (cookie + Bearer), tokens.ts (JWT/refresh), password.ts, access.ts
-                            (доступ к авто), push.ts, webStatic.ts
-    tests/                — unit, server (на временной SQLite), integration (реальный dev-сервер)
+                            (доступ к авто), push.ts, mail.ts, analytics.ts, webStatic.ts
+    tests/                — unit, server (на временной SQLite), integration (собранный сервер, HTTP)
   web/                    — @garage/web: Nuxt SPA (ssr: false)
     pages/ components/ composables/ middleware/ plugins/ layouts/
+    components/ui/        — UI-кит по макету (<Ui…>), витрина /dev/ui
     utils/                — apiClient.ts (baseURL, Bearer, refresh), authTokens.ts (хранилище токенов)
     service-worker/       — sw.ts — service worker (прекэш + push)
     tests/                — клиентские юнит-тесты (happy-dom)
 packages/
-  shared/                 — @garage/shared: schemas/ (Zod), types.ts, utils/ (reminderStatus.ts)
+  shared/                 — @garage/shared: schemas/ (Zod), types.ts, utils/ (форматирование, статусы и сроки
+                            напоминаний, правило пробега, шаблоны — общие для клиента и сервера)
 ```
 
 Импорт общего кода: `@garage/shared/schemas/car`, `@garage/shared/types`, `@garage/shared/utils/reminderStatus`.
 
 ## Тесты
 
-`npm test` (Vitest, три проекта: `api`, `web`, `shared`) — юнит-тесты чистой логики (`computeNextDue`, `getReminderStatus`, токены, раздача статики, клиент API, Zod-схемы), тесты `requireCarAccess`/`notifyDueReminders` на временной SQLite-БД и интеграционные тесты API (`apps/api/tests/integration`) через реальный dev-сервер Nitro (`tests/helpers/apiServer.ts`). `npm run typecheck` гоняется отдельно (см. `CLAUDE.md`). E2E в браузере — Playwright по собранному приложению на временной SQLite (`tests/e2e`, первый раз нужен `npx playwright install chromium`):
+`npm test` (Vitest, три проекта: `api`, `web`, `shared`) — юнит-тесты чистой логики (`computeNextDue`, `getReminderStatus`, токены, раздача статики, клиент API, Zod-схемы), тесты `requireCarAccess`/`notifyDueReminders` на временной SQLite-БД и интеграционные тесты API (`apps/api/tests/integration`) по HTTP на собранном сервере Nitro (`tests/setup/buildApi.ts`, `tests/helpers/apiServer.ts`). `npm run typecheck` гоняется отдельно (см. `CLAUDE.md`). E2E в браузере — Playwright по собранному приложению на временной SQLite (`tests/e2e`, первый раз нужен `npx playwright install chromium`):
 
 ```bash
 npm run build && npm run test:e2e   # скриншоты экранов — в test-results/screens/
@@ -123,7 +128,8 @@ npm run build && npm run test:e2e   # скриншоты экранов — в t
 
 ## Известные ограничения этой версии
 
-- Вложения (фото чеков) и экран аналитики — не реализованы (API аналитики уже есть), это следующие этапы по ТЗ.
+- Вложения (фото чеков) не реализованы. Без сети показываются последние загруженные данные, но новые записи не сохраняются.
+- Сброс пароля работает, только если настроена почта (`NUXT_SMTP_URL` или `NUXT_MAIL_OUTBOX_DIR`); без неё ссылки «Забыли пароль?» нет.
 - Push на iPhone работает только в установленном на экран «Домой» приложении (iOS 16.4+), в обычной вкладке Safari — нет. Нужен HTTPS (локально — `localhost`).
 - Push о просроченном напоминании приходит один раз; повторных «напоминаний о напоминании» нет, пока срок не продлят.
 - Мультивалютность не поддерживается (валюта хранится в записи, но конвертации нет — как и заявлено в ТЗ).

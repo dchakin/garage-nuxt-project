@@ -125,3 +125,80 @@ test('подсказки из прошлых записей и свёрнуты�
   // Журнал перечитан
   await expect(page.getByText('Магазин Тест-77')).toBeVisible()
 })
+
+test('«Категория и место» раскрывается плавно: высота шторки растёт по кадрам, без скачка', async ({
+  page,
+  seededCar,
+}) => {
+  // В e2e по умолчанию reduced motion — анимацию высоты проверяем с включённым движением
+  await page.emulateMedia({ reducedMotion: 'no-preference' })
+  await page.goto(`/cars/${seededCar.carId}`)
+  await addEntryButton(page).click()
+  const sheet = entrySheet(page)
+  await expect(sheet).toBeVisible()
+  await page.waitForTimeout(600) // анимация появления шторки закончилась
+
+  // Шторка уже почти упирается в 92dvh, поэтому плавность видна по высоте самого блока, а сама
+  // шторка при этом не должна менять позицию больше, чем на запас до своего максимума
+  const { heights, panelTops } = await sheet.evaluate(async (panel) => {
+    const heights: number[] = [0]
+    const panelTops: number[] = [panel.getBoundingClientRect().top]
+    panel.querySelector<HTMLButtonElement>('button[aria-expanded]')?.click()
+    const startedAt = performance.now()
+    await new Promise<void>((resolve) => {
+      const tick = () => {
+        const body = panel.querySelector('.collapse-body')
+        heights.push(body ? body.getBoundingClientRect().height : 0)
+        panelTops.push(panel.getBoundingClientRect().top)
+        if (performance.now() - startedAt < 500) requestAnimationFrame(tick)
+        else resolve()
+      }
+      requestAnimationFrame(tick)
+    })
+    return { heights, panelTops }
+  })
+
+  const final = heights[heights.length - 1]
+  expect(final).toBeGreaterThan(50)
+  // Первый кадр не перескакивает к конечной высоте, между 0 и конечной есть промежуточные
+  expect(heights[1]).toBeLessThan(final - 20)
+  const intermediate = heights.filter((height) => height > 1 && height < final - 1)
+  expect(intermediate.length).toBeGreaterThan(2)
+  // Позиция шторки не скачет: верхний край сдвигается только до упора в максимальную высоту
+  const topShift = Math.max(...panelTops) - Math.min(...panelTops)
+  expect(topShift).toBeLessThan(40)
+
+  await expect(sheet.getByLabel('Место')).toBeVisible()
+  await snap(page, 'entry-sheet-more-open')
+})
+
+test('в шторке нет полосы прокрутки, длинное содержимое прокручивается', async ({
+  page,
+  seededCar,
+}) => {
+  await page.setViewportSize({ width: 390, height: 560 })
+  await page.goto(`/cars/${seededCar.carId}`)
+  await addEntryButton(page).click()
+  const sheet = entrySheet(page)
+  await expect(sheet).toBeVisible()
+  await sheet.getByRole('button', { name: 'Категория и место' }).click()
+  await expect(sheet.getByLabel('Место')).toBeVisible()
+
+  const body = sheet.getByTestId('sheet-body')
+  const metrics = () =>
+    body.evaluate((element) => ({
+      scrollbarWidth: (element as HTMLElement).offsetWidth - element.clientWidth,
+      overflows: element.scrollHeight > element.clientHeight,
+      scrollTop: element.scrollTop,
+    }))
+
+  const before = await metrics()
+  expect(before.overflows).toBe(true)
+  expect(before.scrollbarWidth).toBe(0)
+  await expect(sheet.getByTestId('sheet-more-below')).toBeVisible()
+  await snap(page, 'entry-sheet-no-scrollbar')
+
+  await body.evaluate((element) => element.scrollTo({ top: element.scrollHeight }))
+  await expect(sheet.getByTestId('sheet-more-below')).toHaveCount(0)
+  expect((await metrics()).scrollTop).toBeGreaterThan(0)
+})

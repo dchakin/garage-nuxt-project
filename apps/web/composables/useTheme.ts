@@ -3,6 +3,7 @@ import {
   DARK_CLASS,
   DARK_SCHEME_QUERY,
   THEME_STORAGE_KEY,
+  THEME_SWITCHING_CLASS,
   isThemeMode,
   resolveTheme,
   type ResolvedTheme,
@@ -39,9 +40,22 @@ function syncThemeColorMeta() {
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', background)
 }
 
+/** Переключает класс темы с выключенными transition: все цвета меняются в одном кадре. */
+function switchThemeClassInstantly(isDark: boolean) {
+  const root = document.documentElement
+  root.classList.add(THEME_SWITCHING_CLASS)
+  root.classList.toggle(DARK_CLASS, isDark)
+  // Принудительный пересчёт стилей: новые цвета применяются, пока transition ещё выключены
+  void getComputedStyle(root).color
+  setTimeout(() => root.classList.remove(THEME_SWITCHING_CLASS))
+}
+
 function applyTheme() {
   resolved.value = resolveTheme(mode.value, window.matchMedia(DARK_SCHEME_QUERY).matches)
-  document.documentElement.classList.toggle(DARK_CLASS, resolved.value === 'dark')
+  const isDark = resolved.value === 'dark'
+  if (document.documentElement.classList.contains(DARK_CLASS) !== isDark) {
+    switchThemeClassInstantly(isDark)
+  }
   syncThemeColorMeta()
 }
 

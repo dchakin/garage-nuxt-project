@@ -18,7 +18,7 @@ async function logout() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-bg">
+  <div class="min-h-screen bg-bg pb-[env(safe-area-inset-bottom)]">
     <header
       v-if="loggedIn"
       class="sticky top-0 z-10 bg-surface backdrop-blur border-b border-border"
