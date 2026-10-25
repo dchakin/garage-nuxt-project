@@ -1,8 +1,9 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, ref, type Component } from 'vue'
 import { mount, type VueWrapper } from '@vue/test-utils'
 import UiSheet from '~/components/ui/Sheet.vue'
 import UiDialog from '~/components/ui/Dialog.vue'
+import { resetOverlayHistory } from '~/utils/overlayHistory'
 
 // Пропсы оверлеев задаются динамически — типизация пропсов в обёртке не нужна
 type OverlayWrapper = VueWrapper<any>
@@ -43,6 +44,7 @@ function createOpener() {
 
 afterEach(() => {
   mounted.splice(0).forEach((wrapper) => wrapper.unmount())
+  resetOverlayHistory()
   document.body.innerHTML = ''
   document.body.style.overflow = ''
 })
@@ -200,5 +202,24 @@ describe('UiDialog', () => {
     pressEscape()
     await wrapper.vm.$nextTick()
     expect(byTestId('sheet')).toBeNull()
+  })
+})
+
+describe('жест «назад»', () => {
+  const props = { title: 'Удалить?', message: 'Нельзя отменить.', confirmText: 'Удалить' }
+
+  it.each([
+    ['UiSheet', UiSheet, { title: 'Пробег' }],
+    ['UiDialog', UiDialog, props],
+  ])('%s: открытие добавляет запись истории, popstate закрывает', async (_name, component, p) => {
+    const pushState = vi.spyOn(window.history, 'pushState')
+    const wrapper = mountOverlay(component, p)
+    expect(pushState).toHaveBeenCalledTimes(1)
+
+    window.dispatchEvent(new PopStateEvent('popstate', { state: null }))
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.props('open')).toBe(false)
+    pushState.mockRestore()
   })
 })
