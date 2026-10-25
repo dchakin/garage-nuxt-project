@@ -20,6 +20,12 @@ export const DARK_SCHEME_QUERY = '(prefers-color-scheme: dark)'
 /** Класс на <html>, по которому tokens.css и Tailwind (`darkMode: 'class'`) включают тёмную тему. */
 export const DARK_CLASS = 'dark'
 
+/**
+ * Класс на <html> на время смены темы: transition выключены (`motion.css`), иначе элементы
+ * с `transition-colors` перекрашиваются плавно, а остальные — мгновенно.
+ */
+export const THEME_SWITCHING_CLASS = 'theme-switching'
+
 export function isThemeMode(value: unknown): value is ThemeMode {
   return THEME_MODES.includes(value as ThemeMode)
 }

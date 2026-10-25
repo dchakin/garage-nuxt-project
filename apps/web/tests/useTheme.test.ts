@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { THEME_STORAGE_KEY } from '~/theme/constants'
+import { THEME_STORAGE_KEY, THEME_SWITCHING_CLASS } from '~/theme/constants'
 
 type Listener = () => void
 
@@ -98,6 +98,29 @@ describe('useTheme', () => {
     setSystemDark(true)
     expect(resolved.value).toBe('light')
     expect(isDarkClassSet()).toBe(false)
+  })
+
+  it('на время смены темы выключает transition и снимает класс следующей задачей', async () => {
+    vi.useFakeTimers()
+    mockSystemScheme(false)
+    const { setMode } = (await loadUseTheme())()
+    const classes = document.documentElement.classList
+
+    setMode('dark')
+    expect(classes.contains(THEME_SWITCHING_CLASS)).toBe(true)
+    vi.runAllTimers()
+    expect(classes.contains(THEME_SWITCHING_CLASS)).toBe(false)
+    expect(isDarkClassSet()).toBe(true)
+    vi.useRealTimers()
+  })
+
+  it('без смены темы transition не трогает', async () => {
+    mockSystemScheme(true)
+    document.documentElement.classList.add('dark') // как после inline-скрипта
+    const { setMode } = (await loadUseTheme())()
+
+    setMode('dark')
+    expect(document.documentElement.classList.contains(THEME_SWITCHING_CLASS)).toBe(false)
   })
 
   it('повторный вызов отдаёт то же состояние', async () => {
