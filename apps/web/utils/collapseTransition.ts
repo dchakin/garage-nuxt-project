@@ -11,15 +11,25 @@ function clearHeight(element: Element) {
   setHeight(element, '')
 }
 
+/** Читаем layout, чтобы браузер применил стартовую высоту до того, как мы зададим конечную */
+function flushLayout(element: Element) {
+  void (element as HTMLElement).offsetHeight
+}
+
 export const collapseTransitionHooks = {
   onBeforeEnter: (element: Element) => setHeight(element, '0px'),
-  onEnter: (element: Element) => setHeight(element, `${element.scrollHeight}px`),
+  // Без принудительного layout элемент ни разу не рисуется с высотой 0 и раскрывается рывком,
+  // а шторка вместе с ним «прыгает»: transition стартует только от посчитанного стиля
+  onEnter: (element: Element) => {
+    flushLayout(element)
+    setHeight(element, `${element.scrollHeight}px`)
+  },
   onAfterEnter: clearHeight,
   onEnterCancelled: clearHeight,
   onBeforeLeave: (element: Element) => setHeight(element, `${element.scrollHeight}px`),
   // Чтение offsetHeight фиксирует стартовую высоту, иначе браузер не увидит перехода к 0
   onLeave: (element: Element) => {
-    void (element as HTMLElement).offsetHeight
+    flushLayout(element)
     setHeight(element, '0px')
   },
   onAfterLeave: clearHeight,

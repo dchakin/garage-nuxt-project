@@ -125,3 +125,42 @@ test('подсказки из прошлых записей и свёрнуты�
   // Журнал перечитан
   await expect(page.getByText('Магазин Тест-77')).toBeVisible()
 })
+
+test('«Категория и место» раскрывается плавно: высота шторки растёт по кадрам, без скачка', async ({
+  page,
+  seededCar,
+}) => {
+  // В e2e по умолчанию reduced motion — анимацию высоты проверяем с включённым движением
+  await page.emulateMedia({ reducedMotion: 'no-preference' })
+  await page.goto(`/cars/${seededCar.carId}`)
+  await addEntryButton(page).click()
+  const sheet = entrySheet(page)
+  await expect(sheet).toBeVisible()
+  await page.waitForTimeout(600) // анимация появления шторки закончилась
+
+  const heights = await sheet.evaluate(async (panel) => {
+    const samples: number[] = [panel.getBoundingClientRect().height]
+    panel.querySelector<HTMLButtonElement>('button[aria-expanded]')?.click()
+    const startedAt = performance.now()
+    await new Promise<void>((resolve) => {
+      const tick = () => {
+        samples.push(panel.getBoundingClientRect().height)
+        if (performance.now() - startedAt < 500) requestAnimationFrame(tick)
+        else resolve()
+      }
+      requestAnimationFrame(tick)
+    })
+    return samples
+  })
+
+  const initial = heights[0]
+  const final = heights[heights.length - 1]
+  expect(final).toBeGreaterThan(initial)
+  // Первый кадр не перескакивает к конечной высоте, между начальной и конечной есть промежуточные
+  expect(heights[1]).toBeLessThan(final - 20)
+  const intermediate = heights.filter((height) => height > initial + 1 && height < final - 1)
+  expect(intermediate.length).toBeGreaterThan(2)
+
+  await expect(sheet.getByLabel('Место')).toBeVisible()
+  await snap(page, 'entry-sheet-more-open')
+})
