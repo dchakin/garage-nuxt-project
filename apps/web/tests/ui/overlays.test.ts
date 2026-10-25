@@ -111,6 +111,34 @@ describe('UiSheet', () => {
     expect(wrapper.props('open')).toBe(false)
   })
 
+  it('тело прокручивается, но полоса прокрутки скрыта', () => {
+    mountOverlay(UiSheet, { title: 'Новая запись' }, { default: () => h('p', 'Поля формы') })
+    const body = byTestId('sheet-body')!
+    expect(body.classList).toContain('overflow-y-auto')
+    expect(body.classList).toContain('[scrollbar-width:none]')
+    expect(body.classList).toContain('[&::-webkit-scrollbar]:hidden')
+  })
+
+  it('градиент у нижнего края виден, пока ниже есть непоказанный контент', async () => {
+    const wrapper = mountOverlay(UiSheet, { title: 'Новая запись' })
+    const body = byTestId('sheet-body')!
+    expect(byTestId('sheet-more-below')).toBeNull()
+
+    Object.defineProperties(body, {
+      scrollHeight: { value: 800, configurable: true },
+      clientHeight: { value: 400, configurable: true },
+    })
+    body.scrollTop = 0
+    body.dispatchEvent(new Event('scroll'))
+    await wrapper.vm.$nextTick()
+    expect(byTestId('sheet-more-below')).not.toBeNull()
+
+    body.scrollTop = 400
+    body.dispatchEvent(new Event('scroll'))
+    await wrapper.vm.$nextTick()
+    expect(byTestId('sheet-more-below')).toBeNull()
+  })
+
   it('показывает тело и кнопку действия из слотов', () => {
     mountOverlay(
       UiSheet,
