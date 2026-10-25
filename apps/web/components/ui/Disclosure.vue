@@ -10,6 +10,11 @@ import { collapseTransitionHooks } from '~/utils/collapseTransition'
 defineProps<{ label: string }>()
 const open = defineModel<boolean>('open', { default: false })
 const contentId = useId()
+
+/** В шторке с ограниченной высотой раскрытое может уйти под край — подводим его в видимую область */
+function revealContent(element: Element) {
+  element.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' })
+}
 </script>
 
 <template>
@@ -29,7 +34,7 @@ const contentId = useId()
         aria-hidden="true"
       />
     </button>
-    <Transition name="collapse" v-on="collapseTransitionHooks">
+    <Transition name="collapse" v-bind="collapseTransitionHooks" @after-enter="revealContent">
       <div v-if="open" :id="contentId" class="collapse-body overflow-hidden">
         <div class="pt-sp-2">
           <slot />
