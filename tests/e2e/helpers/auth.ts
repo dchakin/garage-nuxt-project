@@ -8,7 +8,7 @@ export interface TestUser {
 
 // exact: у поля пароля есть кнопка с aria-label «Показать пароль», обычный поиск по подписи
 // «Пароль» нашёл бы и её.
-const nameInput = (page: Page) => page.getByLabel('Имя', { exact: true })
+const nameInput = (page: Page) => page.getByLabel('Как вас зовут', { exact: true })
 const emailInput = (page: Page) => page.getByLabel('Email', { exact: true })
 const passwordInput = (page: Page) => page.getByLabel('Пароль', { exact: true })
 
@@ -30,7 +30,7 @@ export async function registerViaUi(page: Page, user: TestUser) {
   await nameInput(page).fill(user.name)
   await emailInput(page).fill(user.email)
   await passwordInput(page).fill(user.password)
-  await page.getByRole('button', { name: 'Зарегистрироваться' }).click()
+  await page.getByRole('button', { name: 'Создать аккаунт' }).click()
   await expect(page).toHaveURL(/\/onboarding$/)
 }
 

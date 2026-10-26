@@ -41,7 +41,8 @@ export default defineEventHandler(async (event) => {
 
   const link = buildAppLink(
     String(useRuntimeConfig().appUrl || ''),
-    `/reset-password?token=${encodeURIComponent(token)}`,
+    // email нужен только экрану А9 («Ссылка для …»); доступ даёт токен
+    `/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(user.email)}`,
   )
   try {
     await sendMail(buildResetMessage(user.email, link), mailConfig)
