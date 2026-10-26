@@ -113,7 +113,8 @@ test('Обзор: машина без записей и напоминаний �
   await expect(page.getByText(/обновлён/)).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Требует внимания' })).toHaveCount(0)
   await expect(page.getByTestId('overview-month-total')).toHaveText(/^0\s₽$/)
-  await expect(page.getByRole('heading', { name: 'Записей пока нет' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Здесь будет история машины' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Журнал', level: 2 })).toBeVisible()
 
   await snap(page, 'overview-empty')
 })

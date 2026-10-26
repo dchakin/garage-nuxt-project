@@ -12,7 +12,7 @@ export function formatMileageAge(
 ): string | null {
   if (!updatedAt) return null
   const days = -daysUntil(todayIso(new Date(updatedAt)), today)
-  if (days <= 0) return 'обновлён сегодня'
+  if (days <= 0) return 'обновлён только что'
   if (days === 1) return 'обновлён вчера'
   return `обновлён ${formatDays(days)} назад`
 }

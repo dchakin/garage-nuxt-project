@@ -49,7 +49,7 @@ test('Б5–Б6: кнопки прибавляют к «Было», блок «�
   const toast = page.getByRole('status').filter({ hasText: 'Пробег обновлён' })
   await expect(toast).toContainText(/87\s950\sкм/)
   await expect(page.getByTestId('overview-mileage')).toHaveText(/87\s950\s+км/)
-  await expect(page.getByText('обновлён сегодня')).toBeVisible()
+  await expect(page.getByText('обновлён только что')).toBeVisible()
   // Запись не создаётся: последняя по-прежнему щётки
   const recent = page.locator('section', {
     has: page.getByRole('heading', { name: 'Последние записи' }),

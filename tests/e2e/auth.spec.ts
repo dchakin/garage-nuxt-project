@@ -108,7 +108,7 @@ test('регистрация: экран А3, после неё открывае
   await page.getByRole('button', { name: 'Создать аккаунт' }).click()
 
   await expect(page).toHaveURL(/\/onboarding$/)
-  await expect(page.getByRole('heading', { name: 'Первая машина' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Ваша машина' })).toBeVisible()
 })
 
 test('регистрация с занятым email: ошибка сервера в плашке', async ({ page }) => {

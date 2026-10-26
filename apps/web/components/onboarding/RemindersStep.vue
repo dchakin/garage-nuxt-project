@@ -1,43 +1,43 @@
 <script setup lang="ts">
 /**
- * Шаг 2 мастера первого запуска (А5 «Что напоминать»): переключатели готовых шаблонов
+ * Шаг 2 мастера первого запуска (А5 «Что напоминать?»): переключатели готовых шаблонов
  * (`reminderTemplates`), у каждого «Указать, когда меняли»; у ОСАГО вместо этого сразу
- * «Полис действует до». Данные хранит страница (`drafts`), поэтому «Назад» ничего не теряет.
+ * «Полис действует до», у шин ничего — срок ставится на ближайший сезон. «Готово» и «Пропустить»
+ * прибиты к низу; «назад» рисует страница. Данные хранит страница (`drafts`), ничего не теряется.
  */
-import { computed } from 'vue'
-import { formatReminderInterval } from '@garage/shared/utils/reminderRemaining'
-import { pluralize } from '@garage/shared/utils/format'
-import { reminderTemplates } from '@garage/shared/utils/reminderTemplates'
+import { reminderTemplates, type ReminderTemplate } from '@garage/shared/utils/reminderTemplates'
 import {
-  countEnabledDrafts,
+  describeTemplateRule,
   POLICY_TEMPLATE_ID,
+  TIRES_TEMPLATE_ID,
   type TemplateDrafts,
 } from '~/utils/onboardingReminders'
 
-const REMINDER_FORMS: [string, string, string] = ['напоминание', 'напоминания', 'напоминаний']
-
-const props = defineProps<{
+defineProps<{
   /** Сегодня (`YYYY-MM-DD`): «когда меняли» не может быть позже */
   today: string
   saving?: boolean
   error?: string
 }>()
 const drafts = defineModel<TemplateDrafts>({ required: true })
-const emit = defineEmits<{ back: []; submit: [] }>()
+/** `skip` — «Пропустить»: создать только машину, без напоминаний */
+const emit = defineEmits<{ skip: []; submit: [] }>()
 
-const enabledCount = computed(() => countEnabledDrafts(drafts.value))
-const submitLabel = computed(() => {
-  if (props.saving) return 'Создаём…'
-  const count = enabledCount.value
-  return count
-    ? `Создать ${count} ${pluralize(count, REMINDER_FORMS)}`
-    : 'Продолжить без напоминаний'
-})
+/** Срок шин — ближайший сезон, «когда меняли» для них не спрашиваем */
+function hasLastOption(template: ReminderTemplate): boolean {
+  return template.id !== TIRES_TEMPLATE_ID
+}
 </script>
 
 <template>
-  <form class="flex flex-col gap-sp-4" @submit.prevent="emit('submit')">
-    <UiAlert v-if="error" variant="error" title="Не удалось сохранить" :message="error" />
+  <form class="flex flex-1 flex-col" @submit.prevent="emit('submit')">
+    <UiAlert
+      v-if="error"
+      variant="error"
+      title="Не удалось сохранить"
+      :message="error"
+      class="mb-sp-4"
+    />
 
     <UiCard tag="ul" aria-label="Напоминания">
       <li
@@ -48,22 +48,24 @@ const submitLabel = computed(() => {
         <UiRowToggle
           v-model="drafts[template.id].enabled"
           :title="template.title"
-          :subtitle="formatReminderInterval(template)"
+          :subtitle="describeTemplateRule(template, drafts[template.id], today)"
         />
-        <div v-if="drafts[template.id].enabled" class="px-sp-4 pb-sp-3">
+        <div v-if="drafts[template.id].enabled && hasLastOption(template)" class="px-sp-4 pb-sp-2">
           <UiField
             v-if="template.id === POLICY_TEMPLATE_ID"
             v-model="drafts[template.id].validUntil"
             type="date"
             label="Полис действует до"
-            hint="Не знаете — оставьте пустым, напомним через год"
+            pretty-date
+            class="pb-sp-2"
           />
-          <UiDisclosure v-else label="Указать, когда меняли">
+          <UiDisclosure v-else label="Указать, когда меняли" centered>
             <div class="flex flex-col gap-sp-3 pb-sp-2">
               <UiField
                 v-model="drafts[template.id].lastDate"
                 type="date"
                 label="Когда меняли"
+                pretty-date
                 :max="today"
               />
               <UiField
@@ -79,15 +81,13 @@ const submitLabel = computed(() => {
       </li>
     </UiCard>
 
-    <p class="text-sm text-text-2">
-      Остальные напоминания можно добавить позже на вкладке «Напоминания».
-    </p>
-
-    <div class="flex gap-sp-3">
-      <UiButton variant="secondary" :disabled="saving" class="shrink-0" @click="emit('back')">
-        Назад
+    <div class="mt-auto flex flex-col items-stretch gap-sp-2 pt-sp-6">
+      <UiButton type="submit" :loading="saving" class="w-full">
+        {{ saving ? 'Создаём…' : 'Готово' }}
       </UiButton>
-      <UiButton type="submit" :loading="saving" class="flex-1">{{ submitLabel }}</UiButton>
+      <UiButton variant="text" :disabled="saving" class="w-full" @click="emit('skip')">
+        Пропустить
+      </UiButton>
     </div>
   </form>
 </template>
