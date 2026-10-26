@@ -62,7 +62,7 @@ test('иконки Lucide вместо эмодзи на основных экр
 
 test('иконки на входе и показ пароля', async ({ page }) => {
   await page.goto('/login')
-  await expect(page.locator('svg.lucide-car-front')).toBeVisible()
+  await expect(page.locator('header img[src="/logo.svg"]')).toBeVisible()
   const toggle = page.getByRole('button', { name: 'Показать пароль' })
   await expect(toggle.locator('svg.lucide-eye')).toBeVisible()
   await toggle.click()

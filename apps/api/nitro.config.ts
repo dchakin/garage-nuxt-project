@@ -1,8 +1,13 @@
 import { defineNitroConfig } from 'nitropack/config'
 
+// `nitropack prepare` (postinstall, typecheck) делает rm -rf output.dir. Если он идёт параллельно
+// со `build` (npm run build / CI), он стирает свежую сборку — поэтому prepare пишет в .nitro.
+const isPrepare = process.argv.includes('prepare')
+
 export default defineNitroConfig({
   compatibilityDate: '2024-11-01',
   srcDir: 'server',
+  ...(isPrepare ? { output: { dir: '.nitro/prepare-output' } } : {}),
 
   runtimeConfig: {
     // Переменные окружения продолжают называться NUXT_* (NUXT_SESSION_PASSWORD, NUXT_VAPID_*, ...),
