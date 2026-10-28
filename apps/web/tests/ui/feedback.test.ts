@@ -83,6 +83,67 @@ describe('UiToast + useToast', () => {
     expect(toast.current.value).toBeNull()
   })
 
+  describe('индикатор обратного отсчёта', () => {
+    const findCountdown = (wrapper: ReturnType<typeof mount>) =>
+      wrapper.find('[data-testid="toast-countdown"]')
+
+    it('есть только у toast с действием и скрыт от скринридера', async () => {
+      const wrapper = mount(UiToast)
+      toast.show({ message: 'Запись добавлена' })
+      await nextTick()
+      expect(findCountdown(wrapper).exists()).toBe(false)
+
+      toast.show({ message: 'Запись удалена', action: { label: 'Отменить', onClick: vi.fn() } })
+      await nextTick()
+      const countdown = findCountdown(wrapper)
+      expect(countdown.exists()).toBe(true)
+      expect(countdown.attributes('aria-hidden')).toBe('true')
+    })
+
+    it('длительность анимации равна времени toast', async () => {
+      const wrapper = mount(UiToast)
+      toast.show({
+        message: 'Запись удалена',
+        action: { label: 'Отменить', onClick: vi.fn() },
+        duration: 2500,
+      })
+      await nextTick()
+
+      const style = findCountdown(wrapper).attributes('style') ?? ''
+      expect(style).toContain('--toast-countdown-duration: 2500ms')
+      expect(style).toContain('--toast-countdown-steps: 3')
+    })
+
+    it('останавливается вместе с таймером и продолжает после отпускания', async () => {
+      const wrapper = mount(UiToast)
+      toast.show({ message: 'Запись удалена', action: { label: 'Отменить', onClick: vi.fn() } })
+      await nextTick()
+      expect(findCountdown(wrapper).classes()).not.toContain('toast-countdown-paused')
+
+      await findToast(wrapper).trigger('pointerdown')
+      expect(toast.paused.value).toBe(true)
+      expect(findCountdown(wrapper).classes()).toContain('toast-countdown-paused')
+
+      await findToast(wrapper).trigger('pointerup')
+      expect(toast.paused.value).toBe(false)
+      expect(findCountdown(wrapper).classes()).not.toContain('toast-countdown-paused')
+    })
+
+    it('пауза сбрасывается, когда toast закрыт или вытеснен', async () => {
+      mount(UiToast)
+      toast.show({ message: 'Запись удалена', action: { label: 'Отменить', onClick: vi.fn() } })
+      toast.pause()
+      expect(toast.paused.value).toBe(true)
+
+      toast.show({ message: 'Запись добавлена' })
+      expect(toast.paused.value).toBe(false)
+
+      toast.pause()
+      toast.dismiss()
+      expect(toast.paused.value).toBe(false)
+    })
+  })
+
   it('новый toast вытесняет старый, и таймер старого его не закрывает', async () => {
     const wrapper = mount(UiToast)
     const firstId = toast.show({ message: 'Запись удалена', duration: 1000 })

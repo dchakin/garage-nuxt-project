@@ -12,6 +12,15 @@ test('UI-кит: toast с «Отменить» вызывает действие
   await expect(toast).toBeInViewport()
   // Таймер на паузе, пока палец на toast, — иначе он может исчезнуть во время съёмки
   await toast.dispatchEvent('pointerdown')
+  // Кольцо отсчёта: на паузе таймера анимация стоит, у toast с действием оно есть
+  const countdown = toast.getByTestId('toast-countdown')
+  await expect(countdown).toBeVisible()
+  await expect(countdown).toHaveAttribute('data-paused', 'true')
+  // snap() перематывает конечные анимации в конец (кольцо опустело бы) — фиксируем половину дуги
+  await page.addStyleTag({
+    content:
+      '.toast-countdown-arc { animation: none !important; stroke-dashoffset: 0.5 !important }',
+  })
   await snap(page, 'ui-toast')
   await toast.getByRole('button', { name: 'Отменить' }).click()
   await expect(toast).toBeHidden()
@@ -19,6 +28,7 @@ test('UI-кит: toast с «Отменить» вызывает действие
 
   await page.getByRole('button', { name: 'Toast без действия' }).click()
   await expect(toast).toContainText('Запись добавлена')
+  await expect(toast.getByTestId('toast-countdown')).toHaveCount(0)
   await expect(toast).toBeHidden({ timeout: 5000 })
 })
 
