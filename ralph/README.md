@@ -84,6 +84,7 @@ PR открываются в `dev`, мёржите их вы. Если PR соз
 | `RALPH_IMPL_TIMEOUT` / `RALPH_REVIEW_TIMEOUT` / `RALPH_CHECK_TIMEOUT` | `40m` / `10m` / `25m` | Таймауты шагов                              |
 | `RALPH_BASE`                                                          | `dev`                 | Базовая ветка PR                            |
 | `RALPH_MAX_STAGE`                                                     | —                     | Последний этап, из которого брать задачи    |
+| `RALPH_ONLY`                                                          | —                     | Номера issue через запятую: брать только их |
 
 ## Безопасность
 
