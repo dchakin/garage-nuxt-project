@@ -58,6 +58,18 @@ describe('MileageCard', () => {
     expect(wrapper.get('button').text()).toBe('Обновить')
   })
 
+  it('офлайн вместо давности — «данные на ЧЧ:ММ · офлайн» (Б3)', async () => {
+    const updatedAt = new Date(2026, 9, 7, 12, 0).toISOString()
+    const wrapper = mount(MileageCard, { props: { mileage: MILEAGE, updatedAt, today: TODAY } })
+    window.dispatchEvent(new Event('offline'))
+    await wrapper.vm.$nextTick()
+    expect(wrapper.text()).toMatch(/данные на \d{1,2}:\d{2} · офлайн/)
+    expect(wrapper.text()).not.toContain('обновлён')
+    window.dispatchEvent(new Event('online'))
+    await wrapper.vm.$nextTick()
+    expect(wrapper.text()).toContain('обновлён')
+  })
+
   it('без даты обновления подпись не рендерится', () => {
     const wrapper = mount(MileageCard, { props: { mileage: MILEAGE, updatedAt: null } })
     expect(wrapper.text()).not.toContain('обновлён')

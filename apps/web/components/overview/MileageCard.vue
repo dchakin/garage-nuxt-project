@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Gauge } from 'lucide-vue-next'
-import { formatNumber } from '@garage/shared/utils/format'
+import { formatNumber, formatTime } from '@garage/shared/utils/format'
 import { formatMileageAge } from '~/utils/mileageAge'
+import { useOnline } from '~/composables/useOnline'
 import UiButton from '~/components/ui/Button.vue'
 import UiCard from '~/components/ui/Card.vue'
 
 /**
- * Карточка «Пробег» на Обзоре: крупный пробег, «обновлён N дней назад» и кнопка «Обновить»
+ * Карточка «Пробег» на Обзоре: крупный пробег, «обновлён N дней назад» (офлайн — «данные на 9:12 · офлайн») и кнопка «Обновить»
  * (событие `update` — страница открывает шторку Б5).
  */
 const props = defineProps<{
@@ -19,7 +20,14 @@ const props = defineProps<{
 
 defineEmits<{ update: [] }>()
 
-const age = computed(() => formatMileageAge(props.updatedAt, props.today))
+const { online, lastOnlineAt } = useOnline()
+
+/** Офлайн (Б3) вместо «обновлён …» — момент, на который данные на экране актуальны */
+const age = computed(() =>
+  online.value
+    ? formatMileageAge(props.updatedAt, props.today)
+    : `данные на ${formatTime(lastOnlineAt.value)} · офлайн`,
+)
 </script>
 
 <template>
