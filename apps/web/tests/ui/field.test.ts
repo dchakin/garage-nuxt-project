@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { NBSP } from '@garage/shared/utils/format'
 import UiField from '~/components/ui/Field.vue'
 import UiTextarea from '~/components/ui/Textarea.vue'
 import UiAmountField from '~/components/ui/AmountField.vue'
@@ -116,6 +117,20 @@ describe('UiTextarea', () => {
 })
 
 describe('UiAmountField', () => {
+  it('пробег: суффикс «км», целые числа и красная рамка без текста ошибки', async () => {
+    const wrapper = mount(UiAmountField, {
+      props: { modelValue: 87450, suffix: 'км', decimals: 0, invalid: true },
+    })
+    const input = wrapper.find('input')
+    expect(wrapper.text()).toContain('км')
+    expect(wrapper.text()).not.toContain('₽')
+    expect(input.element.value).toBe(`87${NBSP}450`)
+    expect(input.attributes('aria-invalid')).toBe('true')
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false)
+    await input.setValue('78450,5')
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([784505])
+  })
+
   it('без фокуса показывает сумму с разрядами', () => {
     const wrapper = mount(UiAmountField, { props: { modelValue: 6800 } })
     expect(wrapper.find('input').element.value).toBe('6 800')

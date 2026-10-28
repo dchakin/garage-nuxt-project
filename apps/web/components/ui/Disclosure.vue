@@ -7,7 +7,11 @@ import { useId } from 'vue'
 import { ChevronDown, Plus } from 'lucide-vue-next'
 import { collapseTransitionHooks } from '~/utils/collapseTransition'
 
-defineProps<{ label: string }>()
+defineProps<{
+  label: string
+  /** Ссылка по центру без значков (А5: «Указать, когда меняли» под строкой шаблона) */
+  centered?: boolean
+}>()
 const open = defineModel<boolean>('open', { default: false })
 const contentId = useId()
 
@@ -21,14 +25,18 @@ function revealContent(element: Element) {
   <div>
     <button
       type="button"
-      class="flex h-12 w-full items-center gap-sp-2 rounded-md px-1 text-left text-accent-text focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus-ring"
+      class="flex h-12 w-full items-center gap-sp-2 rounded-md px-1 text-accent-text focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus-ring"
+      :class="centered ? 'justify-center text-center' : 'text-left'"
       :aria-expanded="open"
       :aria-controls="open ? contentId : undefined"
       @click="open = !open"
     >
-      <Plus class="h-[18px] w-[18px] shrink-0" aria-hidden="true" />
-      <span class="min-w-0 flex-1 text-body font-semibold">{{ label }}</span>
+      <Plus v-if="!centered" class="h-[18px] w-[18px] shrink-0" aria-hidden="true" />
+      <span class="text-body font-semibold" :class="centered ? '' : 'min-w-0 flex-1'">
+        {{ label }}
+      </span>
       <ChevronDown
+        v-if="!centered"
         class="h-5 w-5 shrink-0 transition-transform duration-base ease-standard motion-reduce:transition-none"
         :class="open ? 'rotate-180' : ''"
         aria-hidden="true"

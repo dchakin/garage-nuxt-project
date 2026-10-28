@@ -5,7 +5,8 @@ import type { CarInput } from '@garage/shared/schemas/car'
 definePageMeta({ middleware: 'auth' })
 
 const { cars, loading, saving, fetchCars, createCar } = useCars()
-const { statusCounts, loadAllStatusCounts } = useCarStatusCounts()
+const { statusCounts, nextSoon, loadAllStatusCounts } = useCarStatusCounts()
+const { user } = useAuth()
 const showForm = ref(false)
 const error = ref('')
 
@@ -61,6 +62,8 @@ async function onCreate(input: CarInput) {
           :car="car"
           :overdue-count="statusCounts[car.id]?.overdue"
           :soon-count="statusCounts[car.id]?.soon"
+          :next-soon="nextSoon[car.id]"
+          :is-member="car.ownerId !== user?.id"
           @select="navigateTo(`/cars/${car.id}`)"
         />
       </li>

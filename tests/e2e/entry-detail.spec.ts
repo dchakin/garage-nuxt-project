@@ -43,6 +43,37 @@ test('Д4: тап по записи открывает шторку, правк�
   await expect(entryRow(page, /Щётки стеклоочистителя/)).toContainText(/1\s500\s₽/)
 })
 
+/** «Удалить запись» → диалог подтверждения → «Удалить» */
+async function deleteEntryConfirmed(page: Page) {
+  await entrySheet(page).getByRole('button', { name: 'Удалить запись' }).click()
+  const dialog = page.getByRole('alertdialog', { name: 'Удалить запись?' })
+  await expect(dialog).toBeVisible()
+  await dialog.getByRole('button', { name: 'Удалить', exact: true }).click()
+}
+
+test('«Удалить запись» просит подтверждения, «Отмена» ничего не меняет', async ({
+  page,
+  seededCar,
+}) => {
+  const deletes = trackDeleteRequests(page)
+  await page.goto(`/cars/${seededCar.carId}/journal`)
+  await entryRow(page, /Щётки стеклоочистителя/).click()
+  await entrySheet(page).getByRole('button', { name: 'Удалить запись' }).click()
+
+  const dialog = page.getByRole('alertdialog', { name: 'Удалить запись?' })
+  await expect(dialog).toBeVisible()
+  await expect(dialog).toContainText('Щётки стеклоочистителя')
+  await snap(page, 'entry-delete-dialog')
+
+  await dialog.getByRole('button', { name: 'Отмена' }).click()
+  await expect(dialog).toBeHidden()
+  await expect(entrySheet(page)).toBeVisible()
+  await expect(page.getByText('Запись удалена')).toHaveCount(0)
+
+  await page.waitForTimeout(AFTER_DELETE_DELAY_MS)
+  expect(deletes).toHaveLength(0)
+})
+
 test('удаление и «Отменить»: запись возвращается, DELETE не уходит', async ({
   page,
   seededCar,
@@ -52,9 +83,9 @@ test('удаление и «Отменить»: запись возвращае�
   await expect(page.getByTestId('overview-month-total')).toHaveText(/^1\s200\s₽$/)
 
   await entryRow(page, /Щётки стеклоочистителя/).click()
-  await entrySheet(page).getByRole('button', { name: 'Удалить запись' }).click()
+  await deleteEntryConfirmed(page)
 
-  // Без диалога: запись сразу пропала, сумма месяца пересчитана
+  // После подтверждения запись сразу пропала, сумма месяца пересчитана
   await expect(page.getByRole('alertdialog')).toHaveCount(0)
   await expect(entrySheet(page)).toBeHidden()
   await expect(page.getByText('Запись удалена')).toBeVisible()
@@ -75,7 +106,7 @@ test('В7: удаление без «Отменить» доходит до се
   await expect(entryRow(page, /Мойка и химчистка салона/)).toBeVisible()
 
   await entryRow(page, /Мойка и химчистка салона/).click()
-  await entrySheet(page).getByRole('button', { name: 'Удалить запись' }).click()
+  await deleteEntryConfirmed(page)
 
   await expect(entryRow(page, /Мойка и химчистка салона/)).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Отменить' })).toBeVisible()

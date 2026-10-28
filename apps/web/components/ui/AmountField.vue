@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useNumberInput } from '~/composables/useNumberInput'
 import { useFieldControl } from '~/composables/useFieldControl'
 import FieldFrame from './FieldFrame.vue'
@@ -12,17 +13,31 @@ const props = withDefaults(
     error?: string
     disabled?: boolean
     id?: string
+    /** Единица справа: `₽` для сумм, `км` для пробега */
+    suffix?: string
+    /** Знаков после запятой: 2 для денег, 0 для пробега */
+    decimals?: number
+    /** Красная рамка без текста ошибки (текст показывает соседний Alert) */
+    invalid?: boolean
   }>(),
-  { id: undefined },
+  { id: undefined, suffix: '₽', decimals: 2, invalid: false },
 )
 
 /** Сумма в рублях; null — поле пустое */
 const model = defineModel<number | null>()
 
-const { inputId, helperId, rootAttrs, inputAttrs, invalid, describedBy } = useFieldControl(props)
+const {
+  inputId,
+  helperId,
+  rootAttrs,
+  inputAttrs,
+  invalid: hasError,
+  describedBy,
+} = useFieldControl(props)
+const invalid = computed(() => hasError.value || props.invalid)
 
 // Разряды расставляются и при вводе («680 000»), копейки — через запятую
-const { text, onNumberInput } = useNumberInput(model, 2)
+const { text, onNumberInput } = useNumberInput(model, props.decimals)
 </script>
 
 <template>
@@ -57,7 +72,9 @@ const { text, onNumberInput } = useNumberInput(model, 2)
         class="h-full min-w-0 flex-1 bg-transparent text-amount text-text outline-none placeholder:text-text disabled:cursor-not-allowed"
         @input="onNumberInput"
       />
-      <span class="shrink-0 text-[1.75rem] font-semibold text-text-3" aria-hidden="true">₽</span>
+      <span class="shrink-0 text-[1.75rem] font-semibold text-text-3" aria-hidden="true">{{
+        suffix
+      }}</span>
     </div>
   </FieldFrame>
 </template>

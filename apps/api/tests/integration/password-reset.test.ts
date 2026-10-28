@@ -57,7 +57,7 @@ function mailsTo(email: string) {
 
 function tokenFromMail(email: string): string {
   const mails = mailsTo(email)
-  const match = /\/reset-password\?token=([^\s]+)/.exec(mails[mails.length - 1].text)
+  const match = /\/reset-password\?token=([^\s&]+)/.exec(mails[mails.length - 1].text)
   return decodeURIComponent(match![1])
 }
 
@@ -87,6 +87,11 @@ describe('POST /api/auth/password-reset', () => {
   it('шлёт ссылку на NUXT_APP_URL/reset-password?token=…', async () => {
     const [mail] = mailsTo('exists@example.com')
     expect(mail.text).toContain('https://garage.test/reset-password?token=')
+  })
+
+  it('кладёт email в ссылку — для плашки «Ссылка для …» на экране нового пароля', async () => {
+    const [mail] = mailsTo('exists@example.com')
+    expect(mail.text).toContain('&email=exists%40example.com')
   })
 
   it('не чаще раза в 60 секунд на email', async () => {

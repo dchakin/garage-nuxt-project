@@ -36,6 +36,11 @@ describe('formatMonthYear', () => {
   it('принимает полную дату', () => {
     expect(formatMonthYear('2026-05-02')).toBe('Май 2026')
   })
+
+  it('год текущего года опускается, чужой остаётся', () => {
+    expect(formatMonthYear('2026-10', '2026-10-10')).toBe('Октябрь')
+    expect(formatMonthYear('2025-12', '2026-10-10')).toBe('Декабрь 2025')
+  })
 })
 
 describe('formatTime', () => {

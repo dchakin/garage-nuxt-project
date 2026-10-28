@@ -49,8 +49,13 @@ test('переключатель машин (Б4) и запоминание по
   const camryRow = sheet.getByRole('button', { name: /Toyota Camry/ })
   await expect(camryRow).toHaveAttribute('aria-current', 'true')
   await expect(camryRow.getByText('2 просрочено')).toBeVisible()
+  // Lada: «скоро» — бейдж с названием ближайшего напоминания, машина чужая
+  const ladaRow = sheet.getByRole('button', { name: /Lada Largus/ })
+  await expect(ladaRow.getByText(/^.+ через .+$/)).toBeVisible()
+  await expect(ladaRow).toContainText('вы участник')
+  // Rio: напоминаний нет — «Всё в порядке»
   await expect(
-    sheet.getByRole('button', { name: /Lada Largus/ }).getByText('1 скоро'),
+    sheet.getByRole('button', { name: /Kia Rio/ }).getByText('Всё в порядке'),
   ).toBeVisible()
   await expect(sheet.getByRole('link', { name: 'Настройки Toyota Camry' })).toHaveAttribute(
     'href',

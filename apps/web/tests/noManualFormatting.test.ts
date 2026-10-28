@@ -1,6 +1,10 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
-import { findMatchingLines, listWebSourceFiles } from './helpers/sourceFiles'
+import {
+  findMatchingLines,
+  listWebSourceFiles,
+  SOURCE_SCAN_TIMEOUT_MS,
+} from './helpers/sourceFiles'
 
 // Даты, суммы и пробег выводятся только через @garage/shared/utils/format (#34)
 const MANUAL_FORMATTING_PATTERN = /toLocale(?:Date|Time)?String|Intl\.|\}\}?\s*(?:км|₽)/
@@ -19,8 +23,14 @@ describe('ручное форматирование в apps/web', () => {
       expect(code).not.toMatch(MANUAL_FORMATTING_PATTERN)
   })
 
-  it('нет в исходниках клиента', () => {
-    const files = listWebSourceFiles()
-    expect(files.flatMap((file) => findMatchingLines(file, MANUAL_FORMATTING_PATTERN))).toEqual([])
-  })
+  it(
+    'нет в исходниках клиента',
+    () => {
+      const files = listWebSourceFiles()
+      expect(files.flatMap((file) => findMatchingLines(file, MANUAL_FORMATTING_PATTERN))).toEqual(
+        [],
+      )
+    },
+    SOURCE_SCAN_TIMEOUT_MS,
+  )
 })

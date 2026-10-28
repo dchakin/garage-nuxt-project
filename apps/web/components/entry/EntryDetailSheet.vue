@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /**
  * Шторка записи (Д4): все поля записи, правка и удаление. Состояние открытия —
- * `useEntryDetailSheet()`, компонент стоит в `layouts/car.vue`. «Удалить запись» не спрашивает
- * подтверждения: запись пропадает из списков, а DELETE уходит через 5 с, если не нажали «Отменить»
- * (`useDeferredDelete`).
+ * `useEntryDetailSheet()`, компонент стоит в `layouts/car.vue`. «Удалить запись» сначала спрашивает
+ * подтверждения (`UiDialog`); после него запись пропадает из списков, а DELETE уходит через 5 с,
+ * если не нажали «Отменить» (`useDeferredDelete`).
  */
 import type { CarDetail, Entry } from '@garage/shared/types'
 import type { EntryType } from '@garage/shared/schemas/entry'
@@ -37,6 +37,7 @@ const today = ref(todayIso())
 const currentMileage = ref(0)
 const carEntries = ref<Entry[]>([])
 const contextLoaded = ref(false)
+const deleteDialogOpen = ref(false)
 let openToken = 0
 
 const typeError = computed(() =>
@@ -63,6 +64,7 @@ const mileageError = computed(() =>
 const mileageWarning = computed(() =>
   mileageCheck.value.level === 'warning' ? mileageCheck.value.message : undefined,
 )
+const deleteMessage = computed(() => (entry.value ? describeEntryDeletion(entry.value) : ''))
 const authorLine = computed(() =>
   entry.value
     ? `Добавил ${entry.value.author.name} · ${formatDate(entry.value.createdAt.slice(0, 10), today.value)}`
@@ -137,6 +139,7 @@ async function submit() {
 
 function removeEntry() {
   const target = entry.value
+  deleteDialogOpen.value = false
   if (!target) return
   hide(target.id)
   close()
@@ -212,11 +215,19 @@ function removeEntry() {
           class="w-full"
           :icon="Trash2"
           :disabled="saving"
-          @click="removeEntry"
+          @click="deleteDialogOpen = true"
         >
           Удалить запись
         </UiButton>
       </div>
     </template>
   </UiSheet>
+  <UiDialog
+    v-model:open="deleteDialogOpen"
+    title="Удалить запись?"
+    :message="deleteMessage"
+    confirm-text="Удалить"
+    :icon="Trash2"
+    @confirm="removeEntry"
+  />
 </template>

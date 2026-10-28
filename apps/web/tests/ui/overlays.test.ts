@@ -115,8 +115,7 @@ describe('UiSheet', () => {
     mountOverlay(UiSheet, { title: 'Новая запись' }, { default: () => h('p', 'Поля формы') })
     const body = byTestId('sheet-body')!
     expect(body.classList).toContain('overflow-y-auto')
-    expect(body.classList).toContain('[scrollbar-width:none]')
-    expect(body.classList).toContain('[&::-webkit-scrollbar]:hidden')
+    expect(body.classList).toContain('scrollbar-hidden')
   })
 
   it('градиент у нижнего края виден, пока ниже есть непоказанный контент', async () => {

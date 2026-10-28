@@ -161,6 +161,19 @@ export function describeEmptyPeriod(
   }
 }
 
+/**
+ * Месяцы для графика года: от первого месяца с тратой до текущего — без пустых будущих
+ * (и без пустого начала года, как в макете).
+ */
+function visibleMonths(
+  byMonth: CarAnalytics['byMonth'],
+  currentMonth: string,
+): CarAnalytics['byMonth'] {
+  const upToCurrent = byMonth.filter(({ month }) => month <= currentMonth)
+  const firstWithExpenses = upToCurrent.findIndex(({ total }) => total > 0)
+  return firstWithExpenses > 0 ? upToCurrent.slice(firstWithExpenses) : upToCurrent
+}
+
 export interface ExpensesChart {
   bars: ColumnChartBar[]
   /** Акцентный столбец: выбранный/текущий период */
@@ -197,14 +210,19 @@ export function buildExpensesChart(
       valueIndex: peakIndex(bars.map(({ value }) => value)),
     }
   }
-  const bars = analytics.byMonth.map(({ month, total }) => ({
+  const shown = visibleMonths(analytics.byMonth, today.slice(0, 7))
+  const bars = shown.map(({ month, total }) => ({
     label: MONTHS_AXIS[monthNumber(month) - 1]!,
     value: total,
   }))
+  const indexOfMonth = (month: string | null) => {
+    const index = shown.findIndex((item) => item.month === month)
+    return index >= 0 ? index : null
+  }
   if (period === 'month') {
-    const selected = date ? monthNumber(date) - 1 : null
+    const selected = indexOfMonth(date)
     return { bars, currentIndex: selected, valueIndex: selected }
   }
-  const currentIndex = date === today.slice(0, 4) ? monthNumber(today) - 1 : null
+  const currentIndex = date === today.slice(0, 4) ? indexOfMonth(today.slice(0, 7)) : null
   return { bars, currentIndex, valueIndex: peakIndex(bars.map(({ value }) => value)) }
 }

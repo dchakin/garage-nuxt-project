@@ -3,7 +3,7 @@ import type { CarInput } from '@garage/shared/schemas/car'
 export const MIN_CAR_YEAR = 1900
 export const MAX_CAR_YEAR = 2100
 
-/** Значения формы «Первая машина» (А4); год хранится строкой, пока пользователь печатает */
+/** Значения формы «Ваша машина» (А4); год хранится строкой, пока пользователь печатает */
 export interface CarStepValues {
   brand: string
   model: string

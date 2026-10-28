@@ -1,8 +1,11 @@
 import { readonly, ref, shallowRef } from 'vue'
 import type { Reminder } from '@garage/shared/types'
+import type { ReminderTemplateChoice } from '@garage/shared/utils/reminderTemplates'
 
 export interface ReminderSheetOptions {
   carId: number
+  /** Шаблон, выбранный до открытия (чип на пустом экране Г2) */
+  choice?: ReminderTemplateChoice
 }
 
 // Одна шторка на приложение (SPA, без SSR — модульное состояние безопасно), как `useEntrySheet`.

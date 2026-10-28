@@ -27,6 +27,8 @@ export interface ToastState extends ToastOptions {
 // Один toast на приложение: клиент — SPA (без SSR), поэтому модульное состояние безопасно
 // и не требует Nuxt — компонент и composable тестируются без него
 const current = shallowRef<ToastState | null>(null)
+/** Таймер на паузе (палец на toast, фокус на кнопке) — индикатор отсчёта останавливается вместе с ним */
+const paused = shallowRef(false)
 let nextId = 1
 let timer: ReturnType<typeof setTimeout> | undefined
 let deadline = 0
@@ -39,6 +41,7 @@ function clearTimer() {
 
 function startTimer(ms: number) {
   clearTimer()
+  paused.value = false
   remaining = ms
   deadline = Date.now() + ms
   timer = setTimeout(dismiss, ms)
@@ -57,6 +60,7 @@ function show(options: ToastOptions): number {
 function dismiss(id?: number) {
   if (id !== undefined && current.value?.id !== id) return
   clearTimer()
+  paused.value = false
   current.value = null
 }
 
@@ -65,6 +69,7 @@ function pause() {
   if (!timer) return
   remaining = Math.max(0, deadline - Date.now())
   clearTimer()
+  paused.value = true
 }
 
 function resume() {
@@ -83,5 +88,5 @@ function runAction() {
  * Показ — `show()` из любого места; выводит его единственный `<UiToast />` в `app.vue`.
  */
 export function useToast() {
-  return { current, show, dismiss, pause, resume, runAction }
+  return { current, paused, show, dismiss, pause, resume, runAction }
 }

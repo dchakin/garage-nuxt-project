@@ -134,6 +134,7 @@ onBeforeUnmount(() => clearTimeout(skeletonTimer))
         :entries="visibleEntries"
         :today="today"
         @open="openEntryDetail"
+        @add="openEntrySheet({ carId })"
       />
     </template>
 

@@ -28,6 +28,10 @@ function showAddedToast() {
         <UiButton variant="secondary" @click="showDeletedToast">Toast с «Отменить»</UiButton>
         <UiButton variant="secondary" @click="showAddedToast">Toast без действия</UiButton>
       </div>
+      <p class="text-sm text-text-2">
+        У toast с «Отменить» слева от кнопки — кольцо обратного отсчёта: замирает вместе с таймером
+        (палец на toast, фокус на кнопке), при уменьшенном движении убывает раз в секунду.
+      </p>
       <p class="text-sm text-text-2" data-testid="undo-count">Отменено: {{ undoCount }}</p>
     </div>
 

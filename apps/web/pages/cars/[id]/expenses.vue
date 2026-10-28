@@ -96,10 +96,11 @@ onBeforeUnmount(() => clearTimeout(skeletonTimer))
 </script>
 
 <template>
-  <div class="flex flex-col gap-sp-6 pt-sp-2" :aria-busy="loading">
-    <h1 class="sr-only">Расходы</h1>
+  <div class="flex flex-1 flex-col gap-sp-6 pt-sp-2" :aria-busy="loading">
+    <h1 class="text-h1 text-text">Расходы</h1>
 
-    <UiCard v-if="failed" tag="section">
+    <!-- Пустые состояния и ошибка — без карточки, по центру свободного места экрана -->
+    <section v-if="failed" class="flex flex-1 items-center justify-center">
       <UiEmptyState
         :icon="TriangleAlert"
         tone="danger"
@@ -110,21 +111,21 @@ onBeforeUnmount(() => clearTimeout(skeletonTimer))
           <UiButton variant="secondary" @click="load(query)">Повторить</UiButton>
         </template>
       </UiEmptyState>
-    </UiCard>
+    </section>
 
     <template v-else-if="report && analytics">
       <!-- Ж2: у машины нет ни одной траты — переключать нечего -->
-      <UiCard v-if="!analytics.hasAnyExpenses" tag="section">
+      <section v-if="!analytics.hasAnyExpenses" class="flex flex-1 items-center justify-center">
         <UiEmptyState
           :icon="ChartColumn"
-          title="Пока нет трат"
-          message="Добавьте запись со стоимостью — здесь появятся суммы по месяцам и категориям."
+          title="Пока нечего считать"
+          message="Добавьте записи со стоимостью — здесь появятся итоги, графики и стоимость километра."
         >
           <template #action>
             <UiButton :icon="Plus" @click="openEntrySheet({ carId })">Добавить запись</UiButton>
           </template>
         </UiEmptyState>
-      </UiCard>
+      </section>
 
       <template v-else>
         <UiSegmented
@@ -133,18 +134,23 @@ onBeforeUnmount(() => clearTimeout(skeletonTimer))
           label="Период"
           @update:model-value="(period) => showQuery(changePeriod(query, period, today))"
         />
-        <div v-if="query.period !== 'all'" class="flex justify-center">
-          <UiPeriodSwitcher
-            :label="formatPeriodLabel(query)"
-            :can-prev="canPrev"
-            :can-next="canNext"
-            @prev="showQuery(shiftQuery(query, -1))"
-            @next="showQuery(shiftQuery(query, 1))"
-          />
-        </div>
+        <UiPeriodSwitcher
+          v-if="query.period !== 'all'"
+          :label="formatPeriodLabel(query)"
+          :can-prev="canPrev"
+          :can-next="canNext"
+          @prev="showQuery(shiftQuery(query, -1))"
+          @next="showQuery(shiftQuery(query, 1))"
+        />
+
+        <ExpensesSummary :analytics="analytics" :period="query.period" :today="today" />
 
         <!-- Ж3: за выбранный период трат нет -->
-        <UiCard v-if="emptyPeriod" tag="section" data-testid="expenses-empty-period">
+        <section
+          v-if="emptyPeriod"
+          class="flex flex-1 items-center justify-center"
+          data-testid="expenses-empty-period"
+        >
           <UiEmptyState :icon="CalendarX" :title="emptyPeriod.title" :message="emptyPeriod.message">
             <template v-if="emptyPeriod.target" #action>
               <UiButton variant="secondary" @click="showQuery(emptyPeriod.target)">
@@ -152,12 +158,9 @@ onBeforeUnmount(() => clearTimeout(skeletonTimer))
               </UiButton>
             </template>
           </UiEmptyState>
-        </UiCard>
+        </section>
 
-        <template v-else>
-          <ExpensesSummary :analytics="analytics" :period="query.period" :today="today" />
-          <ExpensesCharts :analytics="analytics" :query="query" :today="today" />
-        </template>
+        <ExpensesCharts v-else :analytics="analytics" :query="query" :today="today" />
       </template>
     </template>
 

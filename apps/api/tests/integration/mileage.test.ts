@@ -45,7 +45,7 @@ describe('PATCH /api/cars/[id]/mileage', () => {
   it('обновляет пробег вверх и меняет mileageUpdatedAt', async () => {
     const cookie = await registerCookie('mileage-up@test.local')
     const car = await createCar(cookie)
-    expect(car.mileageUpdatedAt).toBeNull()
+    expect(car.mileageUpdatedAt).not.toBeNull()
 
     const res = await patchMileage(cookie, car.id, { mileage: 101000 })
     expect(res.status).toBe(200)

@@ -4,6 +4,7 @@
 #
 # Использование: bash ralph/ralph.sh [сколько задач взять, по умолчанию 1]
 # Только этапы до N включительно: RALPH_MAX_STAGE=N bash ralph/ralph.sh 10
+# Только перечисленные задачи: RALPH_ONLY=146,147,149 bash ralph/ralph.sh 3
 # Остановить после текущей задачи: touch .ralph/STOP
 # Подробности: ralph/README.md
 set -euo pipefail
@@ -27,6 +28,7 @@ REVIEW_TIMEOUT="${RALPH_REVIEW_TIMEOUT:-10m}"
 CHECK_TIMEOUT="${RALPH_CHECK_TIMEOUT:-25m}"
 REPO="${RALPH_REPO:-dchakin/garage-nuxt-project}"
 BASE_BRANCH="${RALPH_BASE:-dev}"
+ONLY_ISSUES="${RALPH_ONLY:-}"               # номера issue через запятую — брать только их (пусто — любые)
 MAX_STAGE="${RALPH_MAX_STAGE:-}"            # не брать задачи из этапов после этого (пусто — без ограничения)
 SKIP_LABELS="decision,ralph:blocked,ralph:in-review"
 
@@ -91,7 +93,7 @@ ABORT=""
 # ---------- функции шагов ----------
 pick_issue() {
   "$GH" issue list -R "$REPO" --state open --limit 200 --json number,labels,milestone \
-    | node "$DIR/lib/pick-issue.mjs" "$SKIP_LABELS" "$MAX_STAGE"
+    | node "$DIR/lib/pick-issue.mjs" "$SKIP_LABELS" "$MAX_STAGE" "$ONLY_ISSUES"
 }
 
 # Ветка от последнего открытого PR Ralph (цепочка), иначе от свежего dev.

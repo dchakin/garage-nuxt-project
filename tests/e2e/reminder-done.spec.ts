@@ -37,7 +37,7 @@ test('«Сделал» на «Замена масла»: запись созда
   // Бейдж пересчитан, «Замена масла» ушла из просроченных
   await expect(remindersTab(page)).toHaveAccessibleName(/требуют внимания: 2$/)
   const overdue = page.getByTestId('reminder-group-overdue')
-  await expect(overdue.getByRole('heading', { name: '1 просрочено' })).toBeVisible()
+  await expect(overdue.getByRole('heading', { name: 'Просрочено · 1' })).toBeVisible()
   await expect(overdue.getByRole('heading', { name: 'Замена масла' })).toHaveCount(0)
   await expect(
     page.getByTestId('reminder-group-ok').getByRole('heading', { name: 'Замена масла' }),

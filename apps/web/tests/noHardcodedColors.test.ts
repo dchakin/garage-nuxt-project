@@ -1,7 +1,12 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
 import { relative } from 'node:path'
-import { findMatchingLines, listWebSourceFiles, WEB_ROOT } from './helpers/sourceFiles'
+import {
+  findMatchingLines,
+  listWebSourceFiles,
+  SOURCE_SCAN_TIMEOUT_MS,
+  WEB_ROOT,
+} from './helpers/sourceFiles'
 
 // Цвета — только токены (#33, assets/css/tokens.css): ни hex, ни rgb()/hsl(, ни палитра Tailwind.
 const TOKENS_FILE = 'assets/css/tokens.css'
@@ -92,17 +97,21 @@ describe('хардкод цветов в apps/web', () => {
       for (const pattern of Object.values(COLOR_PATTERNS)) expect(sample).not.toMatch(pattern)
   })
 
-  it('нет в исходниках клиента вне tokens.css', () => {
-    const files = listWebSourceFiles()
-    expect(files.some(isTokensFile)).toBe(true)
+  it(
+    'нет в исходниках клиента вне tokens.css',
+    () => {
+      const files = listWebSourceFiles()
+      expect(files.some(isTokensFile)).toBe(true)
 
-    const offenders = files
-      .filter((file) => !isTokensFile(file))
-      .flatMap((file) =>
-        Object.entries(COLOR_PATTERNS).flatMap(([name, pattern]) =>
-          findMatchingLines(file, pattern).map((line) => `${name} — ${line}`),
-        ),
-      )
-    expect(offenders).toEqual([])
-  })
+      const offenders = files
+        .filter((file) => !isTokensFile(file))
+        .flatMap((file) =>
+          Object.entries(COLOR_PATTERNS).flatMap(([name, pattern]) =>
+            findMatchingLines(file, pattern).map((line) => `${name} — ${line}`),
+          ),
+        )
+      expect(offenders).toEqual([])
+    },
+    SOURCE_SCAN_TIMEOUT_MS,
+  )
 })

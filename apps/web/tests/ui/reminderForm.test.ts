@@ -9,7 +9,7 @@ describe('ReminderTemplates', () => {
     const wrapper = mount(ReminderTemplates, { props: { createdIds: ['oil'] } })
     const chips = wrapper.findAll('button')
     expect(chips).toHaveLength(6)
-    expect(chips[0]?.text()).toContain('Замена масла')
+    expect(chips[0]?.text()).toContain('Масло')
     expect(chips[0]?.attributes('data-created')).toBe('true')
     expect(chips[1]?.attributes('data-created')).toBeUndefined()
     expect(chips.at(-1)?.text()).toBe('Своё')
@@ -32,23 +32,56 @@ describe('ReminderTemplates', () => {
 })
 
 describe('ReminderPreview', () => {
-  const preview = { nextDueDate: '2027-10-10', nextDueMileage: 97_450, isOverdue: false }
+  const base = {
+    currentMileage: 77_450,
+    intervalKm: 10_000,
+    intervalMonths: 12,
+    last: { date: '2026-02-14', mileage: 77_200 },
+    today: '2026-10-10',
+  }
+  const preview = { nextDueDate: '2027-02-14', nextDueMileage: 87_200, isOverdue: false }
 
-  it('описывает срок по пробегу и дате', () => {
-    const wrapper = mount(ReminderPreview, { props: { preview, today: '2026-10-10' } })
-    expect(wrapper.text()).toMatch(/на 97\s450\sкм или 10\sокт\s2027/)
-    expect(wrapper.text()).not.toContain('Срок уже прошёл')
+  it('описывает срок по пробегу и дате в info-плашке', () => {
+    const wrapper = mount(ReminderPreview, { props: { ...base, preview } })
+    expect(wrapper.text()).toContain('Следующее напоминание')
+    expect(wrapper.text()).toMatch(/Следующее — 87\s200\sкм или 14\sфев\s2027\./)
+    expect(wrapper.find('[data-variant="info"]').exists()).toBe(true)
   })
 
-  it('срок позади — предупреждение', () => {
+  it('при одном интервале показывает, откуда срок', () => {
     const wrapper = mount(ReminderPreview, {
-      props: { preview: { ...preview, isOverdue: true }, today: '2026-10-10' },
+      props: {
+        ...base,
+        intervalKm: null,
+        preview: { ...preview, nextDueMileage: null },
+        label: 'Если включить',
+      },
     })
-    expect(wrapper.text()).toContain('Срок уже прошёл')
+    expect(wrapper.text()).toContain('Если включить')
+    expect(wrapper.text()).toMatch(/14\sфев\s2027: 14\sфев \+ 12\sмес\./)
   })
 
-  it('без интервалов просит их указать', () => {
-    const wrapper = mount(ReminderPreview, { props: { preview: null } })
-    expect(wrapper.text()).toContain('Укажите интервал')
+  it('срок позади — warning с полным объяснением', () => {
+    const wrapper = mount(ReminderPreview, {
+      props: {
+        ...base,
+        currentMileage: 87_450,
+        last: { date: '2026-02-14', mileage: 77_200 },
+        preview: { ...preview, nextDueDate: null, isOverdue: true },
+      },
+    })
+    expect(wrapper.find('[data-variant="warning"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Срок уже прошёл')
+    expect(wrapper.text()).toMatch(
+      /От 14\sфев · 77\s200\sкм срок был на 87\s200\sкм — просрочено на 250\sкм\./,
+    )
+    expect(wrapper.text()).toContain('«Требует внимания»')
+  })
+
+  it('без интервалов просит заполнить км или месяцы', () => {
+    const wrapper = mount(ReminderPreview, {
+      props: { ...base, intervalKm: null, intervalMonths: null, preview: null },
+    })
+    expect(wrapper.text()).toContain('Заполните км или месяцы — покажем, когда сработает.')
   })
 })

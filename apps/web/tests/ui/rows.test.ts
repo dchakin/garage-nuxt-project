@@ -115,10 +115,26 @@ describe('UiRowCar', () => {
     expect(quiet.text()).toBe(`Toyota Camry87${NBSP}450${NBSP}км`)
   })
 
+  it('«скоро» с названием ближайшего, без проблем — «Всё в порядке»', () => {
+    const next = { title: 'ОСАГО', remaining: 'через 5 дней' }
+    const soon = mount(UiRowCar, {
+      props: { car: CAMRY, overdueCount: 0, soonCount: 1, nextSoon: next },
+    })
+    expect(soon.text()).toContain('ОСАГО через 5 дней')
+    const calm = mount(UiRowCar, { props: { car: CAMRY, overdueCount: 0, soonCount: 0 } })
+    expect(calm.text()).toContain('Всё в порядке')
+  })
+
+  it('чужая машина — «· вы участник» после пробега', () => {
+    const wrapper = mount(UiRowCar, { props: { car: CAMRY, isMember: true } })
+    expect(wrapper.text()).toContain(`87${NBSP}450${NBSP}км · вы участник`)
+  })
+
   it('выбранная — галочка и aria-current; клик → select', async () => {
     const wrapper = mount(UiRowCar, { props: { car: CAMRY, selected: true } })
     expect(wrapper.attributes('aria-current')).toBe('true')
     expect(wrapper.find('svg.lucide-check').exists()).toBe(true)
+    expect(wrapper.classes()).toContain('border-accent')
     await wrapper.trigger('click')
     expect(wrapper.emitted('select')).toHaveLength(1)
   })

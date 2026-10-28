@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url'
 
 // Исходники клиента для тестов-проверок по тексту (эмодзи, ручное форматирование)
 export const WEB_ROOT = fileURLToPath(new URL('../..', import.meta.url))
+// Синхронное чтение всех исходников под нагрузкой полного прогона (десятки happy-dom окружений) не укладывается в 5 с
+export const SOURCE_SCAN_TIMEOUT_MS = 30_000
 const SOURCE_DIRS = [
   'assets',
   'components',
