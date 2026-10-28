@@ -14,7 +14,8 @@ const open = defineModel<boolean>('open', { required: true })
 const emit = defineEmits<{ select: [carId: number] }>()
 
 const { cars, fetchCars } = useCars()
-const { statusCounts, loadAllStatusCounts } = useCarStatusCounts()
+const { statusCounts, nextSoon, loadAllStatusCounts } = useCarStatusCounts()
+const { user } = useAuth()
 
 watch(open, async (isOpen) => {
   if (!isOpen) return
@@ -37,6 +38,8 @@ function onSelect(carId: number) {
           :selected="car.id === currentCar.id"
           :overdue-count="statusCounts[car.id]?.overdue"
           :soon-count="statusCounts[car.id]?.soon"
+          :next-soon="nextSoon[car.id]"
+          :is-member="car.ownerId !== user?.id"
           @select="onSelect(car.id)"
         />
       </li>

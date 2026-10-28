@@ -10,7 +10,8 @@ import { computed, ref, watch } from 'vue'
 import { MAX_MILEAGE_KM } from '@garage/shared/schemas/car'
 import { formatMileage, formatNumber, pluralize, todayIso } from '@garage/shared/utils/format'
 import { describeMileageChange, diffReminderStatuses } from '@garage/shared/utils/mileageImpact'
-import { formatMileageAge } from '~/utils/mileageAge'
+import { Bell, Gauge } from 'lucide-vue-next'
+import { formatMileageAgePhrase } from '~/utils/mileageAge'
 
 const FORM_ID = 'mileage-sheet-form'
 /** Быстрые кнопки: на сколько км прибавить к прежнему пробегу */
@@ -33,17 +34,24 @@ const today = ref(todayIso())
 const remindersLoaded = ref(false)
 
 const wasText = computed(() => {
-  const age = formatMileageAge(wasUpdatedAt.value, today.value)
-  return `Было ${formatMileage(was.value)}${age ? ` · ${age}` : ''}. Кнопки ниже прибавляют к этому числу.`
+  const age = formatMileageAgePhrase(wasUpdatedAt.value, today.value)
+  return `Было ${formatMileage(was.value)}${age ? ` · обновлено ${age}` : ''}. Кнопки ниже прибавляют к этому числу.`
 })
 const decreaseKm = computed(() =>
   value.value != null && value.value < was.value ? was.value - value.value : 0,
 )
 const tooBig = computed(() => value.value != null && value.value > MAX_MILEAGE_KM)
-const fieldError = computed(() => {
-  if (decreaseKm.value) return 'Меньше прежнего'
-  if (tooBig.value) return `Не больше ${formatMileage(MAX_MILEAGE_KM)}`
-  return undefined
+/** Один изменившийся срок пишем одной строкой: «Замена масла: …. Новых push не будет — …» */
+const impactNote = computed(() => {
+  if (impact.value.willPush) return 'Пришлём push о напоминаниях, чей срок подошёл.'
+  if (staysOverdue.value) return 'Новых push не будет — об этом сроке уже напоминали.'
+  return ''
+})
+const singleChangeText = computed(() => {
+  const [change] = impact.value.changes
+  return impact.value.changes.length === 1
+    ? `${describeMileageChange(change)}. ${impactNote.value}`.trim()
+    : ''
 })
 const canSubmit = computed(
   () => value.value != null && value.value !== was.value && !tooBig.value && !saving.value,
@@ -64,7 +72,7 @@ const impactTitle = computed(
 const submitLabel = computed(() => {
   if (saving.value) return 'Сохраняем…'
   if (decreaseKm.value && value.value != null) return `Исправить на ${formatMileage(value.value)}`
-  return 'Сохранить'
+  return 'Сохранить пробег'
 })
 
 function addQuickStep(stepKm: number) {
@@ -117,25 +125,22 @@ async function submit() {
         title="Не удалось сохранить"
         :message="serverError"
       />
-      <UiField
+      <p class="flex items-start gap-sp-2 text-sm text-text-2" data-testid="mileage-was">
+        <Gauge class="mt-px h-5 w-5 shrink-0" aria-hidden="true" />
+        <span>{{ wasText }}</span>
+      </p>
+      <UiAmountField
         v-model="value"
-        type="number"
-        label="Новый пробег"
+        label="Сейчас на одометре"
         suffix="км"
+        :decimals="0"
         autofocus
-        :error="fieldError"
+        :invalid="Boolean(decreaseKm) || tooBig"
       />
-      <p class="-mt-sp-2 text-sm text-text-2" data-testid="mileage-was">{{ wasText }}</p>
-      <div class="grid grid-cols-3 gap-sp-2">
-        <UiButton
-          v-for="stepKm in QUICK_STEPS_KM"
-          :key="stepKm"
-          variant="tonal"
-          size="sm"
-          @click="addQuickStep(stepKm)"
-        >
+      <div class="flex flex-wrap gap-sp-2">
+        <UiChip v-for="stepKm in QUICK_STEPS_KM" :key="stepKm" @click="addQuickStep(stepKm)">
           +{{ formatMileage(stepKm) }}
-        </UiButton>
+        </UiChip>
       </div>
       <UiAlert
         v-if="decreaseKm"
@@ -144,37 +149,41 @@ async function submit() {
         message="Пробег не может уменьшаться. Если раньше ввели с опечаткой — исправьте: напоминания пересчитаем от нового числа."
       />
       <UiAlert
+        v-else-if="tooBig"
+        variant="error"
+        :title="`Не больше ${formatMileage(MAX_MILEAGE_KM)}`"
+      />
+      <UiAlert
         v-else-if="impact.changes.length"
         variant="warning"
+        :icon="Bell"
         :title="impactTitle"
         data-testid="mileage-impact"
       >
-        <ul class="flex flex-col gap-sp-1">
-          <li v-for="change in impact.changes" :key="change.reminder.id">
-            {{ describeMileageChange(change) }}
-          </li>
-        </ul>
-        <p v-if="impact.willPush" class="mt-sp-2">Пришлём push о напоминаниях, чей срок подошёл.</p>
-        <p v-else-if="staysOverdue" class="mt-sp-2">
-          Новых push не будет — об этом сроке уже напоминали.
-        </p>
+        <p v-if="singleChangeText">{{ singleChangeText }}</p>
+        <template v-else>
+          <ul class="flex flex-col gap-sp-1">
+            <li v-for="change in impact.changes" :key="change.reminder.id">
+              {{ describeMileageChange(change) }}
+            </li>
+          </ul>
+          <p v-if="impactNote" class="mt-sp-2">{{ impactNote }}</p>
+        </template>
       </UiAlert>
+      <UiButton v-if="decreaseKm" variant="text" class="w-full" @click="restoreWas">
+        Вернуть {{ formatNumber(was) }}
+      </UiButton>
     </form>
     <template #footer>
-      <div class="flex flex-col gap-sp-2">
-        <UiButton
-          type="submit"
-          :form="FORM_ID"
-          class="w-full"
-          :loading="saving"
-          :disabled="!canSubmit"
-        >
-          {{ submitLabel }}
-        </UiButton>
-        <UiButton v-if="decreaseKm" variant="text" class="w-full" @click="restoreWas">
-          Вернуть {{ formatNumber(was) }}
-        </UiButton>
-      </div>
+      <UiButton
+        type="submit"
+        :form="FORM_ID"
+        class="w-full"
+        :loading="saving"
+        :disabled="!canSubmit"
+      >
+        {{ submitLabel }}
+      </UiButton>
     </template>
   </UiSheet>
 </template>

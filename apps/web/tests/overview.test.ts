@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { NBSP } from '@garage/shared/utils/format'
 import type { Entry, Reminder } from '@garage/shared/types'
-import { formatMileageAge } from '~/utils/mileageAge'
+import { formatMileageAge, formatMileageAgePhrase } from '~/utils/mileageAge'
 import MileageCard from '~/components/overview/MileageCard.vue'
 import AttentionList from '~/components/overview/AttentionList.vue'
 import MonthExpensesCard from '~/components/overview/MonthExpensesCard.vue'
@@ -11,6 +11,14 @@ import RecentEntries from '~/components/overview/RecentEntries.vue'
 const TODAY = '2026-10-10'
 const MILEAGE = 87_450
 const global = { stubs: { NuxtLink: { template: '<a :href="to"><slot /></a>', props: ['to'] } } }
+
+describe('formatMileageAgePhrase', () => {
+  it('без префикса — для шторки Б5 («обновлено 3 дня назад»)', () => {
+    const threeDaysAgo = new Date(2026, 9, 7, 8, 0).toISOString()
+    expect(formatMileageAgePhrase(threeDaysAgo, TODAY)).toBe(`3${NBSP}дня назад`)
+    expect(formatMileageAgePhrase(null, TODAY)).toBeNull()
+  })
+})
 
 describe('formatMileageAge', () => {
   it('считает календарные дни до сегодня', () => {
@@ -48,6 +56,18 @@ describe('MileageCard', () => {
     await wrapper.get('button').trigger('click')
     expect(wrapper.emitted('update')).toHaveLength(1)
     expect(wrapper.get('button').text()).toBe('Обновить')
+  })
+
+  it('офлайн вместо давности — «данные на ЧЧ:ММ · офлайн» (Б3)', async () => {
+    const updatedAt = new Date(2026, 9, 7, 12, 0).toISOString()
+    const wrapper = mount(MileageCard, { props: { mileage: MILEAGE, updatedAt, today: TODAY } })
+    window.dispatchEvent(new Event('offline'))
+    await wrapper.vm.$nextTick()
+    expect(wrapper.text()).toMatch(/данные на \d{1,2}:\d{2} · офлайн/)
+    expect(wrapper.text()).not.toContain('обновлён')
+    window.dispatchEvent(new Event('online'))
+    await wrapper.vm.$nextTick()
+    expect(wrapper.text()).toContain('обновлён')
   })
 
   it('без даты обновления подпись не рендерится', () => {

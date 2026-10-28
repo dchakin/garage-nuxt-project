@@ -20,14 +20,14 @@ test('Б5–Б6: кнопки прибавляют к «Было», блок «�
   seededCar,
 }) => {
   const sheet = await openMileageSheet(page, seededCar.carId)
-  const field = sheet.getByLabel('Новый пробег')
+  const field = sheet.getByLabel('Сейчас на одометре')
 
   await expect(field).toHaveValue(/^87\s450$/)
   await expect(sheet.getByTestId('mileage-was')).toContainText(/Было 87\s450\sкм/)
-  await expect(sheet.getByTestId('mileage-was')).toContainText('обновлён 3 дня назад')
+  await expect(sheet.getByTestId('mileage-was')).toContainText('обновлено 3 дня назад')
   // Пока пробег не менялся — блока и активной кнопки нет
   await expect(sheet.getByTestId('mileage-impact')).toHaveCount(0)
-  await expect(sheet.getByRole('button', { name: 'Сохранить' })).toBeDisabled()
+  await expect(sheet.getByRole('button', { name: 'Сохранить пробег', exact: true })).toBeDisabled()
 
   await sheet.getByRole('button', { name: /^\+500\s+км$/ }).click()
   await expect(field).toHaveValue(/^87\s950$/)
@@ -43,7 +43,7 @@ test('Б5–Б6: кнопки прибавляют к «Было», блок «�
   await expect(impact).not.toContainText('Замена ГРМ')
   await snap(page, 'mileage-sheet')
 
-  await sheet.getByRole('button', { name: 'Сохранить' }).click()
+  await sheet.getByRole('button', { name: 'Сохранить пробег', exact: true }).click()
 
   await expect(sheet).toBeHidden()
   const toast = page.getByRole('status').filter({ hasText: 'Пробег обновлён' })
@@ -63,7 +63,7 @@ test('Б5: переход напоминания в «скоро» обещае�
   const sheet = await openMileageSheet(page, seededCar.carId)
 
   // До «Замены ГРМ» (100 000 км) остаётся 9 500 км — это «скоро» (порог 10% интервала)
-  await sheet.getByLabel('Новый пробег').fill('90500')
+  await sheet.getByLabel('Сейчас на одометре').fill('90500')
 
   const impact = sheet.getByTestId('mileage-impact')
   await expect(impact).toContainText('Изменится 2 напоминания')
@@ -77,13 +77,15 @@ test('Б7: пробег меньше прежнего — ошибка, «Вер
   seededCar,
 }) => {
   const sheet = await openMileageSheet(page, seededCar.carId)
-  const field = sheet.getByLabel('Новый пробег')
+  const field = sheet.getByLabel('Сейчас на одометре')
   const errorAlert = sheet.locator('[data-variant="error"]')
   await expect(remindersTab(page)).toHaveAccessibleName(/требуют внимания: 3$/)
 
   await field.fill('78450')
   await expect(field).toHaveAttribute('aria-invalid', 'true')
   await expect(errorAlert).toContainText(/Меньше прежнего на 9\s000\sкм/)
+  // Текста ошибки под полем нет — она только в Alert
+  await expect(errorAlert).toHaveCount(1)
   await expect(sheet.getByTestId('mileage-impact')).toHaveCount(0)
   await expect(sheet.getByRole('button', { name: /^Исправить на 78\s450\sкм$/ })).toBeEnabled()
   await snap(page, 'mileage-decrease')
