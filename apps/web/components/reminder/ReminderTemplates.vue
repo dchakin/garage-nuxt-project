@@ -1,9 +1,10 @@
 <script setup lang="ts">
 /**
- * Шаблоны напоминаний (Е1) и «Своё» (Е2) одной группой чипов. Уже созданные по названию
- * шаблона помечены галочкой `check`; выбранный чип — в `v-model`.
+ * Шаблоны напоминаний (Е1, Г2) и «Своё» (Е2) одной группой коротких чипов с иконками. Уже
+ * созданные по названию шаблона помечены галочкой `check`; выбранный чип — в `v-model`.
  */
-import { Check, PenLine } from 'lucide-vue-next'
+import type { Component } from 'vue'
+import { Check, ClipboardCheck, Cog, CircleDot, Droplet, Plus, Shield } from 'lucide-vue-next'
 import {
   CUSTOM_REMINDER_CHOICE,
   reminderTemplates,
@@ -18,6 +19,14 @@ defineProps<{
   disabled?: boolean
 }>()
 
+const templateIcons: Record<ReminderTemplateId, Component> = {
+  oil: Droplet,
+  osago: Shield,
+  inspection: ClipboardCheck,
+  'timing-belt': Cog,
+  tires: CircleDot,
+}
+
 const model = defineModel<ReminderTemplateChoice | null>({ default: null })
 </script>
 
@@ -27,18 +36,18 @@ const model = defineModel<ReminderTemplateChoice | null>({ default: null })
       v-for="template in reminderTemplates"
       :key="template.id"
       :selected="model === template.id"
-      :icon="createdIds.includes(template.id) ? Check : undefined"
-      icon-class="text-success-text"
+      :icon="createdIds.includes(template.id) ? Check : templateIcons[template.id]"
+      :icon-class="createdIds.includes(template.id) ? 'text-success-text' : undefined"
       :disabled="disabled"
       :data-created="createdIds.includes(template.id) || undefined"
       @click="model = template.id"
     >
-      {{ template.title }}
+      {{ template.chipLabel }}
       <span v-if="createdIds.includes(template.id)" class="sr-only"> — уже создано</span>
     </UiChip>
     <UiChip
       :selected="model === CUSTOM_REMINDER_CHOICE"
-      :icon="PenLine"
+      :icon="Plus"
       :disabled="disabled"
       @click="model = CUSTOM_REMINDER_CHOICE"
     >

@@ -147,7 +147,10 @@ async function loadContext(token: number) {
   } catch {
     // Форма работает и без подсказок: сервер всё равно проверит данные
   } finally {
-    if (token === openToken) contextReady.value = true
+    if (token === openToken) {
+      contextReady.value = true
+      if (options.value?.choice) choice.value = options.value.choice
+    }
   }
 }
 

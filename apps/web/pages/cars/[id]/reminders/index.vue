@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { PartyPopper, Plus, TriangleAlert, BellOff } from 'lucide-vue-next'
+import { Plus, TriangleAlert, BellOff } from 'lucide-vue-next'
 import type { Reminder } from '@garage/shared/types'
 import { todayIso } from '@garage/shared/utils/format'
 import { countAttentionReminders } from '@garage/shared/utils/reminderBadge'
-import { averageKmPerMonth } from '@garage/shared/utils/reminderRemaining'
+import { averageKmPerMonth, pickNearestReminder } from '@garage/shared/utils/reminderRemaining'
+import type { ReminderTemplateChoice } from '@garage/shared/utils/reminderTemplates'
 
 // Экран «Напоминания» (Г1/Г2/Г3/Т3). Файл reminders/index.vue, а не reminders.vue:
 // иначе подкаталог reminders/ сделал бы вкладки вложенными маршрутами.
@@ -43,6 +44,18 @@ const allInOrder = computed(
     reminders.value.some((reminder) => reminder.isActive) &&
     countAttentionReminders(reminders.value, currentCar.value.currentMileage, today) === 0,
 )
+// «Ближайший срок — ГРМ через 12 550 км» в Г3
+const nearestText = computed(() => {
+  if (!currentCar.value) return ''
+  const nearest = pickNearestReminder(reminders.value, {
+    currentMileage: currentCar.value.currentMileage,
+    today,
+    avgKmPerMonth: avgKmPerMonth.value,
+  })
+  if (!nearest) return ''
+  const { headline } = nearest.remaining
+  return `Ближайший срок — ${nearest.reminder.title} ${headline.charAt(0).toLowerCase()}${headline.slice(1)}.`
+})
 
 let skeletonTimer: ReturnType<typeof setTimeout> | undefined
 let loadToken = 0
@@ -84,6 +97,10 @@ watch([savedCount, changedCount, reminderSavedCount, reminderChangedCount], asyn
 onBeforeUnmount(() => clearTimeout(skeletonTimer))
 
 const { open: openEntrySheet } = useEntrySheet()
+function startFromTemplate(choice: ReminderTemplateChoice | null) {
+  if (choice) openReminderSheet({ carId: carId.value, choice })
+}
+
 function markDone(reminder: Reminder) {
   openEntrySheet({ carId: carId.value, reminder })
 }
@@ -91,7 +108,18 @@ function markDone(reminder: Reminder) {
 
 <template>
   <div class="flex flex-col gap-sp-4 pt-sp-2" :aria-busy="loading">
-    <h1 class="sr-only">Напоминания</h1>
+    <div class="flex items-center justify-between gap-sp-3">
+      <h1 class="text-h1 text-text">Напоминания</h1>
+      <UiButton
+        v-if="ready"
+        variant="tonal"
+        size="sm"
+        :icon="Plus"
+        @click="openReminderSheet({ carId })"
+      >
+        Добавить
+      </UiButton>
+    </div>
 
     <UiCard v-if="failed" tag="section">
       <UiEmptyState
@@ -107,32 +135,30 @@ function markDone(reminder: Reminder) {
     </UiCard>
 
     <template v-else-if="ready && currentCar">
-      <UiCard v-if="!reminders.length" tag="section">
+      <section v-if="!reminders.length" class="flex flex-1 flex-col justify-between gap-sp-6">
         <UiEmptyState
           :icon="BellOff"
           title="Напоминаний пока нет"
-          message="Добавьте замену масла, ОСАГО или техосмотр — Гараж подскажет, когда подходит срок."
-        >
-          <template #action>
-            <UiButton :icon="Plus" @click="openReminderSheet({ carId })">
-              Добавить напоминание
-            </UiButton>
-          </template>
-        </UiEmptyState>
-      </UiCard>
+          message="Выберите, о чём напомнить — сроки посчитаем сами и пришлём push заранее."
+          class="pt-sp-8"
+        />
+        <div class="flex flex-col items-center gap-sp-3 pb-sp-6">
+          <p class="text-sm font-semibold text-text-2">Частые сроки — нажмите, чтобы создать</p>
+          <ReminderTemplates
+            :model-value="null"
+            :created-ids="[]"
+            class="justify-center"
+            @update:model-value="startFromTemplate"
+          />
+        </div>
+      </section>
 
       <template v-else>
-        <div class="flex justify-end">
-          <UiButton size="sm" :icon="Plus" @click="openReminderSheet({ carId })">
-            Добавить напоминание
-          </UiButton>
-        </div>
         <UiAlert
           v-if="allInOrder"
           variant="success"
-          :icon="PartyPopper"
-          title="Всё в порядке"
-          message="Просроченных и ближайших сроков нет."
+          title="Всё под контролем"
+          :message="nearestText"
         />
         <ReminderGroups
           :reminders="reminders"

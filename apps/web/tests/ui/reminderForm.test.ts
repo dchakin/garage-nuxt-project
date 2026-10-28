@@ -9,7 +9,7 @@ describe('ReminderTemplates', () => {
     const wrapper = mount(ReminderTemplates, { props: { createdIds: ['oil'] } })
     const chips = wrapper.findAll('button')
     expect(chips).toHaveLength(6)
-    expect(chips[0]?.text()).toContain('Замена масла')
+    expect(chips[0]?.text()).toContain('Масло')
     expect(chips[0]?.attributes('data-created')).toBe('true')
     expect(chips[1]?.attributes('data-created')).toBeUndefined()
     expect(chips.at(-1)?.text()).toBe('Своё')

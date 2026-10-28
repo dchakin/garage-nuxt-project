@@ -183,3 +183,40 @@ function describeKm(
   const text = detail ? `${headline}, ${detail}` : headline
   return { status, dimension: 'mileage', text, headline, detail, progress }
 }
+
+/**
+ * Ближайший срок среди включённых напоминаний (Г3): сроки в днях и в километрах сравниваются
+ * через средний пробег; без него километровые сроки считаются дальше датных.
+ */
+export function pickNearestReminder<T extends RemainingReminder>(
+  reminders: readonly T[],
+  context: ReminderRemainingContext,
+): { reminder: T; remaining: ReminderRemaining } | null {
+  const today = context.today ?? todayIso()
+  const avgKmPerMonth = context.avgKmPerMonth ?? null
+  let best: { reminder: T; remaining: ReminderRemaining; days: number } | null = null
+  for (const reminder of reminders) {
+    if (!reminder.isActive) continue
+    const remaining = getReminderRemaining(reminder, { ...context, today })
+    const days = estimateDaysLeft(reminder, remaining, context.currentMileage, today, avgKmPerMonth)
+    if (days != null && (!best || days < best.days)) best = { reminder, remaining, days }
+  }
+  return best && { reminder: best.reminder, remaining: best.remaining }
+}
+
+function estimateDaysLeft(
+  reminder: RemainingReminder,
+  remaining: ReminderRemaining,
+  currentMileage: number,
+  today: string,
+  avgKmPerMonth: number | null,
+): number | null {
+  if (remaining.dimension === 'date' && reminder.nextDueDate) {
+    return daysUntil(reminder.nextDueDate, today)
+  }
+  if (remaining.dimension === 'mileage' && reminder.nextDueMileage != null) {
+    const kmLeft = reminder.nextDueMileage - currentMileage
+    return avgKmPerMonth ? (kmLeft / avgKmPerMonth) * AVG_DAYS_PER_MONTH : Number.MAX_SAFE_INTEGER
+  }
+  return null
+}

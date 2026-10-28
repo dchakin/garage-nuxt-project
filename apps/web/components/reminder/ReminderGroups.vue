@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import type { Reminder, ReminderStatus } from '@garage/shared/types'
 import { groupRemindersByStatus } from '@garage/shared/utils/reminderBadge'
 import UiReminderCard from '~/components/ui/ReminderCard.vue'
+import { reminderStatusLabels } from '@garage/shared/utils/reminderStatus'
 import UiStatusBadge from '~/components/ui/StatusBadge.vue'
 
 /**
@@ -19,14 +20,6 @@ const props = defineProps<{
 
 defineEmits<{ open: [reminder: Reminder]; done: [reminder: Reminder] }>()
 
-/** Подпись заголовка группы: «2 просрочено», «1 скоро»… */
-const groupTitles: Record<ReminderStatus, string> = {
-  overdue: 'просрочено',
-  soon: 'скоро',
-  ok: 'в порядке',
-  inactive: 'выключено',
-}
-
 const groups = computed(() =>
   groupRemindersByStatus(props.reminders, props.currentMileage, props.today),
 )
@@ -42,7 +35,7 @@ const groups = computed(() =>
     >
       <h2 :id="`reminder-group-${group.status}`" class="flex">
         <UiStatusBadge :status="group.status">
-          {{ group.reminders.length }} {{ groupTitles[group.status] }}
+          {{ reminderStatusLabels[group.status] }} · {{ group.reminders.length }}
         </UiStatusBadge>
       </h2>
       <ul class="mt-sp-2 flex flex-col gap-sp-3">
