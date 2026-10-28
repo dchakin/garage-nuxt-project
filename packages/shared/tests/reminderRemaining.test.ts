@@ -5,6 +5,7 @@ import {
   formatReminderInterval,
   formatReminderRemaining,
   getReminderRemaining,
+  pickNearestReminder,
 } from '../utils/reminderRemaining'
 
 // Неразрывный пробел — внутри чисел, между числом и единицей и после «≈»
@@ -214,5 +215,26 @@ describe('formatReminderInterval', () => {
     [{ intervalKm: null, intervalMonths: null }, ''],
   ])('%o → «%s»', (reminder, expected) => {
     expect(formatReminderInterval(reminder)).toBe(nb(expected))
+  })
+})
+
+describe('pickNearestReminder', () => {
+  const base = { isActive: true, intervalKm: null, intervalMonths: null }
+  const context = { currentMileage: 80_000, today: '2026-10-10', avgKmPerMonth: 1_000 }
+
+  it('выбирает ближайший срок, сравнивая км и даты через средний пробег', () => {
+    const reminders = [
+      { ...base, title: 'ГРМ', nextDueDate: null, nextDueMileage: 92_550 },
+      { ...base, title: 'Шины', nextDueDate: null, nextDueMileage: 85_000 },
+      { ...base, title: 'ОСАГО', nextDueDate: '2027-10-10', nextDueMileage: null },
+    ]
+    expect(pickNearestReminder(reminders, context)?.reminder.title).toBe('Шины')
+    expect(pickNearestReminder(reminders, context)?.remaining.headline).toBe(nb('Через 5 000 км'))
+  })
+
+  it('пропускает выключенные; без включённых — null', () => {
+    const off = { ...base, isActive: false, title: 'X', nextDueDate: null, nextDueMileage: 81_000 }
+    expect(pickNearestReminder([off], context)).toBeNull()
+    expect(pickNearestReminder([], context)).toBeNull()
   })
 })

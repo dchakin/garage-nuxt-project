@@ -220,3 +220,16 @@ function estimateDaysLeft(
   }
   return null
 }
+
+/**
+ * Подпись «такое напоминание уже есть» (Е3): «Каждые 10 000 км или 12 мес, просрочено на 250 км.
+ * Откройте его, чтобы изменить интервал.»
+ */
+export function describeExistingReminder(
+  reminder: RemainingReminder & Pick<Reminder, 'intervalMonths'>,
+  context: ReminderRemainingContext,
+): string {
+  const { text } = getReminderRemaining(reminder, context)
+  const status = `${text.charAt(0).toLowerCase()}${text.slice(1)}`
+  return `${formatReminderInterval(reminder)}, ${status}. Откройте его, чтобы изменить интервал.`
+}
