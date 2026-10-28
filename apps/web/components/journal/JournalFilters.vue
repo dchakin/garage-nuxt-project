@@ -32,7 +32,7 @@ const SORT_OPTIONS: { value: JournalSort; label: string }[] = [
     <div
       role="group"
       aria-label="Тип записи"
-      class="-mx-sp-4 flex gap-sp-2 overflow-x-auto px-sp-4 pb-px"
+      class="-mx-sp-4 flex gap-sp-2 overflow-x-auto px-sp-4 pb-px scrollbar-hidden"
     >
       <UiChip :selected="type === null" @click="type = null">Все</UiChip>
       <UiChip

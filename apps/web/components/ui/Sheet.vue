@@ -89,7 +89,7 @@ const panelStyle = computed(() => (offset.value ? { translate: `0 ${offset.value
           <div class="relative flex min-h-0 flex-1 flex-col">
             <div
               ref="body"
-              class="min-h-0 flex-1 overflow-y-auto px-sp-5 pb-sp-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              class="min-h-0 flex-1 overflow-y-auto px-sp-5 pb-sp-4 scrollbar-hidden"
               data-testid="sheet-body"
               @scroll.passive="updateMoreBelow"
             >
