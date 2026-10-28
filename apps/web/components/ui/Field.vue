@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, type Component, type Ref } from 'vue'
 import { Calendar, ChevronDown, CircleAlert, Eye, EyeOff } from 'lucide-vue-next'
+import { formatDate } from '@garage/shared/utils/format'
 import { useFieldControl } from '~/composables/useFieldControl'
 import { useNumberInput } from '~/composables/useNumberInput'
 import FieldFrame from './FieldFrame.vue'
@@ -31,6 +32,8 @@ const props = withDefaults(
     mono?: boolean
     /** Вводимый текст всегда заглавными (госномер); курсор остаётся на месте */
     uppercase?: boolean
+    /** type="date": выбранная дата выводится через `formatDate` («18 окт 2026»), а не по локали */
+    prettyDate?: boolean
     id?: string
   }>(),
   { type: 'text', icon: undefined, options: undefined, id: undefined },
@@ -53,6 +56,10 @@ const inputType = computed(() => {
   return props.type === 'number' ? 'text' : props.type
 })
 const inputMode = computed(() => (props.type === 'number' ? 'numeric' : undefined))
+/** Подпись даты поверх прозрачного нативного значения (`prettyDate`) */
+const prettyDateText = computed(() =>
+  props.prettyDate && props.type === 'date' && model.value ? formatDate(String(model.value)) : '',
+)
 
 function onInput(event: Event) {
   if (props.type === 'number') return onNumberInput(event)
@@ -120,10 +127,21 @@ const controlClass =
         :aria-describedby="describedBy"
         :class="[
           controlClass,
-          { 'font-mono': mono, 'ui-field-date cursor-pointer': type === 'date' },
+          {
+            'font-mono': mono,
+            'ui-field-date cursor-pointer': type === 'date',
+            'text-transparent': prettyDateText,
+          },
         ]"
         @input="onInput"
       />
+      <span
+        v-if="prettyDateText"
+        class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-body text-text"
+        data-testid="field-pretty-date"
+      >
+        {{ prettyDateText }}
+      </span>
       <span v-if="suffix" class="shrink-0 text-body text-text-2">{{ suffix }}</span>
       <CircleAlert v-if="invalid" class="h-5 w-5 shrink-0 text-danger" aria-hidden="true" />
       <button

@@ -15,6 +15,8 @@ export default defineEventHandler(async (event) => {
       plateNumber: body.plateNumber ?? null,
       vin: body.vin ?? null,
       currentMileage: body.currentMileage,
+      // Пробег только что ввели — «обновлён только что» на Обзоре (А6)
+      mileageUpdatedAt: new Date(),
       photoUrl: body.photoUrl || null,
     })
     .returning()

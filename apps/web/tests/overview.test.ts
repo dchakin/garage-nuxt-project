@@ -23,7 +23,7 @@ describe('formatMileageAge', () => {
 
   it('сегодня и вчера — словами', () => {
     expect(formatMileageAge(new Date(2026, 9, 10, 1, 0).toISOString(), TODAY)).toBe(
-      'обновлён сегодня',
+      'обновлён только что',
     )
     expect(formatMileageAge(new Date(2026, 9, 9, 23, 0).toISOString(), TODAY)).toBe(
       'обновлён вчера',
@@ -140,9 +140,13 @@ describe('RecentEntries', () => {
     expect(wrapper.get('a').attributes('href')).toBe('/cars/7/journal')
   })
 
-  it('нет записей — пустое состояние без ссылки', () => {
+  it('нет записей — секция «Журнал» с пустым состоянием и «Добавить запись», без ссылки', async () => {
     const wrapper = mount(RecentEntries, { props: { carId: 7, entries: [], today: TODAY }, global })
-    expect(wrapper.text()).toContain('Записей пока нет')
+    expect(wrapper.get('h2').text()).toBe('Журнал')
+    expect(wrapper.text()).toContain('Здесь будет история машины')
     expect(wrapper.find('a').exists()).toBe(false)
+
+    await wrapper.get('button').trigger('click')
+    expect(wrapper.emitted('add')).toHaveLength(1)
   })
 })

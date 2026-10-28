@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Шаг 1 мастера первого запуска (А4 «Первая машина»): марка, модель и пробег обязательны,
+ * Шаг 1 мастера первого запуска (А4 «Ваша машина»): марка, модель и пробег обязательны,
  * год и госномер — по желанию. Ничего не отправляет: машину создаёт страница на последнем шаге,
  * чтобы «Назад» с шага 2 не терял данные и не плодил машины.
  */
@@ -41,43 +41,53 @@ function onSubmit() {
 </script>
 
 <template>
-  <form class="flex flex-col gap-sp-4" novalidate @submit.prevent="onSubmit">
-    <div class="grid grid-cols-2 gap-sp-3">
+  <form class="flex flex-1 flex-col" novalidate @submit.prevent="onSubmit">
+    <div class="flex flex-col gap-sp-4">
+      <div class="grid grid-cols-2 gap-sp-3">
+        <UiField
+          v-model="form.brand"
+          label="Марка"
+          placeholder="Toyota"
+          required
+          :error="brandError"
+        />
+        <UiField
+          v-model="form.model"
+          label="Модель"
+          placeholder="Camry"
+          required
+          :error="modelError"
+        />
+      </div>
+      <div class="grid grid-cols-2 gap-sp-3">
+        <UiField
+          v-model="form.year"
+          type="tel"
+          label="Год"
+          placeholder="2018"
+          :maxlength="YEAR_LENGTH"
+          :error="yearError"
+        />
+        <UiField
+          v-model="form.plateNumber"
+          label="Госномер"
+          placeholder="А123ВС 77"
+          mono
+          uppercase
+        />
+      </div>
       <UiField
-        v-model="form.brand"
-        label="Марка"
-        placeholder="Toyota"
+        v-model="form.currentMileage"
+        type="number"
+        label="Пробег сейчас"
+        suffix="км"
+        hint="Посмотрите на одометр — от пробега считаются напоминания."
         required
-        :error="brandError"
-      />
-      <UiField
-        v-model="form.model"
-        label="Модель"
-        placeholder="Camry"
-        required
-        :error="modelError"
+        :error="mileageError"
       />
     </div>
-    <UiField
-      v-model="form.currentMileage"
-      type="number"
-      label="Пробег"
-      suffix="км"
-      hint="Сколько сейчас на одометре"
-      required
-      :error="mileageError"
-    />
-    <div class="grid grid-cols-2 gap-sp-3">
-      <UiField
-        v-model="form.year"
-        type="tel"
-        label="Год выпуска"
-        placeholder="2018"
-        :maxlength="YEAR_LENGTH"
-        :error="yearError"
-      />
-      <UiField v-model="form.plateNumber" label="Госномер" placeholder="А123ВС 77" mono uppercase />
+    <div class="mt-auto pt-sp-6">
+      <UiButton type="submit" class="w-full">Дальше</UiButton>
     </div>
-    <UiButton type="submit" class="mt-sp-2 w-full">Далее</UiButton>
   </form>
 </template>

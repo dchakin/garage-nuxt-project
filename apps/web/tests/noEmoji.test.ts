@@ -1,6 +1,10 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
-import { findMatchingLines, listWebSourceFiles } from './helpers/sourceFiles'
+import {
+  findMatchingLines,
+  listWebSourceFiles,
+  SOURCE_SCAN_TIMEOUT_MS,
+} from './helpers/sourceFiles'
 
 // Иконки — только компоненты lucide-vue-next (#33): эмодзи в исходниках клиента запрещены.
 // Extended_Pictographic ловит и «текстовые» символы-эмодзи (⏰, ⚠, ⛔), но не стрелки и валюту.
@@ -13,9 +17,13 @@ describe('эмодзи в apps/web', () => {
       expect(text).not.toMatch(EMOJI_PATTERN)
   })
 
-  it('нет в исходниках клиента', () => {
-    const files = listWebSourceFiles()
-    expect(files.length).toBeGreaterThan(10)
-    expect(files.flatMap((file) => findMatchingLines(file, EMOJI_PATTERN))).toEqual([])
-  })
+  it(
+    'нет в исходниках клиента',
+    () => {
+      const files = listWebSourceFiles()
+      expect(files.length).toBeGreaterThan(10)
+      expect(files.flatMap((file) => findMatchingLines(file, EMOJI_PATTERN))).toEqual([])
+    },
+    SOURCE_SCAN_TIMEOUT_MS,
+  )
 })
