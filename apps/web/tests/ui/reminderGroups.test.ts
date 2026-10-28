@@ -36,10 +36,10 @@ describe('ReminderGroups', () => {
     const wrapper = mountGroups([TIRES, BELT, OSAGO, INSPECTION, OIL])
 
     expect(wrapper.findAll('h2').map((heading) => heading.text())).toEqual([
-      '2 просрочено',
-      '1 скоро',
-      '1 в порядке',
-      '1 выключено',
+      'Просрочено · 2',
+      'Скоро · 1',
+      'В порядке · 1',
+      'Выключено · 1',
     ])
     const overdue = wrapper.get('[data-testid="reminder-group-overdue"]')
     expect(overdue.findAll('article')).toHaveLength(2)

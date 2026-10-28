@@ -2,7 +2,9 @@ import type { Page } from '@playwright/test'
 import { expect, test } from './fixtures'
 import { snap } from './helpers/snap'
 
-const editSheet = (page: Page) => page.getByRole('dialog', { name: 'Изменить напоминание' })
+// Заголовок шторки — название напоминания, поэтому ищем по форме
+const editSheet = (page: Page) =>
+  page.getByRole('dialog').filter({ has: page.locator('#reminder-edit-form') })
 const reminderCard = (page: Page, title: string) =>
   page.getByRole('article').filter({ has: page.getByRole('heading', { name: title, exact: true }) })
 const remindersTab = (page: Page) =>
@@ -38,17 +40,17 @@ test('Е4: поля заполнены, «Напоминать» выключа�
 
   const sheet = await openEditSheet(page, 'Замена масла')
   await expect(sheet.getByLabel('Название')).toHaveValue('Замена масла')
-  await expect(sheet.getByLabel('Каждые', { exact: true })).toHaveValue(/^10\s000$/)
-  await expect(sheet.getByLabel('или каждые')).toHaveValue('12')
+  await expect(sheet.getByLabel('Интервал, километры')).toHaveValue(/^10\s000$/)
+  await expect(sheet.getByLabel('Интервал, месяцы')).toHaveValue('12')
   await expect(sheet.getByRole('switch', { name: 'Напоминать' })).toBeChecked()
-  await expect(sheet.getByTestId('reminder-preview')).toContainText('Следующий раз')
+  await expect(sheet.getByTestId('reminder-preview')).toContainText('Срок уже прошёл')
   await snap(page, 'reminder-edit-sheet')
 
   await sheet.getByRole('switch', { name: 'Напоминать' }).click()
   await expect(sheet.getByTestId('reminder-preview')).toContainText('Если включить')
   await snap(page, 'reminder-edit-disabled')
 
-  await sheet.getByRole('button', { name: 'Сохранить изменения' }).click()
+  await sheet.getByRole('button', { name: 'Сохранить', exact: true }).click()
 
   await expect(sheet).toBeHidden()
   await expect(page.getByText('Изменения сохранены')).toBeVisible()
@@ -63,8 +65,8 @@ test('Е4: правка названия и интервала сохраняе�
 
   const sheet = await openEditSheet(page, 'ОСАГО')
   await sheet.getByLabel('Название').fill('ОСАГО Ингосстрах')
-  await sheet.getByLabel('или каждые').fill('6')
-  await sheet.getByRole('button', { name: 'Сохранить изменения' }).click()
+  await sheet.getByLabel('Интервал, месяцы').fill('6')
+  await sheet.getByRole('button', { name: 'Сохранить', exact: true }).click()
 
   await expect(sheet).toBeHidden()
   await expect(reminderCard(page, 'ОСАГО Ингосстрах')).toContainText(/Каждые 6\sмес/)
@@ -76,7 +78,7 @@ test('Е4: пустое название не сохраняется', async ({ 
 
   const sheet = await openEditSheet(page, 'ОСАГО')
   await sheet.getByLabel('Название').fill('')
-  await sheet.getByRole('button', { name: 'Сохранить изменения' }).click()
+  await sheet.getByRole('button', { name: 'Сохранить', exact: true }).click()
 
   await expect(sheet.getByText('Укажите название')).toBeVisible()
   await expect(sheet).toBeVisible()
@@ -84,9 +86,9 @@ test('Е4: пустое название не сохраняется', async ({ 
 
 test('Е3 → Е4: «Открыть» у дубликата открывает шторку правки', async ({ page, seededCar }) => {
   await page.goto(`/cars/${seededCar.carId}/reminders`)
-  await page.getByRole('button', { name: 'Добавить напоминание' }).click()
+  await page.getByRole('button', { name: 'Добавить', exact: true }).click()
   const createSheet = page.getByRole('dialog', { name: 'Новое напоминание' })
-  await createSheet.getByRole('button', { name: 'Замена масла' }).click()
+  await createSheet.getByRole('button', { name: 'Масло' }).click()
   await createSheet.getByRole('button', { name: 'Открыть «Замена масла»' }).click()
 
   await expect(createSheet).toBeHidden()

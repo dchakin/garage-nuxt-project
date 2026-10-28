@@ -6,19 +6,17 @@
  * «Открыть «…»» из Е3 (`useReminderSheet().openExistingRequest`). Срок при сохранении считает
  * `planReminderEdit` (те же правила, что у сервера).
  */
-import { CircleAlert, Trash2 } from 'lucide-vue-next'
+import { Trash2 } from 'lucide-vue-next'
 import type { Reminder } from '@garage/shared/types'
-import { formatReminderInterval } from '@garage/shared/utils/reminderRemaining'
 import { todayIso } from '@garage/shared/utils/format'
+import { describeLastSource } from '@garage/shared/utils/reminderNextDue'
 import { initialLast, planReminderEdit } from '@garage/shared/utils/reminderEdit'
 
 const FORM_ID = 'reminder-edit-form'
-const NO_CATEGORY = ''
 
 const { isOpen, reminder, open, close, hide, restore, notifyChanged } = useReminderEditSheet()
 const { openExistingRequest, clearOpenExistingRequest } = useReminderSheet()
 const carId = computed(() => reminder.value?.carId ?? 0)
-const { categories, fetchCategories } = useCategories(carId)
 const { updateReminder, saving } = useReminders(carId)
 const { car, refreshCurrentCar } = useCurrentCar()
 const { scheduleDelete } = useDeferredDelete()
@@ -71,22 +69,22 @@ const intervalError = computed(() =>
     ? 'Укажите, как часто напоминать: по пробегу или по времени'
     : undefined,
 )
-const categoryOptions = computed(() => [
-  { value: NO_CATEGORY, label: 'Без категории' },
-  ...categories.value.map((category) => ({ value: category.id, label: category.name })),
-])
-const categoryValue = computed({
-  get: () => form.categoryId ?? NO_CATEGORY,
-  set: (value) => (form.categoryId = value === NO_CATEGORY ? null : Number(value)),
-})
 const toggleSubtitle = computed(() =>
-  reminder.value
-    ? formatReminderInterval({
-        intervalKm: form.intervalKm || null,
-        intervalMonths: form.intervalMonths || null,
-      })
-    : undefined,
+  form.isActive
+    ? 'Включено — пришлём push, когда подойдёт срок'
+    : 'Выключено — push не приходят, в счётчике не учитывается',
 )
+const lastText = computed(() => {
+  const entry = reminder.value?.lastEntry
+  return describeLastSource(
+    { date: form.lastDate || null, mileage: form.lastMileage },
+    {
+      fromJournal: !!entry && !lastTouched.value,
+      today: today.value,
+      note: entry?.description || entry?.category?.name,
+    },
+  )
+})
 
 const deleteMessage = computed(() =>
   reminder.value ? describeReminderDeletion(reminder.value) : '',
@@ -112,7 +110,6 @@ function fillForm(source: Reminder) {
 watch(isOpen, (opened) => {
   if (!opened || !reminder.value) return
   fillForm(reminder.value)
-  fetchCategories().catch(() => {})
 })
 
 // Е3 «Открыть «…»»: шторка создания закрылась и попросила показать существующее напоминание
@@ -170,7 +167,7 @@ function removeReminder() {
 </script>
 
 <template>
-  <UiSheet v-model:open="isOpen" title="Изменить напоминание">
+  <UiSheet v-model:open="isOpen" :title="reminder?.title ?? 'Изменить напоминание'">
     <form
       v-if="reminder"
       :id="FORM_ID"
@@ -184,9 +181,6 @@ function removeReminder() {
         title="Не удалось сохранить"
         :message="serverError"
       />
-      <UiCard>
-        <UiRowToggle v-model="form.isActive" title="Напоминать" :subtitle="toggleSubtitle" />
-      </UiCard>
       <UiField
         v-model="form.title"
         label="Название"
@@ -194,58 +188,43 @@ function removeReminder() {
         required
         :error="titleError"
       />
-      <div class="grid grid-cols-2 gap-x-sp-3 gap-y-sp-2">
-        <UiField v-model="form.intervalKm" type="number" label="Каждые" suffix="км" />
-        <UiField v-model="form.intervalMonths" type="number" label="или каждые" suffix="мес" />
-        <p
-          v-if="intervalError"
-          class="col-span-2 flex items-center gap-sp-1 text-sm text-danger-text"
-          role="alert"
-        >
-          <CircleAlert class="h-4 w-4 shrink-0" aria-hidden="true" />
-          {{ intervalError }}
-        </p>
-      </div>
-      <UiField v-model="categoryValue" label="Категория" :options="categoryOptions" />
-      <div class="flex flex-col gap-sp-2">
-        <p class="text-sm font-semibold text-text">Последний раз</p>
-        <div class="grid grid-cols-2 gap-x-sp-3">
-          <UiField
-            v-model="form.lastMileage"
-            type="number"
-            label="Пробег"
-            suffix="км"
-            @update:model-value="lastTouched = true"
-          />
-          <UiField
-            v-model="form.lastDate"
-            type="date"
-            label="Дата"
-            @update:model-value="lastTouched = true"
-          />
-        </div>
+      <ReminderIntervalFields
+        v-model:km="form.intervalKm"
+        v-model:months="form.intervalMonths"
+        :error="intervalError"
+      />
+      <ReminderLastRow
+        v-model:mileage="form.lastMileage"
+        v-model:date="form.lastDate"
+        :text="lastText"
+        @touched="lastTouched = true"
+      />
+      <div class="border-t border-border">
+        <UiRowToggle v-model="form.isActive" title="Напоминать" :subtitle="toggleSubtitle" />
       </div>
       <ReminderPreview
         :preview="preview"
         :today="today"
-        :label="form.isActive ? 'Следующий раз' : 'Если включить'"
+        :current-mileage="currentMileage"
+        :interval-km="form.intervalKm || null"
+        :interval-months="form.intervalMonths || null"
+        :last="{ date: form.lastDate || null, mileage: form.lastMileage }"
+        :label="form.isActive ? 'Следующее напоминание' : 'Если включить'"
       />
+      <UiButton
+        variant="danger-text"
+        class="self-center"
+        :icon="Trash2"
+        :disabled="saving"
+        @click="deleteDialogOpen = true"
+      >
+        Удалить напоминание
+      </UiButton>
     </form>
     <template #footer>
-      <div class="flex flex-col gap-sp-2">
-        <UiButton type="submit" :form="FORM_ID" class="w-full" :loading="saving">
-          {{ saving ? 'Сохраняем…' : 'Сохранить изменения' }}
-        </UiButton>
-        <UiButton
-          variant="danger-text"
-          class="w-full"
-          :icon="Trash2"
-          :disabled="saving"
-          @click="deleteDialogOpen = true"
-        >
-          Удалить напоминание
-        </UiButton>
-      </div>
+      <UiButton type="submit" :form="FORM_ID" class="w-full" :loading="saving">
+        {{ saving ? 'Сохраняем…' : 'Сохранить' }}
+      </UiButton>
     </template>
   </UiSheet>
   <UiDialog

@@ -9,6 +9,8 @@ export type ReminderTemplateChoice = ReminderTemplateId | typeof CUSTOM_REMINDER
 export interface ReminderTemplate {
   id: ReminderTemplateId
   title: string
+  /** Короткая подпись чипа (Е1/Г2): «Масло», «ГРМ» */
+  chipLabel: string
   intervalKm: number | null
   intervalMonths: number | null
   /**
@@ -23,14 +25,23 @@ export const reminderTemplates: readonly ReminderTemplate[] = [
   {
     id: 'oil',
     title: 'Замена масла',
+    chipLabel: 'Масло',
     intervalKm: 10_000,
     intervalMonths: 12,
     categoryName: 'Масло и фильтры',
   },
-  { id: 'osago', title: 'ОСАГО', intervalKm: null, intervalMonths: 12, categoryName: null },
+  {
+    id: 'osago',
+    title: 'ОСАГО',
+    chipLabel: 'ОСАГО',
+    intervalKm: null,
+    intervalMonths: 12,
+    categoryName: null,
+  },
   {
     id: 'inspection',
     title: 'Техосмотр',
+    chipLabel: 'Техосмотр',
     intervalKm: null,
     intervalMonths: 12,
     categoryName: null,
@@ -38,6 +49,7 @@ export const reminderTemplates: readonly ReminderTemplate[] = [
   {
     id: 'timing-belt',
     title: 'Замена ГРМ',
+    chipLabel: 'ГРМ',
     intervalKm: 60_000,
     intervalMonths: 60,
     categoryName: 'Двигатель',
@@ -45,6 +57,7 @@ export const reminderTemplates: readonly ReminderTemplate[] = [
   {
     id: 'tires',
     title: 'Сезонная смена шин',
+    chipLabel: 'Шины',
     intervalKm: null,
     intervalMonths: 6,
     categoryName: 'Шины',
