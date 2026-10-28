@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Шторка правки напоминания (Е4): поля как в Е1, переключатель «Напоминать» (`isActive`) и
- * «Удалить напоминание» без диалога — через `useDeferredDelete` (И3). Состояние открытия —
+ * «Удалить напоминание» после подтверждения в `UiDialog` — через `useDeferredDelete` (И3). Состояние открытия —
  * `useReminderEditSheet()`, компонент стоит в `layouts/car.vue`; шторка же подхватывает запрос
  * «Открыть «…»» из Е3 (`useReminderSheet().openExistingRequest`). Срок при сохранении считает
  * `planReminderEdit` (те же правила, что у сервера).
@@ -33,6 +33,7 @@ const form = reactive({
   lastMileage: null as number | null,
   isActive: true,
 })
+const deleteDialogOpen = ref(false)
 const lastTouched = ref(false)
 const submitted = ref(false)
 const serverError = ref('')
@@ -85,6 +86,10 @@ const toggleSubtitle = computed(() =>
         intervalMonths: form.intervalMonths || null,
       })
     : undefined,
+)
+
+const deleteMessage = computed(() =>
+  reminder.value ? describeReminderDeletion(reminder.value) : '',
 )
 
 function fillForm(source: Reminder) {
@@ -147,6 +152,7 @@ async function submit() {
 
 function removeReminder() {
   const target = reminder.value
+  deleteDialogOpen.value = false
   if (!target) return
   hide(target.id)
   close()
@@ -235,11 +241,19 @@ function removeReminder() {
           class="w-full"
           :icon="Trash2"
           :disabled="saving"
-          @click="removeReminder"
+          @click="deleteDialogOpen = true"
         >
           Удалить напоминание
         </UiButton>
       </div>
     </template>
   </UiSheet>
+  <UiDialog
+    v-model:open="deleteDialogOpen"
+    title="Удалить напоминание?"
+    :message="deleteMessage"
+    confirm-text="Удалить"
+    :icon="Trash2"
+    @confirm="removeReminder"
+  />
 </template>
