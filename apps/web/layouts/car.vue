@@ -58,7 +58,9 @@ const { open: openEntrySheet } = useEntrySheet()
 </script>
 
 <template>
-  <div class="min-h-screen bg-bg pb-[calc(76px+max(env(safe-area-inset-bottom),8px))]">
+  <div
+    class="flex min-h-screen flex-col bg-bg pb-[calc(76px+max(env(safe-area-inset-bottom),8px))]"
+  >
     <UiAppBar
       variant="car"
       class="sticky top-0 z-10"
@@ -67,7 +69,7 @@ const { open: openEntrySheet } = useEntrySheet()
       :user-name="user?.name ?? ''"
       @switch="switcherOpen = true"
     />
-    <main class="mx-auto max-w-3xl px-sp-4 pb-sp-6">
+    <main class="mx-auto flex w-full max-w-3xl flex-1 flex-col px-sp-4 pb-sp-6">
       <OfflineBanner />
       <slot />
     </main>
