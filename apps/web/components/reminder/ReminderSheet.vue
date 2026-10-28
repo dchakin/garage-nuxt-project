@@ -5,11 +5,11 @@
  * последней записи журнала с той же категорией, срок считает `previewReminderDue` — те же
  * правила, что у `POST /api/cars/[id]/reminders/bulk`, который и создаёт напоминание.
  */
-import { CircleAlert } from 'lucide-vue-next'
-import { formatDate, todayIso } from '@garage/shared/utils/format'
+import { todayIso } from '@garage/shared/utils/format'
+import { describeLastSource } from '@garage/shared/utils/reminderNextDue'
+import { describeExistingReminder } from '@garage/shared/utils/reminderRemaining'
 import { previewReminderDue } from '@garage/shared/utils/reminderPreview'
 import {
-  CUSTOM_REMINDER_CHOICE,
   findLastEntryInCategory,
   findReminderByTitle,
   reminderTemplates,
@@ -17,7 +17,6 @@ import {
 } from '@garage/shared/utils/reminderTemplates'
 
 const FORM_ID = 'reminder-sheet-form'
-const NO_CATEGORY = ''
 
 const { isOpen, options, close, notifySaved, requestOpenExisting } = useReminderSheet()
 const carId = computed(() => options.value?.carId ?? 0)
@@ -80,19 +79,20 @@ const intervalError = computed(() =>
     ? 'Укажите, как часто напоминать: по пробегу или по времени'
     : undefined,
 )
-const lastHint = computed(() =>
-  lastEntry.value
-    ? `Из записи «${lastEntry.value.description || lastEntry.value.category?.name}» от ${formatDate(lastEntry.value.date, today.value)}`
-    : 'Не знаете — оставьте пустым, считаем от сегодняшнего дня',
+const lastText = computed(() =>
+  describeLastSource(
+    { date: form.lastDate || null, mileage: form.lastMileage },
+    { fromJournal: !!lastEntry.value && !lastTouched.value, today: today.value },
+  ),
 )
-const categoryOptions = computed(() => [
-  { value: NO_CATEGORY, label: 'Без категории' },
-  ...categories.value.map((category) => ({ value: category.id, label: category.name })),
-])
-const categoryValue = computed({
-  get: () => form.categoryId ?? NO_CATEGORY,
-  set: (value) => (form.categoryId = value === NO_CATEGORY ? null : Number(value)),
-})
+const duplicateText = computed(() =>
+  duplicate.value
+    ? describeExistingReminder(duplicate.value, {
+        currentMileage: currentMileage.value,
+        today: today.value,
+      })
+    : '',
+)
 
 /** Подставляет «Последний раз» из последней записи категории (нет записи — пусто) */
 function applyLastEntry() {
@@ -189,10 +189,7 @@ onBeforeUnmount(close)
 </script>
 
 <template>
-  <UiSheet
-    v-model:open="isOpen"
-    :title="choice === CUSTOM_REMINDER_CHOICE ? 'Своё напоминание' : 'Новое напоминание'"
-  >
+  <UiSheet v-model:open="isOpen" title="Новое напоминание">
     <form :id="FORM_ID" class="flex flex-col gap-sp-4 pb-sp-2" novalidate @submit.prevent="submit">
       <UiAlert
         v-if="serverError"
@@ -205,17 +202,12 @@ onBeforeUnmount(close)
         Выберите шаблон или создайте своё напоминание: подскажем срок по интервалу.
       </p>
 
-      <UiAlert v-if="duplicate" variant="info" :title="`${duplicate.title} уже есть`">
-        <p>Такое напоминание у этой машины уже создано.</p>
-        <template #actions>
-          <UiButton variant="secondary" size="sm" @click="requestOpenExisting(duplicate)">
-            Открыть «{{ duplicate.title }}»
-          </UiButton>
-          <UiButton variant="text" size="sm" @click="duplicateAcknowledged = true">
-            Всё равно создать ещё одно
-          </UiButton>
-        </template>
-      </UiAlert>
+      <template v-if="duplicate">
+        <UiAlert variant="info" :title="`${duplicate.title} уже есть`" :message="duplicateText" />
+        <UiButton variant="text" class="self-center" @click="duplicateAcknowledged = true">
+          Всё равно создать ещё одно
+        </UiButton>
+      </template>
 
       <template v-else-if="choice">
         <UiField
@@ -225,48 +217,38 @@ onBeforeUnmount(close)
           required
           :error="titleError"
         />
-        <div class="grid grid-cols-2 gap-x-sp-3 gap-y-sp-2">
-          <UiField v-model="form.intervalKm" type="number" label="Каждые" suffix="км" />
-          <UiField v-model="form.intervalMonths" type="number" label="или каждые" suffix="мес" />
-          <p
-            v-if="intervalError"
-            class="col-span-2 flex items-center gap-sp-1 text-sm text-danger-text"
-            role="alert"
-          >
-            <CircleAlert class="h-4 w-4 shrink-0" aria-hidden="true" />
-            {{ intervalError }}
-          </p>
-        </div>
-        <UiField v-model="categoryValue" label="Категория" :options="categoryOptions" />
-        <div class="flex flex-col gap-sp-2">
-          <p class="text-sm font-semibold text-text">Последний раз</p>
-          <div class="grid grid-cols-2 gap-x-sp-3">
-            <UiField
-              v-model="form.lastMileage"
-              type="number"
-              label="Пробег"
-              suffix="км"
-              @update:model-value="lastTouched = true"
-            />
-            <UiField
-              v-model="form.lastDate"
-              type="date"
-              label="Дата"
-              @update:model-value="lastTouched = true"
-            />
-          </div>
-          <p class="text-sm text-text-2" data-testid="reminder-last-hint">{{ lastHint }}</p>
-        </div>
-        <ReminderPreview :preview="preview" :today="today" />
+        <ReminderIntervalFields
+          v-model:km="form.intervalKm"
+          v-model:months="form.intervalMonths"
+          :error="intervalError"
+        />
+        <ReminderLastRow
+          v-model:mileage="form.lastMileage"
+          v-model:date="form.lastDate"
+          :text="lastText"
+          @touched="lastTouched = true"
+        />
+        <ReminderPreview
+          :preview="preview"
+          :today="today"
+          :current-mileage="currentMileage"
+          :interval-km="form.intervalKm || null"
+          :interval-months="form.intervalMonths || null"
+          :last="{ date: form.lastDate || null, mileage: form.lastMileage }"
+        />
       </template>
     </form>
     <template #footer>
+      <UiButton v-if="duplicate" class="w-full" @click="requestOpenExisting(duplicate)">
+        Открыть «{{ duplicate.title }}»
+      </UiButton>
       <UiButton
+        v-else
         type="submit"
         :form="FORM_ID"
         class="w-full"
         :loading="saving"
-        :disabled="!choice || !!duplicate"
+        :disabled="!choice"
       >
         {{ saving ? 'Создаём…' : 'Создать напоминание' }}
       </UiButton>

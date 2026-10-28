@@ -1,39 +1,82 @@
 <script setup lang="ts">
 /**
- * Предпросмотр срока нового напоминания (Е1/Е2): «Следующий раз — на 97 450 км или 12 сент 2027».
- * Срок уже позади — `UiAlert` «Срок уже прошёл».
+ * Предпросмотр срока напоминания (Е1/Е2/Е4) одним `UiAlert`: info «Следующее напоминание» /
+ * «Если включить» (выключенное, Е4) или warning «Срок уже прошёл» с полным объяснением.
  */
 import { computed } from 'vue'
+import { CalendarClock } from 'lucide-vue-next'
+import { formatDate, formatMileage } from '@garage/shared/utils/format'
+import { describeLastPoint, describeUpcomingDue } from '@garage/shared/utils/reminderNextDue'
 import type { ReminderPreview } from '@garage/shared/utils/reminderPreview'
-import { describeNextDue } from '@garage/shared/utils/reminderNextDue'
+import { getReminderRemaining } from '@garage/shared/utils/reminderRemaining'
 import UiAlert from '~/components/ui/Alert.vue'
 
 const props = withDefaults(
   defineProps<{
     preview: ReminderPreview | null
+    currentMileage: number
+    intervalKm: number | null
+    intervalMonths: number | null
+    /** «Последний раз» из формы: пустые значения — отсчёт с сегодня */
+    last: { date: string | null; mileage: number | null }
     today?: string
-    /** Подпись над сроком: у выключенного напоминания (Е4) — «Если включить» */
+    /** Заголовок обычного (не просроченного) предпросмотра: у выключенного (Е4) — «Если включить» */
     label?: string
   }>(),
-  { today: undefined, label: 'Следующий раз' },
+  { today: undefined, label: 'Следующее напоминание' },
 )
 
-const dueText = computed(() => (props.preview ? describeNextDue(props.preview, props.today) : null))
+const EMPTY_TEXT = 'Заполните км или месяцы — покажем, когда сработает.'
+
+const lastPoint = computed(() => describeLastPoint(props.last, props.today))
+
+/** «От 14 фев · 77 200 км срок был на 87 200 км — просрочено на 250 км. …» */
+const overdueText = computed(() => {
+  if (!props.preview?.isOverdue) return ''
+  const { nextDueDate, nextDueMileage } = props.preview
+  const remaining = getReminderRemaining(
+    { isActive: true, nextDueDate, nextDueMileage, intervalKm: props.intervalKm },
+    { currentMileage: props.currentMileage, today: props.today },
+  )
+  const dueAt =
+    remaining.dimension === 'mileage' && nextDueMileage != null
+      ? `на ${formatMileage(nextDueMileage)}`
+      : nextDueDate
+        ? formatDate(nextDueDate, props.today)
+        : ''
+  const was = lastPoint.value ? `От ${lastPoint.value} срок был` : 'Срок был'
+  return `${was} ${dueAt} — просрочено ${remaining.detail}. Напоминание сразу появится в «Требует внимания».`
+})
+
+const upcomingText = computed(() =>
+  props.preview
+    ? describeUpcomingDue(
+        {
+          nextDue: props.preview,
+          intervalKm: props.intervalKm,
+          intervalMonths: props.intervalMonths,
+          last: props.last,
+        },
+        props.today,
+      )
+    : null,
+)
 </script>
 
 <template>
-  <div class="flex flex-col gap-sp-3" data-testid="reminder-preview">
-    <div class="rounded-md bg-surface-2 px-sp-4 py-sp-3">
-      <p class="text-sm text-text-2">{{ label }}</p>
-      <p class="mt-0.5 text-h3 text-text">
-        {{ dueText ?? 'Укажите интервал — покажем срок' }}
-      </p>
-    </div>
+  <div data-testid="reminder-preview">
     <UiAlert
       v-if="preview?.isOverdue"
       variant="warning"
       title="Срок уже прошёл"
-      message="Напоминание сразу окажется в «Просрочено». Отметьте «Сделал», когда выполните."
+      :message="overdueText"
+    />
+    <UiAlert
+      v-else
+      variant="info"
+      :icon="CalendarClock"
+      :title="label"
+      :message="upcomingText ?? EMPTY_TEXT"
     />
   </div>
 </template>
