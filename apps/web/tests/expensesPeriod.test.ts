@@ -106,12 +106,25 @@ describe('buildExpensesChart', () => {
     total: index === 4 ? 48600 : index === 9 ? 1200 : 0,
   }))
 
-  it('год: 12 столбцов, акцент — текущий месяц, сумма — над пиком', () => {
+  it('год: от первого месяца с тратой до текущего, акцент — текущий, сумма — над пиком', () => {
     const chart = buildExpensesChart({ byMonth }, YEAR_2026, TODAY)
-    expect(chart.bars).toHaveLength(12)
-    expect(chart.bars[4]).toEqual({ label: 'май', value: 48600 })
-    expect(chart.currentIndex).toBe(9)
-    expect(chart.valueIndex).toBe(4)
+    expect(chart.bars.map(({ label }) => label)).toEqual(['май', 'июн', 'июл', 'авг', 'сен', 'окт'])
+    expect(chart.bars[0]).toEqual({ label: 'май', value: 48600 })
+    expect(chart.currentIndex).toBe(5)
+    expect(chart.valueIndex).toBe(0)
+  })
+
+  it('год: будущие месяцы текущего года не рисуются, прошлый год — до декабря', () => {
+    const chart = buildExpensesChart({ byMonth }, YEAR_2026, '2026-07-10')
+    expect(chart.bars.map(({ label }) => label)).toEqual(['май', 'июн', 'июл'])
+    const past = buildExpensesChart({ byMonth }, { period: 'year', date: '2026' }, '2027-02-01')
+    expect(past.bars).toHaveLength(8)
+    expect(past.currentIndex).toBeNull()
+  })
+
+  it('год без трат: месяцы до текущего без обрезки начала', () => {
+    const empty = byMonth.map(({ month }) => ({ month, total: 0 }))
+    expect(buildExpensesChart({ byMonth: empty }, YEAR_2026, TODAY).bars).toHaveLength(10)
   })
 
   it('прошлый год: без акцентного столбца', () => {
@@ -122,8 +135,8 @@ describe('buildExpensesChart', () => {
 
   it('месяц: акцент и сумма — выбранный месяц', () => {
     const chart = buildExpensesChart({ byMonth }, { period: 'month', date: '2026-05' }, TODAY)
-    expect(chart.currentIndex).toBe(4)
-    expect(chart.valueIndex).toBe(4)
+    expect(chart.currentIndex).toBe(0)
+    expect(chart.valueIndex).toBe(0)
   })
 
   it('«Всё время» суммирует месяцы по годам', () => {
