@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { Gauge } from 'lucide-vue-next'
 import { formatNumber } from '@garage/shared/utils/format'
 import { formatMileageAge } from '~/utils/mileageAge'
 import UiButton from '~/components/ui/Button.vue'
@@ -32,7 +33,7 @@ const age = computed(() => formatMileageAge(props.updatedAt, props.today))
         </p>
         <p v-if="age" class="mt-sp-1 text-sm text-text-2">{{ age }}</p>
       </div>
-      <UiButton variant="secondary" size="sm" class="shrink-0" @click="$emit('update')">
+      <UiButton variant="tonal" size="sm" :icon="Gauge" class="shrink-0" @click="$emit('update')">
         Обновить
       </UiButton>
     </div>

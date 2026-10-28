@@ -65,6 +65,13 @@ describe('UiReminderCard', () => {
     expect(wrapper.findAll('button').map((button) => button.text())).toContain('Сделал')
   })
 
+  it('ОСАГО: подсказка у «Сделал» — «Продлите полис до …», у остальных — «Срок — …»', () => {
+    expect(mountCard(OSAGO).text()).toContain(nb('Продлите полис до 18 окт'))
+    expect(mountCard(OSAGO).text()).not.toContain('Срок —')
+    const soonOil = { ...OIL, nextDueMileage: 88_000 }
+    expect(mountCard(soonOil).text()).toContain(nb('Срок — 88 000 км'))
+  })
+
   it('в порядке — без кнопки «Сделал», с оценкой в месяцах', () => {
     const wrapper = mountCard(TIMING_BELT)
     expect(wrapper.text()).toContain(nb('Через 12 550 км, ≈ 10 мес'))

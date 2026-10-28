@@ -11,6 +11,9 @@ import { reminderStatusStyles } from '~/utils/reminderStatusStyles'
 import UiButton from './Button.vue'
 import UiProgress from './Progress.vue'
 
+/** ОСАГО: подсказка «Продлите полис до …» вместо общего «Срок — …» (шаблон по названию) */
+const POLICY_TITLE = /осаго/i
+
 /**
  * Карточка напоминания: список напоминаний и «Требует внимания» на Обзоре. Статус и остаток
  * считает сама (`getReminderRemaining`). Вся карточка открывает напоминание (`open`), кнопка
@@ -54,6 +57,9 @@ const hint = computed(() => {
         ? formatDate(nextDueDate, props.today)
         : null
   if (!due) return null
+  if (status !== 'overdue' && dimension === 'date' && POLICY_TITLE.test(props.reminder.title)) {
+    return `Продлите полис до ${due}`
+  }
   return status === 'overdue' ? `Срок был ${due}` : `Срок — ${due}`
 })
 </script>
