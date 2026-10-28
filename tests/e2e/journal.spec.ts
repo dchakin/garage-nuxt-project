@@ -187,3 +187,25 @@ test('Журнал (В6): ошибка загрузки и «Повторить�
   await expect(groupedRows(page)).toHaveCount(CAMRY_ENTRIES_COUNT)
   await expect(page.getByRole('heading', { name: 'Не удалось загрузить журнал' })).toHaveCount(0)
 })
+
+test('Журнал: под чипами нет горизонтальной полосы прокрутки, лента листается', async ({
+  page,
+  seededCar,
+}) => {
+  await page.goto(`/cars/${seededCar.carId}/journal`)
+  const chips = page.getByRole('group', { name: 'Тип записи' })
+  await expect(chips).toBeVisible()
+
+  const metrics = await chips.evaluate((element) => ({
+    scrollbarHeight: (element as HTMLElement).offsetHeight - element.clientHeight,
+    scrollbarWidthStyle: getComputedStyle(element).scrollbarWidth,
+    scrollable: element.scrollWidth > element.clientWidth,
+  }))
+  expect(metrics.scrollbarWidthStyle).toBe('none')
+  expect(metrics.scrollbarHeight).toBe(0)
+  expect(metrics.scrollable).toBe(true)
+
+  await chips.evaluate((element) => element.scrollTo({ left: element.scrollWidth }))
+  await expect.poll(() => chips.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0)
+  await snap(page, 'journal-chips-no-scrollbar')
+})
