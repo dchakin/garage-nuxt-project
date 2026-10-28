@@ -8,7 +8,8 @@ import UiTypeBadge from './TypeBadge.vue'
 /**
  * Единая строка записи (журнал, «Последние записи», поиск). Вся строка нажимается → `open`,
  * своих кнопок нет. Заголовок = описание → категория → тип; мета = дата · пробег · место
- * (пустые части пропускаются).
+ * (пустые части пропускаются). Длинный заголовок переносится на вторую строку (`line-clamp-2`),
+ * а не обрезается многоточием.
  */
 const props = defineProps<{
   entry: Pick<Entry, 'date' | 'type' | 'category' | 'description' | 'mileage' | 'cost' | 'place'>
@@ -45,7 +46,7 @@ const meta = computed(() =>
     <UiTypeBadge :type="entry.type" />
     <span class="flex min-w-0 flex-1 flex-col gap-0.5">
       <span class="flex items-baseline gap-sp-2 text-body font-semibold text-text">
-        <span class="min-w-0 flex-1 truncate">{{ title }}</span>
+        <span class="min-w-0 flex-1 line-clamp-2" data-testid="row-entry-title">{{ title }}</span>
         <span class="shrink-0 whitespace-nowrap">{{ amount }}</span>
       </span>
       <span class="truncate text-sm text-text-2">{{ meta }}</span>

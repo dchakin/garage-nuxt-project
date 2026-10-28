@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
-export const entryTypes = ['repair', 'replacement', 'purchase', 'maintenance', 'other'] as const
+/** Порядок — как в макете (ТО, Ремонт, Замена, Покупка, Прочее): по нему строятся чипы и плитки типа */
+export const entryTypes = ['maintenance', 'repair', 'replacement', 'purchase', 'other'] as const
 export type EntryType = (typeof entryTypes)[number]
 
 export const entryTypeLabels: Record<EntryType, string> = {
