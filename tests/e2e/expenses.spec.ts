@@ -26,7 +26,7 @@ test('Расходы (Ж1): год 2026 совпадает с эталоном',
 
   await expect(page.getByTestId('expenses-total')).toHaveText(/^88\s500\s₽$/)
   const metrics = page.getByTestId('expenses-metrics')
-  await expect(metrics).toContainText(/Стоимость километра\s*8,6\s₽$/)
+  await expect(metrics).toContainText(/Стоимость километра\s*8,6\s₽(?!\/км)/)
   await expect(metrics).toContainText(/Средняя запись\s*11\s060\s₽/)
   await expect(metrics).toContainText(/Больше всего в мае\s*48\s600\s₽/)
   await expect(metrics).not.toContainText('В среднем')
