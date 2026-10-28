@@ -26,10 +26,13 @@ test('Расходы (Ж1): год 2026 совпадает с эталоном',
 
   await expect(page.getByTestId('expenses-total')).toHaveText(/^88\s500\s₽$/)
   const metrics = page.getByTestId('expenses-metrics')
-  await expect(metrics).toContainText(/В среднем в месяц\s*9\s800\s₽/)
-  await expect(metrics).toContainText(/Стоимость километра\s*8,6\s₽\/км/)
+  await expect(metrics).toContainText(/Стоимость километра\s*8,6\s₽$/)
   await expect(metrics).toContainText(/Средняя запись\s*11\s060\s₽/)
   await expect(metrics).toContainText(/Больше всего в мае\s*48\s600\s₽/)
+  await expect(metrics).not.toContainText('В среднем')
+  await expect(page.getByText('Потрачено')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'По месяцам' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'По категориям' })).toBeVisible()
 
   const categories = page.getByTestId('expenses-categories').getByRole('listitem')
   await expect(categories).toHaveCount(6)
@@ -41,6 +44,11 @@ test('Расходы (Ж1): год 2026 совпадает с эталоном',
 
   const canvas = page.getByTestId('expenses-chart').locator('canvas')
   await expect.poll(() => canvas.evaluate(countBarPixels)).toBeGreaterThan(MIN_BAR_PIXELS)
+  // Ось — месяцы от первой траты (фев) до текущего (окт), без пустых будущих
+  const chartMonths = page.getByTestId('expenses-chart').getByRole('listitem')
+  await expect(chartMonths).toHaveCount(9)
+  await expect(chartMonths.first()).toContainText('фев')
+  await expect(chartMonths.last()).toContainText('окт')
 
   await snap(page, 'expenses')
 })
@@ -53,8 +61,8 @@ test('Расходы: «Месяц», листание ‹ › и «Всё вр�
   await expect(page.getByText('Октябрь 2026', { exact: true })).toBeVisible()
   await expect(page.getByTestId('expenses-total')).toHaveText(/^1\s200\s₽$/)
   await expect(page.getByRole('button', { name: NEXT_PERIOD })).toBeDisabled()
-  // В месяце нет «в среднем в месяц» и «Больше всего»
-  await expect(page.getByTestId('expenses-metrics')).not.toContainText('В среднем')
+  // В месяце нет «Больше всего»
+  await expect(page.getByTestId('expenses-metrics')).not.toContainText('Больше всего')
 
   await page.getByRole('button', { name: PREV_PERIOD }).click()
   await expect(page.getByText('Сентябрь 2026', { exact: true })).toBeVisible()
@@ -69,7 +77,7 @@ test('Расходы: «Месяц», листание ‹ › и «Всё вр�
   await page.getByRole('radio', { name: 'Всё время' }).click()
   await expect(page.getByRole('button', { name: PREV_PERIOD })).toHaveCount(0)
   await expect(page.getByTestId('expenses-total')).toHaveText(/^88\s500\s₽$/)
-  await expect(page.getByRole('heading', { name: 'Расходы по годам' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'По годам' })).toBeVisible()
 })
 
 test('Расходы (Ж3): месяц без трат и переход «К июню»', async ({ page, seededCar }) => {
@@ -85,7 +93,9 @@ test('Расходы (Ж3): месяц без трат и переход «К и
   const empty = page.getByTestId('expenses-empty-period')
   await expect(empty.getByRole('heading', { name: 'В июле трат не было' })).toBeVisible()
   await expect(empty).toContainText(/Ближайшие траты — 7\s500\s₽ в июне и 9\s900\s₽ в августе/)
-  await expect(page.getByTestId('expenses-total')).toHaveCount(0)
+  // Под переключателем — «0 ₽», графиков и метрик нет, пустое состояние без карточки
+  await expect(page.getByTestId('expenses-total')).toHaveText(/^0\s₽$/)
+  await expect(page.getByTestId('expenses-metrics')).toHaveCount(0)
   await expect(page.getByTestId('expenses-chart')).toHaveCount(0)
   // Segmented и переключатель остаются: из Ж3 можно листать
   await expect(page.getByRole('radio', { name: 'Месяц' })).toBeChecked()
@@ -101,7 +111,13 @@ test('Расходы (Ж3): месяц без трат и переход «К и
 test('Расходы (Ж2): у машины нет трат — без переключателя периода', async ({ page, seededCar }) => {
   await page.goto(`/cars/${seededCar.carIds.rio}/expenses`)
 
-  await expect(page.getByRole('heading', { name: 'Пока нет трат' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Расходы', level: 1 })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Пока нечего считать' })).toBeVisible()
+  await expect(
+    page.getByText(
+      'Добавьте записи со стоимостью — здесь появятся итоги, графики и стоимость километра.',
+    ),
+  ).toBeVisible()
   await expect(page.getByRole('radiogroup', { name: 'Период' })).toHaveCount(0)
   await expect(page.getByRole('button', { name: PREV_PERIOD })).toHaveCount(0)
   await snap(page, 'expenses-empty')
