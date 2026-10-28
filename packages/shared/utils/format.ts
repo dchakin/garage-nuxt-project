@@ -71,10 +71,14 @@ const MONTHS_FULL = [
   'Декабрь',
 ] as const
 
-/** `'2026-09'` (или полная дата) → `Сентябрь 2026` — заголовок месяца в журнале. */
-export function formatMonthYear(month: string): string {
+/**
+ * `'2026-09'` (или полная дата) → `Сентябрь 2026` — заголовок месяца в журнале. С `today` год
+ * опускается, если это год `today` (`Сентябрь`).
+ */
+export function formatMonthYear(month: string, today?: string): string {
   const [year, monthNumber] = month.slice(0, 7).split('-').map(Number)
-  return `${MONTHS_FULL[monthNumber - 1]} ${year}`
+  const name = MONTHS_FULL[monthNumber - 1]
+  return today && String(year) === today.slice(0, 4) ? name : `${name} ${year}`
 }
 
 /** Время в локальном поясе без ведущего нуля у часов: `9:12`, `14:05`. */

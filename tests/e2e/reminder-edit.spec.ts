@@ -96,6 +96,38 @@ test('Е3 → Е4: «Открыть» у дубликата открывает �
   await expect(editSheet(page).getByLabel('Название')).toHaveValue('Замена масла')
 })
 
+/** «Удалить напоминание» → диалог подтверждения → «Удалить» */
+async function deleteReminderConfirmed(page: Page, sheet: ReturnType<typeof editSheet>) {
+  await sheet.getByRole('button', { name: 'Удалить напоминание' }).click()
+  const dialog = page.getByRole('alertdialog', { name: 'Удалить напоминание?' })
+  await expect(dialog).toBeVisible()
+  await dialog.getByRole('button', { name: 'Удалить', exact: true }).click()
+}
+
+test('Е4: «Удалить напоминание» просит подтверждения, «Отмена» ничего не меняет', async ({
+  page,
+  seededCar,
+}) => {
+  const deletes = trackDeleteRequests(page)
+  await page.goto(`/cars/${seededCar.carId}/reminders`)
+
+  const sheet = await openEditSheet(page, 'ОСАГО')
+  await sheet.getByRole('button', { name: 'Удалить напоминание' }).click()
+
+  const dialog = page.getByRole('alertdialog', { name: 'Удалить напоминание?' })
+  await expect(dialog).toBeVisible()
+  await expect(dialog).toContainText('ОСАГО')
+  await snap(page, 'reminder-delete-dialog')
+
+  await dialog.getByRole('button', { name: 'Отмена' }).click()
+  await expect(dialog).toBeHidden()
+  await expect(sheet).toBeVisible()
+  await expect(page.getByText('Напоминание удалено')).toHaveCount(0)
+
+  await page.waitForTimeout(AFTER_DELETE_DELAY_MS)
+  expect(deletes).toHaveLength(0)
+})
+
 test('И3: удаление и «Отменить» — напоминание возвращается, DELETE не уходит', async ({
   page,
   seededCar,
@@ -105,9 +137,9 @@ test('И3: удаление и «Отменить» — напоминание �
   await expect(page.getByRole('article')).toHaveCount(5)
 
   const sheet = await openEditSheet(page, 'ОСАГО')
-  await sheet.getByRole('button', { name: 'Удалить напоминание' }).click()
+  await deleteReminderConfirmed(page, sheet)
 
-  // Без диалога: напоминание сразу пропало, внизу toast с «Отменить»
+  // После подтверждения напоминание сразу пропало, внизу toast с «Отменить»
   await expect(page.getByRole('alertdialog')).toHaveCount(0)
   await expect(sheet).toBeHidden()
   await expect(page.getByText('Напоминание удалено')).toBeVisible()
@@ -128,7 +160,7 @@ test('И3: удаление без «Отменить» доходит до се
   await page.goto(`/cars/${seededCar.carId}/reminders`)
 
   const sheet = await openEditSheet(page, 'ОСАГО')
-  await sheet.getByRole('button', { name: 'Удалить напоминание' }).click()
+  await deleteReminderConfirmed(page, sheet)
   await expect(reminderCard(page, 'ОСАГО')).toHaveCount(0)
   expect(deletes).toHaveLength(0)
 

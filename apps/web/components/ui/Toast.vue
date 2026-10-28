@@ -8,7 +8,10 @@ import { ref, watch } from 'vue'
 import { CircleCheck } from 'lucide-vue-next'
 import { useToast } from '~/composables/useToast'
 
-const { current, pause, resume, runAction } = useToast()
+const { current, paused, pause, resume, runAction } = useToast()
+
+/** Длина окружности кольца отсчёта задана через `pathLength="1"`, поэтому штрих = доля 0…1 */
+const MS_PER_SECOND = 1000
 
 const replacing = ref(false)
 watch(current, (next, previous) => {
@@ -50,6 +53,26 @@ watch(current, (next, previous) => {
         <p class="min-w-0 flex-1 py-sp-2 text-body font-medium text-on-inverse">
           {{ current.message }}
         </p>
+        <svg
+          v-if="current.action"
+          class="toast-countdown h-6 w-6 shrink-0 -rotate-90 text-inverse-accent"
+          :class="{ 'toast-countdown-paused': paused }"
+          :style="{
+            '--toast-countdown-duration': `${current.duration}ms`,
+            '--toast-countdown-steps': Math.max(1, Math.ceil(current.duration / MS_PER_SECOND)),
+          }"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          aria-hidden="true"
+          data-testid="toast-countdown"
+          :data-paused="paused"
+        >
+          <circle cx="12" cy="12" r="9" class="opacity-25" />
+          <circle cx="12" cy="12" r="9" pathLength="1" class="toast-countdown-arc" />
+        </svg>
         <button
           v-if="current.action"
           type="button"

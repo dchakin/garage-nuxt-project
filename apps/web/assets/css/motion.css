@@ -85,6 +85,22 @@
   transform: translateY(8px);
 }
 
+/* Кольцо отсчёта у «Отменить»: дуга убывает за время toast (длительность — --toast-countdown-duration),
+   на паузе таймера замирает (класс toast-countdown-paused) */
+.toast-countdown-arc {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: toast-countdown var(--toast-countdown-duration, 5000ms) linear forwards;
+}
+.toast-countdown-paused .toast-countdown-arc {
+  animation-play-state: paused;
+}
+@keyframes toast-countdown {
+  to {
+    stroke-dashoffset: 1;
+  }
+}
+
 /* Раскрытие секции / офлайн-плашка: высота 0 → auto и обратно (хуки utils/collapseTransition.ts),
    содержимое проявляется за dur-fast; скрытие — 140 exit */
 .collapse-enter-active {
@@ -120,6 +136,10 @@
   .toast-enter-from,
   .toast-leave-to {
     transform: none;
+  }
+  /* Кольцо отсчёта — упрощённо: дуга убывает не плавно, а раз в секунду */
+  .toast-countdown-arc {
+    animation-timing-function: steps(var(--toast-countdown-steps, 5), end);
   }
   /* Раскрытие — сразу, без анимации высоты */
   .collapse-enter-active,

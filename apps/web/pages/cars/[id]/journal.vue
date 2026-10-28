@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { NotebookPen, SearchX, TriangleAlert } from 'lucide-vue-next'
+import { ArrowUpDown, NotebookPen, Plus, RefreshCw, SearchX, TriangleAlert } from 'lucide-vue-next'
 import type { EntryFilterInput, EntryType } from '@garage/shared/schemas/entry'
 import { todayIso } from '@garage/shared/utils/format'
 import { groupEntriesByMonth } from '@garage/shared/utils/groupEntries'
+import { describeJournalSummary } from '~/utils/journalSummary'
 
-// Журнал (В1–В6, Т2): записи по месяцам, чипы типов, поиск, порядок «по дате / по пробегу»
+// Журнал (В1–В7, Т2): записи по месяцам, чипы типов, поиск, порядок «по дате / по пробегу»
 definePageMeta({ middleware: 'auth', layout: 'car' })
 
 /** Скелетон показываем, только если данные идут дольше этого, мс (иначе мелькает на быстрой сети) */
@@ -15,7 +16,7 @@ const SEARCH_DEBOUNCE_MS = 300
 const route = useRoute()
 const carId = computed(() => Number(route.params.id))
 const { entries: loadedEntries, fetchEntries } = useEntries(carId)
-const { savedCount } = useEntrySheet()
+const { savedCount, open: openEntrySheet } = useEntrySheet()
 const { open: openEntryDetail, hiddenIds, changedCount } = useEntryDetailSheet()
 /** Запись, удаляемая с «Отменить», пропадает из списка сразу, до запроса на сервер */
 const entries = computed(() =>
@@ -42,6 +43,8 @@ const query = computed<Partial<EntryFilterInput>>(() => ({
 const hasFilters = computed(() => Boolean(query.value.type || query.value.search))
 /** Были ли фильтры у запроса, чей ответ сейчас в `entries`: пустой список относится к нему, а не к текущим чипам */
 const loadedWithFilters = ref(false)
+/** Поисковый запрос того же ответа — для заголовка «Ничего не нашли по «…»» */
+const loadedSearch = ref('')
 const loaded = computed(() => loadedCarId.value === carId.value && !failed.value)
 const journalEmpty = computed(
   () => loaded.value && !entries.value.length && !loadedWithFilters.value,
@@ -51,6 +54,17 @@ const nothingFound = computed(
 )
 /** При сортировке по пробегу месяцев нет — один плоский список */
 const groups = computed(() => (sortBy.value === 'date' ? groupEntriesByMonth(entries.value) : []))
+const summary = computed(() => describeJournalSummary(entries.value, loadedWithFilters.value))
+const sortLabel = computed(
+  () => `Сортировка: ${sortBy.value === 'date' ? 'по дате' : 'по пробегу'}`,
+)
+const notFoundTitle = computed(() =>
+  loadedSearch.value ? `Ничего не нашли по «${loadedSearch.value}»` : 'Ничего не нашли',
+)
+
+function toggleSort() {
+  sortBy.value = sortBy.value === 'date' ? 'mileage' : 'date'
+}
 
 let skeletonTimer: ReturnType<typeof setTimeout> | undefined
 let searchTimer: ReturnType<typeof setTimeout> | undefined
@@ -64,11 +78,13 @@ async function load() {
   clearTimeout(skeletonTimer)
   skeletonTimer = setTimeout(() => (skeletonVisible.value = true), SKELETON_DELAY_MS)
   const requestHasFilters = hasFilters.value
+  const requestSearch = query.value.search ?? ''
   try {
     await fetchEntries(query.value)
     if (token === loadToken) {
       loadedCarId.value = carId.value
       loadedWithFilters.value = requestHasFilters
+      loadedSearch.value = requestSearch
     }
   } catch {
     // Уже показанные записи этой машины остаются (нет сети — плашка в layout), не экран ошибки
@@ -101,50 +117,66 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-sp-4 pt-sp-2" :aria-busy="loading">
-    <h1 class="sr-only">Журнал</h1>
+  <div class="flex flex-1 flex-col gap-sp-4 pt-sp-2" :aria-busy="loading">
+    <div class="flex items-center justify-between gap-sp-3">
+      <h1 class="text-h1 text-text">Журнал</h1>
+      <UiIconButton
+        v-if="!journalEmpty && !failed"
+        :icon="ArrowUpDown"
+        :label="sortLabel"
+        variant="filled"
+        :aria-pressed="sortBy === 'mileage'"
+        data-testid="journal-sort"
+        @click="toggleSort"
+      />
+    </div>
 
     <JournalFilters
       v-if="!journalEmpty && !failed"
       v-model:type="type"
       v-model:search="searchInput"
-      v-model:sort-by="sortBy"
     />
 
-    <UiCard v-if="failed" tag="section">
+    <section v-if="failed" class="flex flex-1 items-center justify-center">
       <UiEmptyState
         :icon="TriangleAlert"
         tone="danger"
         title="Не удалось загрузить журнал"
-        message="Проверьте соединение и попробуйте ещё раз."
+        message="Сервер не ответил. Ваши записи в безопасности — попробуйте ещё раз через минуту."
       >
         <template #action>
-          <UiButton variant="secondary" @click="load">Повторить</UiButton>
+          <UiButton :icon="RefreshCw" @click="load">Повторить</UiButton>
         </template>
       </UiEmptyState>
-    </UiCard>
+    </section>
 
-    <UiCard v-else-if="journalEmpty" tag="section">
+    <section v-else-if="journalEmpty" class="flex flex-1 items-center justify-center">
       <UiEmptyState
         :icon="NotebookPen"
         title="Записей пока нет"
-        message="Добавьте первую запись кнопкой «＋» внизу — здесь появится история обслуживания и трат."
-      />
-    </UiCard>
-
-    <UiCard v-else-if="nothingFound" tag="section">
-      <UiEmptyState
-        :icon="SearchX"
-        title="Ничего не найдено"
-        message="Попробуйте изменить запрос или сбросить фильтры."
+        message="Записывайте ТО, ремонты и покупки — здесь появится история машины с итогами по месяцам. Поиск и фильтры появятся, когда будет что искать."
       >
         <template #action>
-          <UiButton variant="secondary" @click="resetFilters">Сбросить</UiButton>
+          <UiButton :icon="Plus" @click="openEntrySheet({ carId })">Добавить запись</UiButton>
         </template>
       </UiEmptyState>
-    </UiCard>
+    </section>
+
+    <section v-else-if="nothingFound" class="flex flex-1 flex-col items-center gap-sp-4">
+      <div class="flex flex-1 items-center">
+        <UiEmptyState
+          :icon="SearchX"
+          :title="notFoundTitle"
+          message="Ищем по описанию, месту и категории. Попробуйте другое слово или сбросьте фильтр."
+        />
+      </div>
+      <UiButton variant="secondary" @click="resetFilters">
+        {{ loadedSearch ? 'Сбросить поиск' : 'Сбросить фильтр' }}
+      </UiButton>
+    </section>
 
     <template v-else-if="loaded">
+      <p class="px-sp-1 text-sm text-text-2" data-testid="journal-summary">{{ summary }}</p>
       <JournalMonthGroup
         v-for="group in groups"
         :key="group.month"

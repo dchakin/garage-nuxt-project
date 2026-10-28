@@ -40,6 +40,14 @@
 }
 
 @layer components {
+  /* Прокрутка остаётся (свайп/колесо), полосы нет — ни при монтировании, ни при прокрутке. */
+  .scrollbar-hidden {
+    scrollbar-width: none;
+  }
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+
   .card {
     @apply bg-surface border border-border rounded-lg;
   }
